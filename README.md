@@ -82,16 +82,56 @@ cp -R last-price-agent-skills/skills/* .cursor/skills/
 **VS Code (GitHub Copilot agent mode)**
 
 ```bash
-code --add-mcp '{"name":"lastprice","type":"http","url":"https://api.last-price.ai/api/mcp/rpc"}'
+code --add-mcp '{"name":"lastprice","type":"http","url":"https://api.last-price.ai/api/mcp/rpc?via=vscode"}'
 ```
 
-**ChatGPT, Claude.ai, Perplexity, Windsurf and other MCP clients**
+**Google Antigravity**
+
+Open the Agent panel's menu, MCP Servers, Manage MCP Servers, View raw config, and add this to `mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "lastprice": {
+      "serverUrl": "https://api.last-price.ai/api/mcp/rpc?via=antigravity"
+    }
+  }
+}
+```
+
+For your workspace, add `"headers": { "x-api-key": "<your key>" }` beside `serverUrl`.
+
+The Antigravity CLI reads the same block from `.agents/mcp_config.json` in a project. Copy `skills/` into `.agents/skills/` for the skills.
+
+**Grok**
+
+At grok.com/connectors choose New Connector, Custom, and enter `https://api.last-price.ai/api/mcp/rpc?via=grok`. The demo tools work with no key.
+
+**Zed, Warp, Kiro, JetBrains (Junie and AI Assistant), Goose, Windsurf**
+
+Add a remote (HTTP) MCP server named `lastprice` with the URL `https://api.last-price.ai/api/mcp/rpc?via=<tag>`, where the tag is `zed`, `warp`, `kiro`, `jetbrains`, `goose` or `windsurf`, and an optional `x-api-key` header.
+
+**v0 and Microsoft Copilot Studio**
+
+Add `https://api.last-price.ai/api/mcp/rpc?via=v0` or `https://api.last-price.ai/api/mcp/rpc?via=copilot-studio` as a custom MCP server (Streamable HTTP), with an optional `x-api-key` header.
+
+**Clients that only run local (stdio) servers**
+
+```bash
+npx -y mcp-remote https://api.last-price.ai/api/mcp/rpc?via=mcp-remote
+```
+
+**ChatGPT, Claude.ai, Perplexity and other MCP clients**
 
 Add `https://api.last-price.ai/api/mcp/rpc` as a custom connector or remote MCP server. For an API key, send it as the `x-api-key` header where the client allows headers.
 
 **Other Agent Skills-compatible agents**
 
-Copy the folders from `skills/` into the agent's skills directory (for example `.agents/skills/`). Agents without skill support can be pointed at `skills/last-price-overview/SKILL.md` as a starting document.
+```bash
+npx skills add last-price-ai/skills
+```
+
+The [skills CLI](https://skills.sh) installs the skills into Claude Code, Cursor, Codex and the other agents it supports (`-a <agent>` picks one, `-g` installs for all projects). Or copy the folders from `skills/` into the agent's skills directory (for example `.agents/skills/`). Agents without skill support can be pointed at `skills/last-price-overview/SKILL.md` as a starting document.
 
 ## What the plugin connects to
 
