@@ -16,6 +16,8 @@ Pay-per-call uses the paid compute endpoint. The free demo is a separate, limite
 
 ## Skills
 
+Choose a starting point in the [user guide](skills/last-price-overview/references/user-guide.md).
+
 | Skill | Use it for |
 |---|---|
 | [`last-price-x402`](skills/last-price-x402/SKILL.md) | HTTP 402 pay-per-call with USDC on Base, day passes, top-ups |

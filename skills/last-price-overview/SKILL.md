@@ -31,6 +31,8 @@ HTTP: `x-api-key: $LP_API_KEY`. MCP connector: `LASTPRICE_API_KEY`. Never paste 
 
 ## Which skill
 
+For a starting point by user goal or workspace role, read the [user guide](references/user-guide.md).
+
 | Job | Skill |
 |---|---|
 | HTTP 402, x402 pay-per-call, day passes, top-ups | `last-price-x402` |
