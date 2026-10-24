@@ -95,7 +95,7 @@ Copy the folders from `skills/` into the agent's skills directory (for example `
 
 ## What the plugin connects to
 
-The plugin, extension and manifests in this repository contain no code that runs on install. They point the assistant at one remote server, `https://api.last-price.ai/api/mcp/rpc`, run by Last Price. Tool calls send the arguments the assistant chooses (pricing context such as currency, cost and product type) and, if you set one, your API key in the `x-api-key` header. Nothing else is read from your machine. Privacy policy: https://last-price.ai/privacy.
+The plugin, extension and manifests in this repository contain no code that runs on install. They point the assistant at one remote server, `https://api.last-price.ai/api/mcp/rpc`, run by Last Price. Each manifest adds a `via` tag to that address (`?via=claude-plugin`, `cursor-plugin`, `openai-plugin`, `gemini-cli`) so Last Price can count installs by assistant; the tag changes nothing about the answers. Tool calls send the arguments the assistant chooses (pricing context such as currency, cost and product type) and, if you set one, your API key in the `x-api-key` header. Nothing else is read from your machine. Privacy policy: https://last-price.ai/privacy.
 
 ## Plugin files
 

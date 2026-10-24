@@ -31,15 +31,19 @@ for (const [label, m] of Object.entries(manifests)) {
   expect(m.version === claude.version, `${label}: version ${m.version} differs from Claude's ${claude.version}`);
 }
 
-const urls = {
-  "claude .mcp.json": claudeMcp.mcpServers?.lastprice?.url,
-  "claude plugin.json": claude.mcpServers?.lastprice?.url,
-  "cursor mcp.json": cursorMcp.mcpServers?.lastprice?.url,
-  "openai mcp.json": openaiMcp.mcpServers?.lastprice?.url,
-  "gemini-extension.json": gemini.mcpServers?.lastprice?.httpUrl,
-};
-for (const [label, url] of Object.entries(urls)) {
-  expect(url === SERVER_URL, `${label}: server URL is ${url}, expected ${SERVER_URL}`);
+// Each assistant calls the same server with its own listing tag, so Last
+// Price can tell which install a call came from. The tag never changes an
+// answer; an unknown tag is ignored by the server.
+const urls = [
+  ["claude .mcp.json", claudeMcp.mcpServers?.lastprice?.url, "claude-plugin"],
+  ["claude plugin.json", claude.mcpServers?.lastprice?.url, "claude-plugin"],
+  ["cursor mcp.json", cursorMcp.mcpServers?.lastprice?.url, "cursor-plugin"],
+  ["openai mcp.json", openaiMcp.mcpServers?.lastprice?.url, "openai-plugin"],
+  ["gemini-extension.json", gemini.mcpServers?.lastprice?.httpUrl, "gemini-cli"],
+];
+for (const [label, url, via] of urls) {
+  const expected = `${SERVER_URL}?via=${via}`;
+  expect(url === expected, `${label}: server URL is ${url}, expected ${expected}`);
 }
 
 const keyRef = claude.mcpServers?.lastprice?.headers?.["x-api-key"];

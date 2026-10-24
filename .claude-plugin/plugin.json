@@ -34,7 +34,7 @@
   "mcpServers": {
     "lastprice": {
       "type": "http",
-      "url": "https://api.last-price.ai/api/mcp/rpc",
+      "url": "https://api.last-price.ai/api/mcp/rpc?via=claude-plugin",
       "headers": {
         "x-api-key": "${user_config.api_key}"
       }

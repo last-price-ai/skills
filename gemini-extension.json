@@ -5,7 +5,7 @@
   "contextFileName": "GEMINI.md",
   "mcpServers": {
     "lastprice": {
-      "httpUrl": "https://api.last-price.ai/api/mcp/rpc",
+      "httpUrl": "https://api.last-price.ai/api/mcp/rpc?via=gemini-cli",
       "headers": {
         "x-api-key": "${LASTPRICE_API_KEY:-}"
       }
