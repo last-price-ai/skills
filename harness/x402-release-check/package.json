@@ -1,0 +1,17 @@
+{
+  "name": "lastprice-x402-release-check",
+  "version": "0.1.0",
+  "description": "Capped x402 release check for Last Price pay-per-call compute. Dry run by default.",
+  "type": "module",
+  "scripts": {
+    "dry-run": "node release-check.mjs",
+    "execute": "node release-check.mjs --execute"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@x402/evm": "^2.28.0",
+    "@x402/fetch": "^2.28.0",
+    "viem": "^2.57.11"
+  },
+  "engines": { "node": ">=20" }
+}

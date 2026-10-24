@@ -1,0 +1,11 @@
+{
+  "name": "last-price",
+  "owner": { "name": "Last Price", "email": "support@last-price.ai" },
+  "plugins": [
+    {
+      "name": "lastprice",
+      "source": "./",
+      "description": "Eighteen Last Price skills plus the Last Price MCP server."
+    }
+  ]
+}

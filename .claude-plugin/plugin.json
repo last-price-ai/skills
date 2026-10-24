@@ -1,0 +1,9 @@
+{
+  "name": "lastprice",
+  "description": "Last Price skills for agents: price, verify, spend safely, and run every part of a Last Price workspace over MCP.",
+  "version": "0.1.0",
+  "author": { "name": "Last Price", "email": "support@last-price.ai", "url": "https://last-price.ai" },
+  "homepage": "https://last-price.ai/skills",
+  "license": "MIT",
+  "keywords": ["pricing", "mcp", "x402", "agents", "commerce"]
+}
