@@ -1,0 +1,31 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "lastprice",
+  "version": "0.2.0",
+  "description": "Last Price skills for pricing, x402 wallet payments, and workspace operations over HTTP and MCP.",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Last Price",
+        "shortDescription": "Compute and verify prices from an agent, metered per call.",
+        "longDescription": "Last Price is a pricing compute network for agents. One tool call computes a price for a product or a task, with the function that produced it, a trace of every step, and a record of what the decision cost. verify_price judges a price you already have against a band. Without a key both tools answer from a rate limited demo. The bundled skills teach the agent the rest of the API: experiments, marketplace listings, webhooks, usage and billing.",
+        "developerName": "Last Price",
+        "category": "Finance",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://last-price.ai",
+        "privacyPolicyURL": "https://last-price.ai/privacy",
+        "termsOfServiceURL": "https://last-price.ai/terms",
+        "defaultPrompt": [
+          "Use Last Price to price a 12-month SaaS seat that costs us $4 a month to serve.",
+          "Use Last Price to check whether $89 is a fair price for these noise-cancelling headphones."
+        ],
+        "brandColor": "#047857",
+        "composerIcon": "./assets/logo-128.png",
+        "logo": "./assets/logo-512.png"
+      }
+    }
+  }
+}

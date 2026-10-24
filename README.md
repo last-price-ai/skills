@@ -39,9 +39,39 @@ Pay-per-call uses the paid compute endpoint. The free demo is a separate, limite
 
 ## Install
 
-Copy the skill folders you want (or all of `skills/`) into your agent's skills directory.
+This repository is a plugin for Claude Code, Cursor, Codex and ChatGPT, and an extension for Gemini CLI. Each one installs the skills and the Last Price MCP server (`https://api.last-price.ai/api/mcp/rpc`) together. Without an API key, `compute_price` and `verify_price` answer from a rate limited demo; add a key for everything else.
+
+**Claude Code**
+
+```
+/plugin marketplace add last-price-ai/skills
+/plugin install lastprice@last-price
+```
+
+Claude Code asks for an optional API key when the plugin is enabled and keeps it in your system's secure storage.
+
+**Codex**
+
+```bash
+codex plugin marketplace add last-price-ai/skills
+codex plugin add lastprice@last-price
+```
+
+**Gemini CLI**
+
+```bash
+gemini extensions install https://github.com/last-price-ai/skills
+```
+
+Gemini CLI asks for an optional API key at install time (stored in your keychain); change it later with `gemini extensions config lastprice`.
 
 **Cursor**
+
+The plugin manifest is in `.cursor-plugin/`. Until it is listed in the Cursor Marketplace, add the server with this link and copy the skills:
+
+```
+cursor://anysphere.cursor-deeplink/mcp/install?name=lastprice&config=eyJ1cmwiOiJodHRwczovL2FwaS5sYXN0LXByaWNlLmFpL2FwaS9tY3AvcnBjIn0=
+```
 
 ```bash
 git clone https://github.com/last-price-ai/skills.git last-price-agent-skills
@@ -49,27 +79,75 @@ mkdir -p .cursor/skills            # project-level; or ~/.cursor/skills for all 
 cp -R last-price-agent-skills/skills/* .cursor/skills/
 ```
 
-**Claude Code**
-
-As a plugin (skills plus the Last Price MCP server):
-
-```
-/plugin marketplace add last-price-ai/skills
-/plugin install lastprice@last-price
-```
-
-Or copy the folders:
+**VS Code (GitHub Copilot agent mode)**
 
 ```bash
-mkdir -p ~/.claude/skills          # or .claude/skills inside a project
-cp -R last-price-agent-skills/skills/* ~/.claude/skills/
+code --add-mcp '{"name":"lastprice","type":"http","url":"https://api.last-price.ai/api/mcp/rpc?via=vscode"}'
 ```
 
-**Codex and other Agent Skills-compatible agents**
+**Google Antigravity**
 
-Copy the folders into the agent's skills directory (for example `~/.codex/skills/` or `.agents/skills/`, depending on the agent). Agents without skill support can be pointed at `skills/last-price-overview/SKILL.md` as a starting document.
+Open the Agent panel's menu, MCP Servers, Manage MCP Servers, View raw config, and add this to `mcp_config.json`:
 
-Skill directory locations differ between agents and versions; check your agent's documentation.
+```json
+{
+  "mcpServers": {
+    "lastprice": {
+      "serverUrl": "https://api.last-price.ai/api/mcp/rpc?via=antigravity"
+    }
+  }
+}
+```
+
+For your workspace, add `"headers": { "x-api-key": "<your key>" }` beside `serverUrl`.
+
+The Antigravity CLI reads the same block from `.agents/mcp_config.json` in a project. Copy `skills/` into `.agents/skills/` for the skills.
+
+**Grok**
+
+At grok.com/connectors choose New Connector, Custom, and enter `https://api.last-price.ai/api/mcp/rpc?via=grok`. The demo tools work with no key.
+
+**Zed, Warp, Kiro, JetBrains (Junie and AI Assistant), Goose, Windsurf**
+
+Add a remote (HTTP) MCP server named `lastprice` with the URL `https://api.last-price.ai/api/mcp/rpc?via=<tag>`, where the tag is `zed`, `warp`, `kiro`, `jetbrains`, `goose` or `windsurf`, and an optional `x-api-key` header.
+
+**v0 and Microsoft Copilot Studio**
+
+Add `https://api.last-price.ai/api/mcp/rpc?via=v0` or `https://api.last-price.ai/api/mcp/rpc?via=copilot-studio` as a custom MCP server (Streamable HTTP), with an optional `x-api-key` header.
+
+**Clients that only run local (stdio) servers**
+
+```bash
+npx -y mcp-remote https://api.last-price.ai/api/mcp/rpc?via=mcp-remote
+```
+
+**ChatGPT, Claude.ai, Perplexity and other MCP clients**
+
+Add `https://api.last-price.ai/api/mcp/rpc` as a custom connector or remote MCP server. For an API key, send it as the `x-api-key` header where the client allows headers.
+
+**Other Agent Skills-compatible agents**
+
+```bash
+npx skills add last-price-ai/skills
+```
+
+The [skills CLI](https://skills.sh) installs the skills into Claude Code, Cursor, Codex and the other agents it supports (`-a <agent>` picks one, `-g` installs for all projects). Or copy the folders from `skills/` into the agent's skills directory (for example `.agents/skills/`). Agents without skill support can be pointed at `skills/last-price-overview/SKILL.md` as a starting document.
+
+## What the plugin connects to
+
+The plugin, extension and manifests in this repository contain no code that runs on install. They point the assistant at one remote server, `https://api.last-price.ai/api/mcp/rpc`, run by Last Price. Each manifest adds a `via` tag to that address (`?via=claude-plugin`, `cursor-plugin`, `openai-plugin`, `gemini-cli`) so Last Price can count installs by assistant; the tag changes nothing about the answers. Tool calls send the arguments the assistant chooses (pricing context such as currency, cost and product type) and, if you set one, your API key in the `x-api-key` header. Nothing else is read from your machine. Privacy policy: https://last-price.ai/privacy.
+
+## Plugin files
+
+| File | Read by |
+|---|---|
+| `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.mcp.json` | Claude Code |
+| `.cursor-plugin/plugin.json`, `.cursor-plugin/mcp.json`, `.cursor-plugin/marketplace.json` | Cursor |
+| `plugin.json`, `mcp.json`, `.agents/plugins/marketplace.json` | Codex and ChatGPT |
+| `gemini-extension.json`, `GEMINI.md` | Gemini CLI |
+| `skills/` | all of them |
+
+Keep the version in all four manifests equal; `scripts/check-manifests.mjs` fails when they differ.
 
 ## API keys
 
