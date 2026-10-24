@@ -1,13 +1,15 @@
 {
   "name": "lastprice",
+  "displayName": "Last Price",
   "description": "Last Price skills for pricing, x402 wallet payments, and workspace operations over HTTP and MCP.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Last Price",
     "email": "support@last-price.ai",
     "url": "https://last-price.ai"
   },
   "homepage": "https://last-price.ai/skills",
+  "repository": "https://github.com/last-price-ai/skills",
   "license": "MIT",
   "keywords": [
     "pricing",
@@ -15,5 +17,27 @@
     "x402",
     "agents",
     "commerce"
-  ]
+  ],
+  "icon": "./assets/logo-512.png",
+  "documentationUrl": "https://last-price.ai/docs",
+  "supportUrl": "https://last-price.ai/support",
+  "privacyPolicyUrl": "https://last-price.ai/privacy",
+  "termsOfServiceUrl": "https://last-price.ai/terms",
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "Last Price API key (optional)",
+      "description": "A workspace key (lp_...) from https://app.last-price.ai. Leave empty to use the keyless public demo for compute_price and verify_price.",
+      "sensitive": true
+    }
+  },
+  "mcpServers": {
+    "lastprice": {
+      "type": "http",
+      "url": "https://api.last-price.ai/api/mcp/rpc",
+      "headers": {
+        "x-api-key": "${user_config.api_key}"
+      }
+    }
+  }
 }

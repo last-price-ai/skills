@@ -1,0 +1,20 @@
+{
+  "name": "last-price",
+  "interface": {
+    "displayName": "Last Price"
+  },
+  "plugins": [
+    {
+      "name": "lastprice",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Finance"
+    }
+  ]
+}

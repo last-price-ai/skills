@@ -4,6 +4,7 @@
     "name": "Last Price",
     "email": "support@last-price.ai"
   },
+  "description": "Last Price skills and the Last Price MCP server for Claude Code.",
   "plugins": [
     {
       "name": "lastprice",

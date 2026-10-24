@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- Installs as a Cursor plugin, a Codex and ChatGPT plugin, and a Gemini CLI extension, from the same skills and MCP server.
+- The Claude Code plugin asks for an optional API key and sends it as `x-api-key`.
+- Logo and directory listing fields (documentation, support, privacy and terms links).
+- `scripts/check-manifests.mjs` keeps the manifests in step.
+
 ## 0.1.0
 
 - Skills for pricing, wallet payments, workspace administration and commerce over HTTP and MCP.

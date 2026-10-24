@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "lastprice": {
+      "url": "https://api.last-price.ai/api/mcp/rpc"
+    }
+  }
+}
