@@ -10,8 +10,6 @@ Pay for a computation with USDC on Base, without an account or API key. `POST /a
 
 Read the current payment requirements before signing; prices and terms can change.
 
-Read the current payment requirements before signing; prices and terms can change.
-
 From `/.well-known/agents.json` -> `payments.x402`, the live 402, and `https://last-price.ai/docs/agent-wallets`:
 
 | Field | Expected value |
