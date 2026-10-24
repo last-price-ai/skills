@@ -1,0 +1,14 @@
+{
+  "name": "last-price",
+  "owner": {
+    "name": "Last Price",
+    "email": "support@last-price.ai"
+  },
+  "plugins": [
+    {
+      "name": "lastprice",
+      "source": "./",
+      "description": "Last Price skills for pricing, x402 wallet payments, and workspace operations over HTTP and MCP."
+    }
+  ]
+}

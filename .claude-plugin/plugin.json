@@ -1,0 +1,19 @@
+{
+  "name": "lastprice",
+  "description": "Last Price skills for pricing, x402 wallet payments, and workspace operations over HTTP and MCP.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Last Price",
+    "email": "support@last-price.ai",
+    "url": "https://last-price.ai"
+  },
+  "homepage": "https://last-price.ai/skills",
+  "license": "MIT",
+  "keywords": [
+    "pricing",
+    "mcp",
+    "x402",
+    "agents",
+    "commerce"
+  ]
+}

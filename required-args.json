@@ -1,0 +1,715 @@
+{
+ "accept_counter": [
+  "handle",
+  "negotiation_id",
+  "buyer_token"
+ ],
+ "activate_order": [
+  "order_id"
+ ],
+ "add_commerce_observation": [
+  "source",
+  "competitor",
+  "observed_price",
+  "currency"
+ ],
+ "add_order_line": [
+  "order_id",
+  "description",
+  "unit_price"
+ ],
+ "add_storefront_dns_record": [
+  "storefront_id",
+  "domain_id",
+  "name",
+  "type",
+  "value"
+ ],
+ "add_storefront_domain": [
+  "storefront_id",
+  "domain"
+ ],
+ "add_team_member": [
+  "user_id"
+ ],
+ "allocate_variant_traffic": [
+  "variants"
+ ],
+ "apply_analyst_proposal": [
+  "approval_id"
+ ],
+ "approve_commerce_proposal": [
+  "proposal_id"
+ ],
+ "approve_payout_run": [
+  "run_id"
+ ],
+ "ask_pricing_analyst": [
+  "question"
+ ],
+ "browse_catalog": [],
+ "buy_day_pass": [],
+ "cancel_ucp_checkout": [
+  "checkout_id"
+ ],
+ "change_team_member_role": [
+  "user_id",
+  "role"
+ ],
+ "check_agent_readiness": [
+  "url"
+ ],
+ "check_purchase": [
+  "seller",
+  "amount"
+ ],
+ "check_variant_significance": [
+  "variants"
+ ],
+ "close_spend_session": [
+  "session_id"
+ ],
+ "complete_ucp_checkout": [
+  "checkout_id"
+ ],
+ "compute_price": [
+  "currency"
+ ],
+ "compute_prices_batch": [
+  "requests"
+ ],
+ "confirm_purchase": [
+  "reservation_id"
+ ],
+ "contribute_price_data": [
+  "vertical",
+  "source_url",
+  "product_name",
+  "price"
+ ],
+ "contribute_price_data_batch": [
+  "contributions"
+ ],
+ "create_card_topup": [
+  "amount"
+ ],
+ "create_commerce_connector": [
+  "platform",
+  "display_name"
+ ],
+ "create_commerce_policy": [
+  "name",
+  "rules"
+ ],
+ "create_contact": [
+  "customer_id",
+  "name",
+  "email"
+ ],
+ "create_credit": [
+  "customer_id",
+  "amount"
+ ],
+ "create_customer": [
+  "name"
+ ],
+ "create_dispute": [
+  "payment_id",
+  "amount"
+ ],
+ "create_experiment": [
+  "key",
+  "name",
+  "variants"
+ ],
+ "create_function": [
+  "name",
+  "display_name",
+  "execution_type"
+ ],
+ "create_hosted_model": [
+  "name",
+  "kind"
+ ],
+ "create_invoice": [
+  "customer_id",
+  "amount"
+ ],
+ "create_marketplace_listing": [
+  "function_id"
+ ],
+ "create_order": [
+  "customer_id"
+ ],
+ "create_payment": [
+  "customer_id",
+  "amount"
+ ],
+ "create_routing_policy": [
+  "name",
+  "strategy"
+ ],
+ "create_storefront": [
+  "display_name"
+ ],
+ "create_ucp_checkout": [
+  "line_items"
+ ],
+ "create_webhook": [
+  "url",
+  "events"
+ ],
+ "decide_approval": [
+  "approval_id",
+  "decision"
+ ],
+ "decide_learned_price_change": [
+  "change_id",
+  "decision"
+ ],
+ "decide_rosetta_review": [
+  "id",
+  "action"
+ ],
+ "delete_commerce_policy": [
+  "policy_id"
+ ],
+ "delete_contact": [
+  "contact_id"
+ ],
+ "delete_credit": [
+  "credit_id"
+ ],
+ "delete_customer": [
+  "customer_id"
+ ],
+ "delete_feature_contract": [],
+ "delete_function": [
+  "function_id"
+ ],
+ "delete_invoice": [
+  "invoice_id"
+ ],
+ "delete_marketplace_listing": [
+  "listing_id"
+ ],
+ "delete_order": [
+  "order_id"
+ ],
+ "delete_price_guardrails": [],
+ "delete_routing_policy": [
+  "policy_id"
+ ],
+ "delete_storefront": [
+  "storefront_id"
+ ],
+ "delete_webhook": [
+  "webhook_id"
+ ],
+ "disconnect_connected_app": [
+  "connected_app_id"
+ ],
+ "discover_offers": [
+  "task"
+ ],
+ "draw_session_spend": [
+  "session_id",
+  "amount"
+ ],
+ "estimate_task_cost": [
+  "task_description",
+  "countries"
+ ],
+ "execute_commerce_proposals": [],
+ "freeze_rosetta_adapter": [
+  "plan"
+ ],
+ "get_agent_behaviour_test_run": [
+  "agent_id",
+  "run_id"
+ ],
+ "get_agent_behaviour_tests": [
+  "agent_id"
+ ],
+ "get_agent_capabilities": [
+  "agent_id"
+ ],
+ "get_agent_protocol": [],
+ "get_agent_value_receipt": [
+  "agent_id"
+ ],
+ "get_aitune_profiling": [
+  "model"
+ ],
+ "get_aitune_system_stats": [],
+ "get_alert_preferences": [],
+ "get_analyst_brief": [],
+ "get_analyst_settings": [],
+ "get_approval": [
+  "approval_id"
+ ],
+ "get_billing_settings": [],
+ "get_buyer_aware_pricing": [],
+ "get_card_topup": [
+  "topup_id"
+ ],
+ "get_changelog": [],
+ "get_channel_rates": [],
+ "get_commerce_policy": [
+  "policy_id"
+ ],
+ "get_contact": [
+  "contact_id"
+ ],
+ "get_contact_by_external_id": [
+  "external_id",
+  "customer_id"
+ ],
+ "get_cost_analytics": [],
+ "get_credit": [
+  "credit_id"
+ ],
+ "get_credit_balance": [
+  "customer_id"
+ ],
+ "get_customer": [
+  "customer_id"
+ ],
+ "get_customer_by_external_id": [
+  "external_id"
+ ],
+ "get_cut_advisor_settings": [],
+ "get_dispute": [
+  "dispute_id"
+ ],
+ "get_experiment_definition": [
+  "experiment_key"
+ ],
+ "get_experiment_results": [
+  "experiment_key"
+ ],
+ "get_experiment_stopping": [
+  "experiment_key"
+ ],
+ "get_feature_contract": [],
+ "get_feature_launch_plan": [
+  "flag"
+ ],
+ "get_forge_status": [],
+ "get_frontier_model": [],
+ "get_function": [
+  "function_id"
+ ],
+ "get_function_health": [
+  "function_id"
+ ],
+ "get_function_review": [
+  "function_id"
+ ],
+ "get_hosted_model": [
+  "model_id"
+ ],
+ "get_invoice": [
+  "invoice_id"
+ ],
+ "get_jale_token_balance": [],
+ "get_learned_elasticity_curve": [],
+ "get_learned_pricing": [],
+ "get_learned_routing": [],
+ "get_llm_usage": [],
+ "get_marketplace_earnings": [],
+ "get_negotiation": [
+  "handle",
+  "negotiation_id",
+  "buyer_token"
+ ],
+ "get_offer_settings": [],
+ "get_offer_terms": [
+  "handle"
+ ],
+ "get_order": [
+  "order_id"
+ ],
+ "get_payment": [
+  "payment_id"
+ ],
+ "get_payout_run": [
+  "run_id"
+ ],
+ "get_payout_schedule": [],
+ "get_price_exploration": [],
+ "get_price_guardrails": [],
+ "get_pricing_analysis": [],
+ "get_prompt_class_benchmarks": [],
+ "get_public_leaderboard": [],
+ "get_purchase_intent": [
+  "intent_id"
+ ],
+ "get_receipt": [
+  "usage_event_id"
+ ],
+ "get_reel": [
+  "reel_id"
+ ],
+ "get_rosetta_health": [],
+ "get_routing_policy": [
+  "policy_id"
+ ],
+ "get_spend_policy": [],
+ "get_spend_session": [
+  "session_id"
+ ],
+ "get_storefront": [
+  "storefront_id"
+ ],
+ "get_ucp_checkout": [
+  "checkout_id"
+ ],
+ "get_ucp_profile": [],
+ "get_ucp_quote": [
+  "cart"
+ ],
+ "get_usage": [],
+ "get_usage_breakdown": [],
+ "get_wallet_balance": [
+  "address"
+ ],
+ "get_workspace_settings": [],
+ "get_x402_price_index": [],
+ "infer_feature_contract": [
+  "samples"
+ ],
+ "ingest_with_rosetta": [
+  "canonical_target",
+  "payload"
+ ],
+ "invite_team_member": [
+  "email"
+ ],
+ "list_aitune_backends": [],
+ "list_approvals": [],
+ "list_audit_events": [],
+ "list_canonical_schemas": [],
+ "list_commerce_audit_events": [],
+ "list_commerce_catalog": [],
+ "list_commerce_connectors": [],
+ "list_commerce_observations": [],
+ "list_commerce_policies": [],
+ "list_commerce_proposals": [],
+ "list_connected_apps": [],
+ "list_contacts": [],
+ "list_costs": [],
+ "list_credits": [],
+ "list_customers": [],
+ "list_day_passes": [],
+ "list_demo_apps": [],
+ "list_disputes": [],
+ "list_experiments": [],
+ "list_feature_launches": [],
+ "list_functions": [],
+ "list_hosted_models": [],
+ "list_inference_providers": [],
+ "list_invitations": [],
+ "list_invoices": [],
+ "list_jale_contributions": [],
+ "list_learned_price_changes": [],
+ "list_llm_usage_events": [],
+ "list_marketplace_listings": [],
+ "list_my_marketplace_listings": [],
+ "list_negotiations": [],
+ "list_notifications": [],
+ "list_order_lines": [
+  "order_id"
+ ],
+ "list_orders": [],
+ "list_outcomes": [],
+ "list_payments": [],
+ "list_payout_runs": [],
+ "list_pricing_pipelines": [],
+ "list_product_categories": [],
+ "list_receipts": [],
+ "list_reels": [],
+ "list_rosetta_review": [],
+ "list_routing_policies": [],
+ "list_storefront_dns_records": [
+  "storefront_id",
+  "domain_id"
+ ],
+ "list_storefront_domain_quotes": [
+  "storefront_id"
+ ],
+ "list_storefronts": [],
+ "list_team_members": [],
+ "list_ucp_checkouts": [],
+ "list_usage_events": [],
+ "list_vendor_adapters": [],
+ "list_verification_strategies": [],
+ "list_webhook_deliveries": [],
+ "list_webhooks": [],
+ "make_offer": [
+  "handle",
+  "product_id",
+  "offered_price"
+ ],
+ "mark_notifications_read": [],
+ "normalize_with_rosetta": [
+  "plan",
+  "vendor_response"
+ ],
+ "open_spend_session": [
+  "seller",
+  "max_amount"
+ ],
+ "ping_webhook": [
+  "webhook_id"
+ ],
+ "plan_rosetta_mapping": [
+  "source_schema",
+  "canonical_schema"
+ ],
+ "predict_with_hosted_model": [
+  "model_id",
+  "context"
+ ],
+ "preview_offer": [
+  "product_id",
+  "offered_price"
+ ],
+ "pricing_conversation": [],
+ "promote_hosted_model_version": [
+  "model_id",
+  "version"
+ ],
+ "propose_experiment_variant": [
+  "experiment_key",
+  "price"
+ ],
+ "query_jale_pool": [],
+ "quote_storefront_domain": [
+  "storefront_id",
+  "domain"
+ ],
+ "read_my_inbox": [],
+ "recommend_jale_price": [
+  "experiment_id"
+ ],
+ "reconcile_purchase": [
+  "reservation_id",
+  "outcome",
+  "note"
+ ],
+ "record_cost": [
+  "amount"
+ ],
+ "refund_payment": [
+  "payment_id"
+ ],
+ "reject_commerce_proposal": [
+  "proposal_id",
+  "reason"
+ ],
+ "reject_forge_candidate": [
+  "candidate_id"
+ ],
+ "reject_payout_run": [
+  "run_id"
+ ],
+ "remove_offer_product": [
+  "product_id"
+ ],
+ "remove_storefront_dns_record": [
+  "storefront_id",
+  "domain_id",
+  "record_id"
+ ],
+ "remove_storefront_domain": [
+  "storefront_id",
+  "domain_id"
+ ],
+ "remove_team_member": [
+  "user_id"
+ ],
+ "report_outcome": [
+  "outcome"
+ ],
+ "request_payout_run": [
+  "period_start",
+  "period_end"
+ ],
+ "retry_payout_run": [
+  "run_id"
+ ],
+ "revoke_invitation": [
+  "invitation_id"
+ ],
+ "rollback_hosted_model": [
+  "model_id"
+ ],
+ "run_agent_behaviour_tests": [
+  "agent_id"
+ ],
+ "run_commerce_cycle": [],
+ "run_function_health_probe": [
+  "function_id"
+ ],
+ "run_function_review": [
+  "function_id"
+ ],
+ "run_pricing_chain": [
+  "stages",
+  "context"
+ ],
+ "search_storefront_domains": [],
+ "seed_commerce_sample": [],
+ "send_invoice": [
+  "invoice_id"
+ ],
+ "set_agent_protocol": [
+  "organization_name",
+  "domain"
+ ],
+ "set_analyst_settings": [],
+ "set_buyer_aware_pricing": [],
+ "set_channel_rates": [
+  "rates"
+ ],
+ "set_commerce_connector_active": [
+  "connector_id",
+  "active"
+ ],
+ "set_experiment_bandit": [
+  "experiment_key",
+  "bandit_enabled"
+ ],
+ "set_feature_contract": [
+  "contract"
+ ],
+ "set_learned_pricing": [],
+ "set_offer_product": [
+  "product_id",
+  "enabled",
+  "list_price",
+  "floor_price"
+ ],
+ "set_offer_settings": [
+  "enabled"
+ ],
+ "set_payout_schedule": [
+  "enabled",
+  "cadence",
+  "run_day"
+ ],
+ "set_price_exploration": [],
+ "set_price_guardrails": [],
+ "set_product_category": [
+  "product_id",
+  "category_id"
+ ],
+ "set_spend_policy": [],
+ "settle_purchase": [
+  "reservation_id",
+  "outcome"
+ ],
+ "settle_session_draw": [
+  "session_id",
+  "draw_id",
+  "outcome"
+ ],
+ "simulate_agent_cut": [
+  "price",
+  "unit_cost",
+  "current_cut_pct",
+  "base_units"
+ ],
+ "start_aitune_profiling": [
+  "model"
+ ],
+ "suggest_frontier_price": [
+  "product_id"
+ ],
+ "sync_commerce_connector": [
+  "connector_id"
+ ],
+ "sync_commerce_orders": [
+  "connector_id"
+ ],
+ "test_commerce_policy": [
+  "policy_id",
+  "item"
+ ],
+ "test_function": [
+  "function_id"
+ ],
+ "top_up_balance": [
+  "amount"
+ ],
+ "train_hosted_model": [
+  "model_id"
+ ],
+ "translate_with_rosetta": [
+  "source_schema",
+  "source_record",
+  "canonical_schema",
+  "vendor_contract"
+ ],
+ "update_alert_preferences": [],
+ "update_billing_settings": [],
+ "update_commerce_policy": [
+  "policy_id"
+ ],
+ "update_contact": [
+  "contact_id"
+ ],
+ "update_customer": [
+  "customer_id"
+ ],
+ "update_dispute": [
+  "dispute_id"
+ ],
+ "update_function": [
+  "function_id"
+ ],
+ "update_invoice": [
+  "invoice_id"
+ ],
+ "update_marketplace_listing": [
+  "listing_id"
+ ],
+ "update_order": [
+  "order_id"
+ ],
+ "update_routing_policy": [
+  "policy_id"
+ ],
+ "update_storefront": [
+  "storefront_id"
+ ],
+ "update_ucp_checkout": [
+  "checkout_id"
+ ],
+ "update_webhook": [
+  "webhook_id"
+ ],
+ "update_workspace_settings": [],
+ "upload_hosted_model_version": [
+  "model_id",
+  "artifact_base64",
+  "spec"
+ ],
+ "verify_agent_protocol": [],
+ "verify_price": [
+  "proposed_price"
+ ],
+ "verify_signed_quote": [
+  "jws"
+ ],
+ "verify_storefront_domain": [
+  "storefront_id",
+  "domain_id"
+ ],
+ "verify_webhook_signature": [
+  "payload",
+  "signature",
+  "secret"
+ ]
+}

@@ -1,0 +1,500 @@
+{
+ "add_commerce_observation": [
+  "/api/commerce/observations"
+ ],
+ "add_order_line": [
+  "/api/orders/{orderId}/lines"
+ ],
+ "add_storefront_dns_record": [
+  "/api/storefronts/{storefrontId}/domains/{domainId}/dns-records"
+ ],
+ "add_storefront_domain": [
+  "/api/storefronts/{storefrontId}/domains"
+ ],
+ "add_team_member": [
+  "/api/workspaces/{workspaceId}/team"
+ ],
+ "allocate_variant_traffic": [
+  "/api/compute/allocation"
+ ],
+ "apply_analyst_proposal": [
+  "/api/approvals/{id}/apply"
+ ],
+ "ask_pricing_analyst": [
+  "/api/pricing-analyst/ask"
+ ],
+ "browse_catalog": [
+  "/api/functions/catalog"
+ ],
+ "buy_day_pass": [
+  "/api/agents/{id}"
+ ],
+ "change_team_member_role": [
+  "/api/workspaces/{workspaceId}/team/{userId}"
+ ],
+ "check_agent_readiness": [
+  "/api/public/agent-ready-check"
+ ],
+ "check_purchase": [
+  "/api/spend-policy/check"
+ ],
+ "check_variant_significance": [
+  "/api/compute/significance"
+ ],
+ "close_spend_session": [
+  "/api/spend-policy/sessions/{id}/close"
+ ],
+ "compute_prices_batch": [
+  "/api/compute/batch"
+ ],
+ "confirm_purchase": [
+  "/api/spend-policy/reservations/{id}/confirm"
+ ],
+ "contribute_price_data": [
+  "/api/jale/contribute"
+ ],
+ "contribute_price_data_batch": [
+  "/api/jale/contribute/batch"
+ ],
+ "create_card_topup": [
+  "/api/billing/topup/card"
+ ],
+ "create_commerce_connector": [
+  "/api/commerce/connectors"
+ ],
+ "create_commerce_policy": [
+  "/api/commerce/policies"
+ ],
+ "create_contact": [
+  "/api/contacts"
+ ],
+ "create_credit": [
+  "/api/credits"
+ ],
+ "create_customer": [
+  "/api/customers"
+ ],
+ "create_dispute": [
+  "/api/disputes"
+ ],
+ "create_experiment": [
+  "/api/tenants/{tenantId}/experiments"
+ ],
+ "create_function": [
+  "/api/functions"
+ ],
+ "create_hosted_model": [
+  "/api/hosted-models"
+ ],
+ "create_invoice": [
+  "/api/invoices"
+ ],
+ "create_marketplace_listing": [
+  "/api/marketplace/listings"
+ ],
+ "create_order": [
+  "/api/orders"
+ ],
+ "create_payment": [
+  "/api/payments"
+ ],
+ "create_routing_policy": [
+  "/api/routing-policies"
+ ],
+ "create_storefront": [
+  "/api/storefronts"
+ ],
+ "create_ucp_checkout": [
+  "/api/ucp/checkout-sessions"
+ ],
+ "create_webhook": [
+  "/api/webhooks"
+ ],
+ "decide_rosetta_review": [
+  "/api/rosetta/review"
+ ],
+ "delete_feature_contract": [
+  "/api/learned-elasticity/feature-contract"
+ ],
+ "delete_price_guardrails": [
+  "/api/price-guardrails"
+ ],
+ "delete_storefront": [
+  "/api/storefronts/{storefrontId}"
+ ],
+ "disconnect_connected_app": [
+  "/api/user/connected-apps/{grantId}"
+ ],
+ "draw_session_spend": [
+  "/api/spend-policy/sessions/{id}/draw"
+ ],
+ "estimate_task_cost": [
+  "/api/agents/{id}"
+ ],
+ "execute_commerce_proposals": [
+  "/api/commerce/execution"
+ ],
+ "freeze_rosetta_adapter": [
+  "/api/rosetta/freeze"
+ ],
+ "get_agent_behaviour_test_run": [
+  "/api/agents/{id}/behaviour-tests/{runId}"
+ ],
+ "get_agent_behaviour_tests": [
+  "/api/agents/{id}/behaviour-tests"
+ ],
+ "get_agent_capabilities": [
+  "/api/agents/{id}/capabilities"
+ ],
+ "get_agent_protocol": [
+  "/api/agent-protocol"
+ ],
+ "get_agent_value_receipt": [
+  "/api/agents/{id}/value-receipt"
+ ],
+ "get_alert_preferences": [
+  "/api/workspaces/{workspaceId}/alert-preferences"
+ ],
+ "get_analyst_brief": [
+  "/api/pricing-analyst/brief"
+ ],
+ "get_analyst_settings": [
+  "/api/pricing-analyst/settings"
+ ],
+ "get_approval": [
+  "/api/approvals/{id}"
+ ],
+ "get_billing_settings": [
+  "/api/billing/balance"
+ ],
+ "get_buyer_aware_pricing": [
+  "/api/learned-elasticity/buyer-models"
+ ],
+ "get_card_topup": [
+  "/api/billing/topup/card/{topupId}"
+ ],
+ "get_channel_rates": [
+  "/api/channel-rates"
+ ],
+ "get_commerce_policy": [
+  "/api/commerce/policies/{id}"
+ ],
+ "get_cut_advisor_settings": [
+  "/api/cut-advisor"
+ ],
+ "get_experiment_stopping": [
+  "/api/experiments/{experimentId}/sequential"
+ ],
+ "get_feature_contract": [
+  "/api/learned-elasticity/feature-contract"
+ ],
+ "get_frontier_model": [
+  "/api/frontier-model"
+ ],
+ "get_invoice": [
+  "/api/invoices/{invoiceId}"
+ ],
+ "get_learned_pricing": [
+  "/api/learned-elasticity"
+ ],
+ "get_learned_routing": [
+  "/api/routing-policies/{id}/learned",
+  "/api/routing/learned"
+ ],
+ "get_offer_settings": [
+  "/api/negotiation/settings"
+ ],
+ "get_payment": [
+  "/api/payments/{paymentId}"
+ ],
+ "get_payout_schedule": [
+  "/api/marketplace/payouts/schedule"
+ ],
+ "get_price_exploration": [
+  "/api/learned-elasticity/exploration"
+ ],
+ "get_price_guardrails": [
+  "/api/price-guardrails"
+ ],
+ "get_pricing_analysis": [
+  "/api/pricing-analyst/findings"
+ ],
+ "get_purchase_intent": [
+  "/api/spend-policy/intents/{id}"
+ ],
+ "get_receipt": [
+  "/api/receipts/{id}"
+ ],
+ "get_reel": [
+  "/api/public/reels/{id}"
+ ],
+ "get_rosetta_health": [
+  "/api/rosetta/health"
+ ],
+ "get_spend_session": [
+  "/api/spend-policy/sessions/{id}"
+ ],
+ "get_storefront": [
+  "/api/storefronts/{storefrontId}"
+ ],
+ "get_ucp_profile": [
+  "/api/ucp/discovery"
+ ],
+ "get_ucp_quote": [
+  "/api/ucp/quote"
+ ],
+ "get_workspace_settings": [
+  "/api/workspaces/{workspaceId}/settings"
+ ],
+ "infer_feature_contract": [
+  "/api/learned-elasticity/feature-contract/infer"
+ ],
+ "ingest_with_rosetta": [
+  "/api/rosetta/ingest"
+ ],
+ "invite_team_member": [
+  "/api/workspaces/{workspaceId}/invitations"
+ ],
+ "list_canonical_schemas": [
+  "/api/rosetta/canonical-schemas"
+ ],
+ "list_commerce_connectors": [
+  "/api/commerce/connectors"
+ ],
+ "list_commerce_policies": [
+  "/api/commerce/policies"
+ ],
+ "list_connected_apps": [
+  "/api/user/connected-apps"
+ ],
+ "list_day_passes": [
+  "/api/agents/{id}"
+ ],
+ "list_experiments": [
+  "/api/tenants/{tenantId}/experiments"
+ ],
+ "list_functions": [
+  "/api/functions"
+ ],
+ "list_hosted_models": [
+  "/api/hosted-models"
+ ],
+ "list_inference_providers": [
+  "/api/workspaces/{workspaceId}/inference-providers"
+ ],
+ "list_notifications": [
+  "/api/workspaces/{workspaceId}/notifications"
+ ],
+ "list_pricing_pipelines": [
+  "/api/price-router/pipelines"
+ ],
+ "list_product_categories": [
+  "/api/product-categories"
+ ],
+ "list_reels": [
+  "/api/public/reels"
+ ],
+ "list_routing_policies": [
+  "/api/routing-policies"
+ ],
+ "list_storefront_dns_records": [
+  "/api/storefronts/{storefrontId}/domains/{domainId}/dns-records"
+ ],
+ "list_storefront_domain_quotes": [
+  "/api/storefronts/{storefrontId}/domain-quotes"
+ ],
+ "list_storefronts": [
+  "/api/storefronts"
+ ],
+ "list_ucp_checkouts": [
+  "/api/ucp/checkout-sessions"
+ ],
+ "list_vendor_adapters": [
+  "/api/vendor-adapters"
+ ],
+ "list_verification_strategies": [
+  "/api/price-router/verify"
+ ],
+ "list_webhooks": [
+  "/api/webhooks"
+ ],
+ "mark_notifications_read": [
+  "/api/workspaces/{workspaceId}/notifications/read"
+ ],
+ "normalize_with_rosetta": [
+  "/api/rosetta/normalize"
+ ],
+ "open_spend_session": [
+  "/api/spend-policy/check"
+ ],
+ "plan_rosetta_mapping": [
+  "/api/rosetta/plan"
+ ],
+ "preview_offer": [
+  "/api/negotiation/preview"
+ ],
+ "pricing_conversation": [
+  "/api/compute/conversation"
+ ],
+ "propose_experiment_variant": [
+  "/api/jale/propose-variant"
+ ],
+ "quote_storefront_domain": [
+  "/api/storefronts/{storefrontId}/domain-quotes"
+ ],
+ "read_my_inbox": [
+  "/api/agents/{id}/inbox"
+ ],
+ "recommend_jale_price": [
+  "/api/jale/optimize"
+ ],
+ "reconcile_purchase": [
+  "/api/spend-policy/reservations/{id}/reconcile"
+ ],
+ "record_cost": [
+  "/api/costs"
+ ],
+ "refund_payment": [
+  "/api/payments/{paymentId}/refund"
+ ],
+ "reject_forge_candidate": [
+  "/api/forge/candidates/{id}/reject"
+ ],
+ "remove_storefront_dns_record": [
+  "/api/storefronts/{storefrontId}/domains/{domainId}/dns-records/{recordId}"
+ ],
+ "remove_storefront_domain": [
+  "/api/storefronts/{storefrontId}/domains/{domainId}"
+ ],
+ "remove_team_member": [
+  "/api/workspaces/{workspaceId}/team/{userId}"
+ ],
+ "request_payout_run": [
+  "/api/marketplace/payouts/runs"
+ ],
+ "revoke_invitation": [
+  "/api/workspaces/{workspaceId}/invitations/{invitationId}"
+ ],
+ "run_agent_behaviour_tests": [
+  "/api/agents/{id}/behaviour-tests"
+ ],
+ "run_commerce_cycle": [
+  "/api/commerce/cycle"
+ ],
+ "run_pricing_chain": [
+  "/api/price-router/chain"
+ ],
+ "search_storefront_domains": [
+  "/api/storefronts/{storefrontId}"
+ ],
+ "seed_commerce_sample": [
+  "/api/commerce/seed-sample"
+ ],
+ "send_invoice": [
+  "/api/invoices/{invoiceId}/send"
+ ],
+ "set_agent_protocol": [
+  "/api/agent-protocol"
+ ],
+ "set_analyst_settings": [
+  "/api/pricing-analyst/settings"
+ ],
+ "set_buyer_aware_pricing": [
+  "/api/learned-elasticity/buyer-models"
+ ],
+ "set_channel_rates": [
+  "/api/channel-rates"
+ ],
+ "set_experiment_bandit": [
+  "/api/experiments/{experimentId}/sequential"
+ ],
+ "set_feature_contract": [
+  "/api/learned-elasticity/feature-contract"
+ ],
+ "set_learned_pricing": [
+  "/api/learned-elasticity"
+ ],
+ "set_offer_product": [
+  "/api/negotiation/products"
+ ],
+ "set_offer_settings": [
+  "/api/negotiation/settings"
+ ],
+ "set_payout_schedule": [
+  "/api/agents/{id}",
+  "/api/marketplace/payouts/schedule"
+ ],
+ "set_price_exploration": [
+  "/api/learned-elasticity/exploration"
+ ],
+ "set_price_guardrails": [
+  "/api/price-guardrails"
+ ],
+ "set_product_category": [
+  "/api/product-categories"
+ ],
+ "set_spend_policy": [
+  "/api/spend-policy"
+ ],
+ "settle_session_draw": [
+  "/api/spend-policy/sessions/{id}/draws/{drawId}/settle"
+ ],
+ "simulate_agent_cut": [
+  "/api/cut-advisor"
+ ],
+ "top_up_balance": [
+  "/api/billing/topup"
+ ],
+ "translate_with_rosetta": [
+  "/api/rosetta/translate"
+ ],
+ "update_alert_preferences": [
+  "/api/workspaces/{workspaceId}/alert-preferences"
+ ],
+ "update_billing_settings": [
+  "/api/billing/balance"
+ ],
+ "update_contact": [
+  "/api/contacts/{contactId}"
+ ],
+ "update_customer": [
+  "/api/customers/{customerId}"
+ ],
+ "update_dispute": [
+  "/api/disputes/{disputeId}"
+ ],
+ "update_invoice": [
+  "/api/invoices/{invoiceId}"
+ ],
+ "update_marketplace_listing": [
+  "/api/marketplace/listings/{listingId}"
+ ],
+ "update_order": [
+  "/api/orders/{orderId}"
+ ],
+ "update_storefront": [
+  "/api/storefronts/{storefrontId}"
+ ],
+ "update_ucp_checkout": [
+  "/api/ucp/checkout-sessions/{id}"
+ ],
+ "update_workspace_settings": [
+  "/api/workspaces/{workspaceId}/settings"
+ ],
+ "verify_agent_protocol": [
+  "/api/agent-protocol/verify"
+ ],
+ "verify_price": [
+  "/api/price-router/verify",
+  "/api/public/price-router/verify"
+ ],
+ "verify_signed_quote": [
+  "/api/quotes/verify"
+ ],
+ "verify_storefront_domain": [
+  "/api/storefronts/{storefrontId}/domains/{domainId}/verify"
+ ],
+ "verify_webhook_signature": [
+  "/api/public/webhook-verify"
+ ]
+}

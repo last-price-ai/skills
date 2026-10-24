@@ -1,0 +1,50 @@
+name: spec-drift
+
+# Re-checks every skill against the live Last Price API: the OpenAPI
+# operations (check-spec-drift.py) and the MCP connector's tools
+# (scripts/sync.mjs). Runs every weekday, on demand, and when Last Price
+# sends a repository_dispatch "api-changed" event after a release.
+on:
+  schedule:
+    - cron: "0 6 * * 1-5"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [api-changed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: OpenAPI operations and skill paths
+        id: spec
+        continue-on-error: true
+        run: python3 scripts/check-spec-drift.py | tee spec.txt
+      - name: MCP tools and generated references
+        id: tools
+        continue-on-error: true
+        run: node scripts/sync.mjs --check | tee tools.txt
+      - name: Regenerate tool references
+        if: steps.tools.outcome == 'failure'
+        run: node scripts/sync.mjs --keep-required || true
+      - name: Open a pull request with what drifted
+        if: steps.spec.outcome == 'failure' || steps.tools.outcome == 'failure'
+        run: cat spec.txt tools.txt > drift.txt
+      - if: steps.spec.outcome == 'failure' || steps.tools.outcome == 'failure'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: spec-drift
+          title: "Skills drifted from the live Last Price API"
+          body-path: drift.txt
+          commit-message: "chore: regenerate MCP tool references from the live API"
+          add-paths: skills/
