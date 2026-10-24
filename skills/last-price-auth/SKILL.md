@@ -11,15 +11,17 @@ description: Use when a last-price.ai call needs a credential, returns 401/402/4
 - `Authorization: Bearer <token>` is only for a session JWT or an OAuth access token the product issued.
 - A 401 on a key check is not proof the key is dead; read the error `code` in the body.
 
-## Ways to get a credential (pick one)
+## Pay per call without a key
+
+Send an unauthenticated request to `POST /api/compute/price` for x402 payment requirements. A wallet pays for the computation. See `last-price-x402`.
+
+## Get a workspace credential
 
 The live list is in `/llms.txt` and `/.well-known/agents.json` (`access_options`, `pay_or_auth`). Re-read them; they change.
 
-1. **No key, just trying:** `POST /api/public/compute/demo` or the MCP connector without a key (rate-limited demo). See `last-price-compute`.
-2. **Self-register an agent (no human):** `POST /api/agents/register` with `{"name":"your-system/role"}` (optional `contact_email`, `intended_use`). Returns a sandbox key once plus a claim link for a person. Store the key immediately as `LP_API_KEY` in a secret store. Over MCP the same sign-up is the `register_agent` tool; a key you already hold can be attached to a keyless MCP session with `use_api_key`. Both appear in the tool list only where self-registration is switched on.
-3. **OAuth client credentials:** `POST /api/oauth/register` (RFC 7591) then `client_credentials` at `POST /api/oauth/token`. Same sandbox as self-registration.
-4. **Pay per call, no account:** unauthenticated `POST /api/compute/price` answers 402 with x402 requirements. See `last-price-x402`.
-5. **Person-owned workspace:** a person signs up at `https://app.last-price.ai/sign-up` and creates a scoped API key (Settings) or an agent-bound key (`POST /api/agents/{id}/keys`) for the agent.
+1. **Self-register an agent (no human):** `POST /api/agents/register` with `{"name":"your-system/role"}` (optional `contact_email`, `intended_use`). Returns a sandbox key once plus a claim link for a person. Store the key immediately as `LP_API_KEY` in a secret store. Over MCP the same sign-up is the `register_agent` tool; a key you already hold can be attached to a keyless MCP session with `use_api_key`. Both appear in the tool list only where self-registration is switched on.
+2. **OAuth client credentials:** `POST /api/oauth/register` (RFC 7591) then `client_credentials` at `POST /api/oauth/token`. Same sandbox as self-registration.
+3. **Person-owned workspace:** a person signs up at `https://app.last-price.ai/sign-up` and creates a scoped API key (Settings) or an agent-bound key (`POST /api/agents/{id}/keys`) for the agent.
 
 ## Verify before real work
 

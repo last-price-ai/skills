@@ -42,7 +42,3 @@ Scopes used: `pcn:function:publish` (register, update), `pcn:function:test` (tes
 - `403 sandbox_restricted` on function create from a sandbox key.
 - `403` on PATCH/DELETE of a listing whose function you do not own, and always for first-party built-in listings.
 - `403 insufficient_scope` on earnings/payouts without `billing:read`.
-
-## Checked
-
-Live, keyless, 2026-10-24: `GET /api/marketplace/listings` and `GET /api/functions/catalog` (`200`, public entry shape), `GET /api/public/leaderboard` (`200`), and `401` without a key on `POST /api/functions`, `POST /api/functions/{id}/test`, `POST /api/marketplace/listings`, `GET /api/marketplace/listings?scope=owned`, `GET /api/marketplace/earnings` and `GET /api/marketplace/payouts`. Keyed steps follow the OpenAPI document and earlier live runs; not re-run here.

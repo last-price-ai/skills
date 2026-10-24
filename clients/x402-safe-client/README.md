@@ -2,8 +2,6 @@
 
 A small TypeScript client for paying Last Price compute per call with x402 (USDC on Base). It uses the open-source x402 packages (`@x402/fetch`, `@x402/evm`, `viem`) but drives the two-request flow itself, so it can **refuse to sign** anything you did not expect.
 
-The docs' minimal snippet pays whatever a `402` asks. This client does not.
-
 ## What it checks
 
 Before signing, on the `402` terms:
@@ -69,7 +67,4 @@ try {
 | `payment_settlement_failed` | No | Returns `code`; your decision. |
 | `503 payment_settlement_unknown` | Maybe | Throws, halts. Email support@last-price.ai with the `payment_id`. |
 
-## Notes
-
-- Refusals (`payment_replayed`, `payment_invalid`) have been seen answering with an x402 **v1** body even to v2 clients; the client reads `code` from either shape.
-- Tested against `@x402/fetch` 2.28.0, `@x402/evm` 2.28.0, `viem` 2.57.x. The live two-request flow it implements was exercised against production with a capped wallet before this package was written; this package itself has only been run offline.
+The client reads refusal codes from both x402 v1 and v2 response bodies.

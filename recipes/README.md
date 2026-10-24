@@ -1,6 +1,6 @@
 # Last Price recipes for outside agents
 
-Short, end-to-end recipes for an agent that only has the public docs. Each one lists the calls in order, what a good answer looks like, and the traps seen live.
+Examples for wallet payments, workspace compute, marketplace listings, experiments and Rosetta.
 
 | Recipe | You need | Cost |
 |---|---|---|
@@ -18,9 +18,3 @@ Short, end-to-end recipes for an agent that only has the public docs. Each one l
 - Keep secrets (API keys, embed tokens, wallet keys) in environment variables or a secret store. Never put them in code, prompts, logs or reports.
 - Error bodies carry `error`, often a `code`, and may carry `hint`, `next`, `example`, `issues` and `retry_after`. Read them before retrying.
 - A `429` means wait `retry_after` seconds. A `429 quota_exceeded` lists ways past the limit in `next`.
-
-## How these were checked (2026-10-24)
-
-- Every path named here was matched against the live OpenAPI document.
-- Keyless calls were made live: the unpaid `402` on `POST /api/compute/price`, the public demo, the conversation clarifier, the public catalog, listings and leaderboard, public verify, Rosetta health and canonical schemas, and the `401` answers on every keyed route used below.
-- Keyed and paid steps are described from the public docs and earlier live runs; they were not re-run for this pack. Each recipe says which steps that covers.

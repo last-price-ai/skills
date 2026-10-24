@@ -90,7 +90,3 @@ Prices are whole cents; floors round up; the result never goes below `unit_cost`
 ## Try it with no key first
 
 `POST /api/public/compute/demo` with body A minus `metadata` and `constraints` (the demo strips them) prices on a demo workspace, about 30 calls per IP per hour. Label demo results as demo. It refuses a missing or zero `current_price`; cost-plus needs a key.
-
-## Checked
-
-Live, keyless, 2026-10-24: the conversation clarifier (`needs_input` with questions), the public demo (`200`, `lastprice/jale-optimizer`, 44.99 from 49 with the -1.2 assumption stated), `GET /api/functions/catalog` (lists `lastprice/cost-plus` and `lastprice/competitive-price`), and `401` on `GET /api/me` and `PATCH /api/usage/events/{id}/outcome` without a key. Keyed compute bodies B and C match an earlier live run on the paid path (C priced at 119 by `lastprice/competitive-price`); the keyed calls themselves were not re-run here.

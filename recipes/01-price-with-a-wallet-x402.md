@@ -24,7 +24,7 @@ No account, no API key. Your agent pays 0.01 USDC on Base for each `POST /api/co
 5. **Read the answer.** `200` with the price (`computed_price`, `currency`, `function_name`, `confidence`), plus `PAYMENT-RESPONSE` (v2) and `X-PAYMENT-RESPONSE` (v1). Decode `PAYMENT-RESPONSE`: `success`, `network`, `transaction`, `payer`.
 6. **Keep the transaction hash as your proof of payment.** The paid answer carries only a `receipt.id`, and `GET /api/receipts/{id}` needs an API key (keyless answers `401`). The hash resolves on `https://basescan.org/tx/<hash>`.
 
-## Body variations that worked on the paid path
+## Pricing inputs
 
 - Incumbent price: `{"context":{"product_type":"saas","current_price":49,"currency":"USD"}}` → `lastprice/jale-optimizer`.
 - With cost and elasticity: add `"metadata":{"unit_cost":9,"elasticity":-1.6}`.
@@ -49,13 +49,8 @@ Paid calls run on a shared pay-per-call workspace with the built-in and publicly
 - **Prepaid balance** (needs an API key that can compute): `POST /api/billing/topup` with `{"amount":"10"}` or more and one x402 payment for exactly that amount. Calls then draw 0.008333 USDC each. `GET /api/billing/balance` shows the balance.
 - **Day pass** (self-registered sandbox key): `POST /api/agents/allowance` with one 2.5 USDC payment adds 500 calls for 24 hours once the daily limit is used. `GET` the same path lists passes.
 
-## Known rough edges (seen live)
+## Response handling
 
 - Refusals (`payment_replayed`, `payment_invalid`) answer with an x402 **v1** body even to a v2 client.
 - The v2 `PAYMENT-REQUIRED` envelope's `error` text says `X-PAYMENT header is required`, though v2 clients send `PAYMENT-SIGNATURE`.
-- `explanation` came back `null` on paid calls.
-- Timing: the unpaid `402` takes about 0.6–1.2 s and the paid call about 1.7–3.4 s, because settlement happens inside the request.
-
-## Checked
-
-Live, keyless, 2026-10-24: step 1 (402, decoded v2 terms as above). The paid steps match an earlier capped live run and the docs; they were not re-run for this recipe.
+- `explanation` can be `null`; handle it as an optional field.

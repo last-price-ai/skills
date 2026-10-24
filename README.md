@@ -4,12 +4,21 @@ Agent skills for [Last Price](https://last-price.ai), the Pricing Compute Networ
 
 Each skill is a folder with a `SKILL.md` in the open [Agent Skills](https://agentskills.io) format: YAML frontmatter (`name`, `description` saying when to use it) and a concise body of instructions. These skills work in Cursor, Claude Code, Codex, and other agents that support Agent Skills, or as plain reference docs for any agent.
 
-> Status: **draft for review** by the Last Price team. Every endpoint path mentioned was checked against the live OpenAPI spec (`https://api.last-price.ai/api/openapi.json`, 334 paths / 456 operations on 2026-10-24).
+## Pay per call
+
+Pay for a computation with a wallet, without an account or API key. Send a request to `POST /api/compute/price`, read the HTTP 402 payment requirements, then submit the same request with an x402 payment authorization. Payment uses USDC on Base.
+
+- [Pay-per-call skill](skills/last-price-x402/SKILL.md): payment terms, signing, settlement and errors.
+- [Wallet recipe](recipes/01-price-with-a-wallet-x402.md): request and payment flow.
+- [TypeScript client](clients/x402-safe-client/): validates the recipient, token, amount and spending cap before signing.
+
+Pay-per-call uses the paid compute endpoint. The free demo is a separate, limited endpoint at `/api/public/compute/demo`.
 
 ## Skills
 
 | Skill | Use it for |
 |---|---|
+| [`last-price-x402`](skills/last-price-x402/SKILL.md) | HTTP 402 pay-per-call with USDC on Base, day passes, top-ups |
 | [`last-price-overview`](skills/last-price-overview/SKILL.md) | Start here: what Last Price is, MCP vs HTTP, which skill does what |
 | [`last-price-auth`](skills/last-price-auth/SKILL.md) | Getting and verifying a key, request headers, sandbox limits, scopes |
 | [`last-price-mcp`](skills/last-price-mcp/SKILL.md) | Using the MCP connector: ~280 tools mapped by job |
@@ -26,7 +35,6 @@ Each skill is a folder with a `SKILL.md` in the open [Agent Skills](https://agen
 | [`last-price-order-to-cash`](skills/last-price-order-to-cash/SKILL.md) | Customers, contacts, orders, payments, disputes |
 | [`last-price-usage-and-billing`](skills/last-price-usage-and-billing/SKILL.md) | Usage, receipts, costs, prepaid balance, top-ups, credits, invoices |
 | [`last-price-ucp`](skills/last-price-ucp/SKILL.md) | Universal Commerce Protocol quotes and checkout sessions |
-| [`last-price-x402`](skills/last-price-x402/SKILL.md) | HTTP 402 pay-per-call with USDC on Base, day passes, top-ups |
 | [`last-price-spend-and-offers`](skills/last-price-spend-and-offers/SKILL.md) | Buyer-agent spend policy checks, negotiated offers and counters |
 
 ## Install
@@ -36,7 +44,7 @@ Copy the skill folders you want (or all of `skills/`) into your agent's skills d
 **Cursor**
 
 ```bash
-git clone <this-repo-url> last-price-agent-skills
+git clone https://github.com/last-price-ai/skills.git last-price-agent-skills
 mkdir -p .cursor/skills            # project-level; or ~/.cursor/skills for all projects
 cp -R last-price-agent-skills/skills/* .cursor/skills/
 ```
@@ -63,18 +71,16 @@ Copy the folders into the agent's skills directory (for example `~/.codex/skills
 
 Skill directory locations differ between agents and versions; check your agent's documentation.
 
-## Authentication
+## API keys
 
-1. Get a key, one of:
-   - Self-register an agent (no human): `POST https://api.last-price.ai/api/agents/register` returns a sandbox key once, plus a claim link for a person.
-   - Have a person create a scoped key at `https://app.last-price.ai` (Settings), or an agent-bound key.
-   - No key at all: the public demo (`POST /api/public/compute/demo`) or x402 pay-per-call.
-2. Store it as an environment variable, never in chat or source:
-   - HTTP / scripts: `LP_API_KEY`, sent as `x-api-key: $LP_API_KEY` (never as `Authorization: Bearer`).
-   - MCP connector: `LASTPRICE_API_KEY` in the connector configuration.
-3. Verify with `GET https://api.last-price.ai/api/me`.
+For workspace access, create a scoped key in [Settings](https://app.last-price.ai), or self-register with `POST /api/agents/register` for a sandbox key and claim link.
 
-Details: [`last-price-auth`](skills/last-price-auth/SKILL.md).
+Store the key in your environment or secret store:
+
+- HTTP: `LP_API_KEY`, sent as `x-api-key: $LP_API_KEY`.
+- MCP: `LASTPRICE_API_KEY` in the connector configuration.
+
+Verify a key with `GET https://api.last-price.ai/api/me`. See [authentication](skills/last-price-auth/SKILL.md) for scopes, sandbox limits and OAuth. Pay-per-call needs a wallet instead of an API key.
 
 ## MCP vs HTTP
 
@@ -104,16 +110,16 @@ node scripts/sync.mjs           # regenerate references/mcp-tools.md
 
 `.github/workflows/spec-drift.yml` runs both every weekday, on demand, and on a `repository_dispatch` (`api-changed`) that Last Price can send after each release, and opens a pull request when anything drifted. When it reports drift, re-read the changed operations, update the affected skills, add a `CHANGELOG.md` entry, and refresh the snapshot.
 
-## Safety principles built into every skill
+## Credentials and payments
 
 - Never invent prices, ids, verdicts, or schema fields; report what the API returned.
 - Read state before writing; confirm with the user before changing live prices, money, access, or deleting data.
 - Keep API keys, claim tokens, webhook secrets, embed tokens, and payment headers out of chat and logs.
 
-## Extras
+## Recipes and client
 
-`recipes/` (five tested walk-throughs), `clients/x402-safe-client/` (a paid-call client that checks network, token, amount, recipient and a spend cap before it signs), `harness/x402-release-check/` (a capped, dry-run-by-default paid-call check), `persona-templates/` and `report-format/`. See [EXTRAS.md](EXTRAS.md).
+[Recipes](recipes/) cover wallet payments, keyed compute, marketplace publishing, experiments and Rosetta. The [TypeScript x402 client](clients/x402-safe-client/) provides payment validation and settlement handling.
 
 ## License
 
-MIT; see [LICENSE](LICENSE). The copyright holder is a placeholder ("Last Price") and is **TBD**: the Last Price team should confirm the legal entity name before publishing.
+[MIT](LICENSE).

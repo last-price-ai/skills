@@ -66,7 +66,3 @@ Prefer webhooks over polling: `rosetta.adapter.frozen`, `rosetta.adapter.review_
 ## Errors
 
 `400` names the missing or invalid key (for freeze/normalize this is usually a snake_case plan or no `mappings`); `401` no credential; `403 sandbox_restricted` unclaimed sandbox; `404` review id from another workspace; `409` review already decided.
-
-## Checked
-
-Live, keyless, 2026-10-24: `GET /api/rosetta/health` and `GET /api/rosetta/canonical-schemas` (`200`, five targets, camelCase fields), and `401` without a key on `ingest`, `plan`, `translate` and `freeze`. Bodies follow the live OpenAPI document (`ingest` requires `canonical_target` + `payload`, `samples` capped at 25; `freeze` requires a camelCase `plan` with `mappings`). Keyed steps not re-run here.

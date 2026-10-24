@@ -13,6 +13,12 @@ Last Price is price computation as a service. A caller sends a pricing context (
 - Agent discovery: `/.well-known/agents.json`, `/llms.txt`, `/.well-known/mcp.json`, `/.well-known/ucp`.
 - What changed: `GET /api/public/changelog` (public), or the `platform.changelog` webhook.
 
+## Pay per call
+
+A wallet-only caller pays for compute through `POST /api/compute/price` using x402 and USDC on Base. No account or API key is required. Validate the payment requirements and obtain spending authorization before signing. Use `last-price-x402` for this flow.
+
+The free demo at `/api/public/compute/demo` has narrower inputs and routing. Paid compute uses `/api/compute/price`.
+
 ## MCP or HTTP
 
 - **MCP connector** (`https://api.last-price.ai/api/mcp/rpc`): structured tools, now covering most of the API (compute, functions, routing, guardrails, experiments, learning, Rosetta, commerce, order-to-cash, webhooks, billing, team). Prefer it when the connector is installed. See `last-price-mcp`.
@@ -27,6 +33,7 @@ HTTP: `x-api-key: $LP_API_KEY`. MCP connector: `LASTPRICE_API_KEY`. Never paste 
 
 | Job | Skill |
 |---|---|
+| HTTP 402, x402 pay-per-call, day passes, top-ups | `last-price-x402` |
 | Get or verify a key, headers, self-register an agent | `last-price-auth` |
 | Call through the MCP connector | `last-price-mcp` |
 | Quote a price (single, batch, demo, clarifier) | `last-price-compute` |
@@ -42,7 +49,6 @@ HTTP: `x-api-key: $LP_API_KEY`. MCP connector: `LASTPRICE_API_KEY`. Never paste 
 | Customers, contacts, orders, payments, disputes | `last-price-order-to-cash` |
 | Usage, costs, prepaid balance, credits, invoices | `last-price-usage-and-billing` |
 | Agent shopping: UCP quote and checkout sessions | `last-price-ucp` |
-| HTTP 402, x402 pay-per-call, day passes, top-ups | `last-price-x402` |
 | Buyer-agent spend policy, offers and counter-offers | `last-price-spend-and-offers` |
 
 ## Rules for every skill

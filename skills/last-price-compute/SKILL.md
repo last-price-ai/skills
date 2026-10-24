@@ -55,16 +55,21 @@ Rules for every function: whole cents; floors round up; if no cent fits between 
 | 400 `missing_incumbent_price` | Send a positive `current_price`, or `unit_cost` for cost-plus. |
 | 400 `missing_pricing_basis` | Cost-plus with no `unit_cost` and no full band. |
 | 400 `conflicting_pricing_inputs` | Currency mismatch, min > max, max below floor: correct inputs, don't add more. |
-| 401 / 402 | No or bad credential; 402 means x402 pay-per-call is offered (see `last-price-x402`). |
+| 401 | Invalid credential; read the error code before replacing it. |
+| 402 `payment_required` | Pay per call with x402 (see `last-price-x402`). |
 | 403 | Missing `price:compute`. |
 | 404 | `function_id` unknown or not reachable by this workspace (deliberately indistinguishable). |
 | 422 `not_a_pricing_function` | The UUID is a non-pricing built-in (Rosetta, significance, allocator). Nothing metered. |
 | 429 | `rate_limited` (wait `Retry-After`) or `quota_exceeded`; `next` offers pay per call, day pass, claim. |
 | 503 | Function inactive or circuit open; retry after `Retry-After`. `payment_settlement_unknown` is never retryable. |
 
-## Demo (no key)
+## Pay per call
 
-`POST /api/public/compute/demo` pins `lastprice/jale-optimizer` on a demo workspace, ignores `function_id`/`routing_preference`, strips `constraints` and `metadata`, caps the body at 4 KB and about 30 calls per IP per hour (`X-Demo-Remaining`). A missing or zero `current_price` is a 400 pointing at cost-plus, which only the authenticated endpoint runs. Label demo results as demo.
+Use `/api/compute/price` with an x402 payment authorization instead of an API key. Read `last-price-x402` for payment validation and settlement handling. Paid calls can use metadata, constraints and available pricing functions.
+
+## Free demo
+
+`POST /api/public/compute/demo` pins `lastprice/jale-optimizer` on a demo workspace, ignores `function_id`/`routing_preference`, strips `constraints` and `metadata`, caps the body at 4 KB and about 30 calls per IP per hour (`X-Demo-Remaining`). A missing or zero `current_price` is a 400 pointing at cost-plus on `/api/compute/price`, using an API key or x402 payment. Label demo results as demo.
 
 ```bash
 curl -sS -X POST https://api.last-price.ai/api/public/compute/demo \

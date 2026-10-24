@@ -4,13 +4,17 @@ description: Use when last-price.ai answers HTTP 402 or an agent wants to pay pe
 ---
 # Last Price: x402 pay-per-call, day passes, and top-ups
 
-**402 is a real product path**, not an auth failure: unauthenticated `POST /api/compute/price` answers 402 with x402 payment requirements. A wallet-only agent can buy one priced computation with no account. This was verified end to end with a funded wallet (October 2026).
+Pay for a computation with USDC on Base, without an account or API key. `POST /api/compute/price` returns HTTP 402 payment requirements; submit the same request with a signed x402 authorization to pay for the result.
 
-## Live terms (re-read before paying; they can change)
+## Payment terms
+
+Read the current payment requirements before signing; prices and terms can change.
+
+Read the current payment requirements before signing; prices and terms can change.
 
 From `/.well-known/agents.json` -> `payments.x402`, the live 402, and `https://last-price.ai/docs/agent-wallets`:
 
-| Field | Value seen live |
+| Field | Expected value |
 |---|---|
 | Network | Base, `eip155:8453` (v1 name `base`) |
 | Asset | USDC, contract `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` (6 decimals) |
@@ -29,7 +33,6 @@ From `/.well-known/agents.json` -> `payments.x402`, the live 402, and `https://l
 
 Notes:
 - **Keep the transaction hash** from `PAYMENT-RESPONSE` as proof of payment. The 200 body carries only `receipt.id`, and `GET /api/receipts/{id}` needs an API key, so a wallet-only buyer cannot fetch the receipt.
-- **Latency:** settlement happens inside the request: about 1.7-3.4 s per paid call versus 0.25-0.43 s of compute. The unpaid 402 round trip adds 0.6-1.2 s; a client that already knows the terms can pre-sign and skip it (still verify the terms periodically).
 - The v2 402 text says "X-PAYMENT header is required" (the v1 name); v2 clients still send `PAYMENT-SIGNATURE`.
 - Body `remaining.rate_limit.limit` and the `X-RateLimit-Limit` header may disagree; trust the headers and `Retry-After`. `explanation` may be null on paid calls.
 - Private keys exported from some wallets (e.g. MetaMask) lack the `0x` prefix; `viem`'s `privateKeyToAccount` needs it. Load keys from a secret store, never log them.

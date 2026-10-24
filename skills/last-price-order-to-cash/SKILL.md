@@ -68,14 +68,6 @@ Record: `customerId`, `amount` required; optional `invoiceId`, `currency`, `stat
 
 Create: `paymentId` and `amount` (> 0) required; optional `customerId`, `currency`, `reason`, `status`, `metadata`. PATCH `status`, `reason`, `metadata`. No delete. Opening a dispute alerts owners/admins.
 
-## Test loop
-
-1. Create a customer with an `externalId`; fetch it by external id.
-2. Create a contact and a `draft` order with that billing contact.
-3. Compute a price (`last-price-compute`), add a line with `metadata.quote_request_id`, activate the order.
-4. Record a payment, refund part of it, open a dispute, move it to `under_review`.
-5. Clean up test data only: cancel then delete the order (payments have no delete).
-
 Webhooks: `order.created`, `payment.received`, `dispute.opened`, `invoice.generated` (see `last-price-webhooks`).
 
 ## Guardrails
