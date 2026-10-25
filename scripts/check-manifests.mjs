@@ -12,7 +12,6 @@ const read = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
 const SERVER_URL = "https://api.last-price.ai/api/mcp/rpc";
 
 const claude = read(".claude-plugin/plugin.json");
-const claudeMcp = read(".mcp.json");
 const cursor = read(".cursor-plugin/plugin.json");
 const cursorMcp = read(".cursor-plugin/mcp.json");
 const openai = read("plugin.json");
@@ -35,7 +34,6 @@ for (const [label, m] of Object.entries(manifests)) {
 // Price can tell which install a call came from. The tag never changes an
 // answer; an unknown tag is ignored by the server.
 const urls = [
-  ["claude .mcp.json", claudeMcp.mcpServers?.lastprice?.url, "claude-plugin"],
   ["claude plugin.json", claude.mcpServers?.lastprice?.url, "claude-plugin"],
   ["cursor mcp.json", cursorMcp.mcpServers?.lastprice?.url, "cursor-plugin"],
   ["openai mcp.json", openaiMcp.mcpServers?.lastprice?.url, "openai-plugin"],

@@ -141,7 +141,7 @@ The plugin, extension and manifests in this repository contain no code that runs
 
 | File | Read by |
 |---|---|
-| `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.mcp.json` | Claude Code |
+| `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Claude Code |
 | `.cursor-plugin/plugin.json`, `.cursor-plugin/mcp.json`, `.cursor-plugin/marketplace.json` | Cursor |
 | `plugin.json`, `mcp.json`, `.agents/plugins/marketplace.json` | Codex and ChatGPT |
 | `gemini-extension.json`, `GEMINI.md` | Gemini CLI |
@@ -179,7 +179,7 @@ python3 scripts/check-spec-drift.py           # exit 1 on drift or missing paths
 python3 scripts/check-spec-drift.py --update  # refresh the snapshot after re-verifying skills
 ```
 
-`scripts/sync.mjs` (Node 18+, no dependencies) does the same for the MCP connector: it reads the live `tools/list`, fails when a tool is named in no skill or a known tool disappears or changes its required arguments, and regenerates each skill's `references/mcp-tools.md` (every argument, access level and documented refusal of the tools that skill names).
+`scripts/sync.mjs` (Node 18+, no dependencies) does the same for the MCP connector: it reads the live `tools/list`, fails when a tool is named in no skill or a known tool disappears or changes its required arguments, and regenerates each skill's `references/mcp-tools.md` (split into an index and `mcp-tools-<n>.md` parts when it would pass 200 kB; every argument, access level and documented refusal of the tools that skill names).
 
 ```bash
 node scripts/sync.mjs --check   # exit 1 on drift
