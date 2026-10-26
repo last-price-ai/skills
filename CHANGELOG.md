@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
-- Caught up with production (308 tools): `last-price-mcp` now names the 26 tools prod gained since the pack was written (price checks from a photo or link, quote replies, reference pipelines, hosted price scraping, credit bundles, tax preview, Stripe invoices, monetization code), and every tool reference is regenerated.
+- No payments in the plugins: every manifest now points at the connector's directory tool set (`?profile=directory`, 258 tools), the same one listed in the Claude connector directory, so wallet balance, top-ups, day passes, spend sessions, purchase settlement, payouts and the x402 price index are no longer installed. The skills match it: `scripts/sync.mjs` and the drift check read the directory tool set, `last-price-x402` and the spend policy half of `last-price-spend-and-offers` moved to `payments/` (with the wallet recipe and the x402 client), which no plugin loads, and the offers half is now `last-price-offers`. Workspace settings, team, notifications and agent inbox tools are left out too, since a directory sign-in cannot call them.
+- Caught up with production: `last-price-mcp` now names the 26 tools prod gained since the pack was written (price checks from a photo or link, quote replies, reference pipelines, hosted price scraping, credit bundles, tax preview, Stripe invoices, monetization code), and every tool reference is regenerated.
 - The drift check now fails when it should: its steps ran under `bash -e` without pipefail, so `| tee` hid every failure and no drift pull request was ever opened. It also runs every three hours instead of once a weekday.
 - Removed the root `.mcp.json`: the Claude Code plugin's server lives in `.claude-plugin/plugin.json` (with the optional key), and the duplicate showed as a shadowed second server in the Claude plugin directory.
 - `scripts/sync.mjs` splits a tool reference over 200 kB into an index and parts, so the directory's 256 KiB scan reads every file in full (`last-price-mcp` now has `mcp-tools-1.md` and `mcp-tools-2.md`).

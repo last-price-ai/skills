@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => JSON.parse(readFileSync(join(root, p), "utf8"));
 const SERVER_URL = "https://api.last-price.ai/api/mcp/rpc";
+// Every plugin uses the directory tool set: no wallet, top-up, spend-session or payout tools.
 
 const claude = read(".claude-plugin/plugin.json");
 const cursor = read(".cursor-plugin/plugin.json");
@@ -40,7 +41,7 @@ const urls = [
   ["gemini-extension.json", gemini.mcpServers?.lastprice?.httpUrl, "gemini-cli"],
 ];
 for (const [label, url, via] of urls) {
-  const expected = `${SERVER_URL}?via=${via}`;
+  const expected = `${SERVER_URL}?profile=directory&via=${via}`;
   expect(url === expected, `${label}: server URL is ${url}, expected ${expected}`);
 }
 

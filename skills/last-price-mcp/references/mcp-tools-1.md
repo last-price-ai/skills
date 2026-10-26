@@ -20,7 +20,7 @@ Ask Last Price what pricing inputs are missing. Start with request: {}, return i
 
 ## `compute_price`
 
-Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. To pay for this one call with x402 instead of a key or a balance, pass payment: a signed payment for the price it asks (call it without payment to read what it asks). Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after.
+Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -50,7 +50,6 @@ Compute a price for a product/context via the Last Price Pricing Compute Network
 | `include_buyer_envelope` | boolean | If true, and metadata.category names a category, the result carries buyer_envelope: what buyers' own spend checks allowed in that category (p25 to p75, the median, and how often checks were refused over a limit, pooled over 5 or more buyer workspaces; no numbers below 5) and where this price sits. A limit, not a valuation: it never changes the price. Where it is not switched on for the workspace it is ignored. |
 | `metadata` | object | Optional context. For competitive pricing: competitor_price, competitor_currency and competitive_action (match or undercut); undercut requires undercut_pct. Confirm product comparability before calling. |
 | `idempotency_key` | string | Optional. A new value (e.g. a UUID) for each call you mean to make; send the SAME value if you retry after a timeout or error you cannot interpret, and the call is computed and charged once. Ignored without a credential. |
-| `payment` | string | Optional. The signed x402 payment, base64, as sent in an X-PAYMENT or PAYMENT-SIGNATURE header. Omit it to read what the call costs and how to pay; nothing is charged until you send it. |
 
 ## `compute_prices_batch`
 
@@ -710,21 +709,20 @@ _No arguments._
 
 ## `ask_pricing_analyst`
 
-Ask the pricing analyst one question about your workspace's pricing, in plain words, and get short claims that each cite the findings or estimates they rest on: every number is checked against them, and a claim with a number that is not is dropped. It refuses to forecast, to state a price or to answer from anything but your own records. At most 500 characters and 30 questions an hour. Paid like the brief (your own model key, the monthly allowance, or your balance if you opted in, which only a credential with routing write or billing write may spend); when nothing pays, the answer lists the closest findings plus the x402 price and requirements for one written answer (0.02 USDC): sign them and call again with payment, which is settled only when a written answer is delivered within this call, never for a refusal. Changes no setting and no price. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Ask the pricing analyst one question about your workspace's pricing, in plain words, and get short claims that each cite the findings or estimates they rest on: every number is checked against them, and a claim with a number that is not is dropped. It refuses to forecast, to state a price or to answer from anything but your own records. At most 500 characters and 30 questions an hour. Changes no setting and no price. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/pricing-analyst/ask`
-- **Errors and cautions:** It refuses to forecast, to state a price or to answer from anything but your own records. Paid like the brief (your own model key, the monthly allowance, or your balance if you opted in, which only a credential with routing write or billing write may spend); when nothing pays, the answer lists the closest findings plus the x402 price and requirements for one written answer (0.02 USDC): sign them and call again with payment, which is settled only when a written answer is delivered within this call, never for a refusal.
+- **Errors and cautions:** It refuses to forecast, to state a price or to answer from anything but your own records.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `question` **(required)** | string | The question, such as "Why is learning not using my estimate yet?". Treated as data, never as instructions. |
-| `payment` | string | Optional. The signed x402 payment, base64, as sent in an X-PAYMENT or PAYMENT-SIGNATURE header. Omit it to read what the call costs and how to pay; nothing is charged until you send it. |
 
 ## `get_analyst_settings`
 
-Read whether the pricing analyst writes your workspace a brief, how often, whether a written brief may be paid from your Last Price balance and up to what monthly cap, whether the brief is switched on for your workspace (released), the funding terms (with the x402 price of one question), and whether the commerce cycle runs on a schedule, how often, and what its latest run drafted. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read whether the pricing analyst writes your workspace a brief, how often, whether a written brief may be paid from your Last Price balance and up to what monthly cap, whether the brief is switched on for your workspace (released), and whether the commerce cycle runs on a schedule, how often, and what its latest run drafted. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
@@ -2543,99 +2541,140 @@ Get receipts for many of your workspace's priced calls at once, as one statement
 | `limit` | integer | Receipts per page for a period. Defaults to 100. |
 | `offset` | integer | Receipts to skip for a period. Defaults to 0, at most 1000000. |
 
-## `get_billing_settings`
+## `browse_catalog`
 
-Read your workspace's prepaid balance and billing settings: the balance in USDC, whether balance billing and outcome pricing are on, the auto top-up offer, the latest ledger rows and the terms. Needs a Last Price credential with price compute scope.
+Browse the public marketplace catalog of pricing functions.
 
-- **Access:** key, price compute scope
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
-- **REST:** `/api/billing/balance`
+- **REST:** `/api/functions/catalog`
 
 _No arguments._
 
-## `update_billing_settings`
+## `list_marketplace_listings`
 
-Change your workspace's billing settings. Only the settings you send change. outcome_pricing turns on paying in full only when a price is used: a rejection reported with report_outcome within its window gives part back. balance_billing makes every compute call draw on the prepaid balance, and a call the balance cannot cover is refused. auto_topup is an offer, not a charge: below the threshold, results carry a top-up hint and nothing is paid automatically. A self-registered agent workspace cannot change outcome_pricing or balance_billing until it is claimed. Needs a Last Price credential with price compute scope; a person also needs the owner, admin or billing role.
+Browse the public marketplace: the pricing functions their owners listed for anyone to use, each cut to its public fields, with usage and rating. Page with limit and offset. Public: needs no credential, limited per address.
 
-- **Access:** key, price compute scope
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **Errors and cautions:** Public: needs no credential, limited per address.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | How many to return. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `list_my_marketplace_listings`
+
+List your own marketplace listings, public or not. Page with limit and offset. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | How many to return. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `create_marketplace_listing`
+
+List one of your functions on the marketplace: pass function_id, and optionally is_public (default false), commission_rate (default 0.30), min_payout_threshold (default 50) and payout_currency (default USD). A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Where payouts go is set by a person, not by this tool. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **REST:** `/api/marketplace/listings`
+- **Errors and cautions:** A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+| `is_public` | boolean | List it publicly. Defaults to false. |
+| `commission_rate` | number | The share of each sale the marketplace keeps. Defaults to 0.30. |
+| `min_payout_threshold` | number | The least balance that is paid out. Defaults to 50. |
+| `payout_currency` | string | The currency payouts are made in. Defaults to USD. |
+
+## `update_marketplace_listing`
+
+Change one of your marketplace listings: pass listing_id and at least one of is_public, commission_rate and min_payout_threshold. Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
-- **REST:** `/api/billing/balance`
-- **Errors and cautions:** balance_billing makes every compute call draw on the prepaid balance, and a call the balance cannot cover is refused.
+- **REST:** `/api/marketplace/listings/{listingId}`
+- **Errors and cautions:** Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `outcome_pricing` | boolean | Turn outcome pricing on or off. |
-| `balance_billing` | boolean | Turn balance billing on or off. |
-| `auto_topup` | object / null | The auto top-up offer, or null to clear it. |
+| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
+| `is_public` | boolean | Whether the listing is public. |
+| `commission_rate` | number | The share of each sale the marketplace keeps. |
+| `min_payout_threshold` | number | The least balance that is paid out. |
 
-## `list_outcomes`
+## `delete_marketplace_listing`
 
-Read your workspace's outcome pricing: whether it is on, its terms, counts of open, accepted and rejected windows with the total refunded, and the windows themselves, newest first. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Remove one of your marketplace listings: pass listing_id. The function stays; it is no longer listed. Only the owner can remove a listing. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
+
+## `get_function_review`
+
+Read the latest marketplace review of one of your functions, from its listing: the report, whether the listing is public and the listing id. The review is null when the function has no listing or was never reviewed. Pass function_id. Only the owner can read it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `status` | `open` / `decided` | Only open windows, or only decided ones. Both by default. |
-| `limit` | integer | Most windows to return. Defaults to 50. |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
 
-## `top_up_balance`
+## `run_function_review`
 
-Add USDC to your workspace's prepaid balance with one x402 payment signed by your own wallet. amount is in USDC, such as "25". Called without payment it spends nothing and returns the payment requirements to sign. Sign them, then call again with the same amount and payment set to the base64 payment (the value of the X-PAYMENT or PAYMENT-SIGNATURE header). The result gives the credited amount, any bonus and the new balance; get_billing_settings shows the terms. Needs a Last Price credential with the price:compute scope.
+Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the listing is public. Pass function_id. The sample call spends your endpoint or provider key. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key, price:compute scope
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
-- **REST:** `/api/billing/topup`
+- **Errors and cautions:** Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `amount` **(required)** | string | USDC to add, with at most 6 decimals, such as "25" or "25.50". |
-| `payment` | string | Optional. The signed x402 payment, base64, as sent in an X-PAYMENT or PAYMENT-SIGNATURE header. Omit it to read what the call costs and how to pay; nothing is charged until you send it. |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
 
-## `create_card_topup`
+## `get_public_leaderboard`
 
-Add to your workspace's prepaid balance by card, when no crypto wallet is at hand to sign an x402 payment. amount is in US dollars with whole cents, such as "25". Nothing is charged by this call: it returns a checkout link, a card payment page for exactly that amount, and the top-up id. Give the link to the person who runs you; once they pay, the balance is credited one USDC per dollar. Poll get_card_topup with the top-up id until its status is paid. Not every workspace has card top-ups yet: a refusal lists the other ways to pay. Needs a Last Price credential with the price:compute scope.
+Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating. Pass window as 7d, 30d, 90d or all (default all). Public: needs no credential, limited per address.
 
-- **Access:** key, price:compute scope
-- **Behaviour:** reaches outside Last Price
-- **REST:** `/api/billing/topup/card`
-- **Errors and cautions:** Not every workspace has card top-ups yet: a refusal lists the other ways to pay.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `amount` **(required)** | string | US dollars to add, with at most 2 decimals, such as "25" or "25.50". |
-
-## `get_card_topup`
-
-Read one card top-up of your workspace by topup_id: pending (with its checkout link), paid (the balance holds it), expired (the payment page lapsed unpaid) or failed, with the amount in US dollars and the USDC credited. Needs a Last Price credential with the price:compute scope.
-
-- **Access:** key, price:compute scope
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
-- **REST:** `/api/billing/topup/card/{topupId}`
+- **Errors and cautions:** Public: needs no credential, limited per address.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `topup_id` **(required)** | string | The card top-up UUID: topup_id on a create_card_topup result. |
+| `window` | `7d` / `30d` / `90d` / `all` | How far back to rank. Defaults to all. |
 
-## `list_day_passes`
+## `get_marketplace_earnings`
 
-Read your workspace's day passes, newest first: for each, the calls left and when it ends, plus the total calls left and what a new pass costs now. A day pass is extra compute calls for 24 hours that a self-registered agent workspace buys with one x402 payment: buy_day_pass buys one. Needs a Last Price credential with the price:compute scope.
+Read the payout ledger for the functions you own on the marketplace: what each call earned, its commission and its payout status. Filter by payout_status and page with limit and offset. Read-only. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key, price:compute scope
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
-- **REST:** `/api/agents/{id}`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `payout_status` | string | Only entries with this payout status. |
+| `limit` | integer | How many to return. Defaults to 50. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `list_webhooks`
+
+List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret (whsec_...; the secret is how you verify the x-lastprice-signature header on what it receives). Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/webhooks`
 
 _No arguments._
-
-## `buy_day_pass`
-
-Buy a day pass for your workspace: extra compute calls for 24 hours, paid with one x402 payment signed by your own wallet. Called without payment it spends nothing and returns the payment requirements (price, recipient, network, asset) to sign. Sign them, then call again with payment set to the base64 payment (the value of the X-PAYMENT or PAYMENT-SIGNATURE header). Only a self-registered agent workspace may buy one; list_day_passes shows the offer and your passes. Needs a Last Price credential with the price:compute scope.
-
-- **Access:** key, price:compute scope
-- **Behaviour:** reaches outside Last Price
-- **REST:** `/api/agents/{id}`
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `payment` | string | Optional. The signed x402 payment, base64, as sent in an X-PAYMENT or PAYMENT-SIGNATURE header. Omit it to read what the call costs and how to pay; nothing is charged until you send it. |

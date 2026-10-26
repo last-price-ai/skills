@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "lastprice": {
-      "url": "https://api.last-price.ai/api/mcp/rpc?via=cursor-plugin"
+      "url": "https://api.last-price.ai/api/mcp/rpc?profile=directory&via=cursor-plugin"
     }
   }
 }

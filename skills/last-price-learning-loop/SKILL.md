@@ -4,7 +4,7 @@ description: Use when closing the last-price.ai pricing feedback loop - reportin
 ---
 # Last Price: the learning loop
 
-Last Price gets smarter per workspace only when quotes get outcomes: **quote -> outcome -> nightly elasticity fit -> analyst findings -> learned pricing on -> re-quote**. Every endpoint here is 401 without a credential. MCP equivalents include `report_outcome`, `list_outcomes`, `get_pricing_analysis`, `get_analyst_brief`, `ask_pricing_analyst`, `get_learned_pricing`, `set_learned_pricing`, `list_learned_price_changes`, `decide_learned_price_change`, `get_price_exploration`, `set_price_exploration`, `recommend_jale_price` (see `last-price-mcp`).
+Last Price gets smarter per workspace only when quotes get outcomes: **quote -> outcome -> nightly elasticity fit -> analyst findings -> learned pricing on -> re-quote**. Every endpoint here is 401 without a credential. MCP equivalents include `report_outcome`, `get_pricing_analysis`, `get_analyst_brief`, `ask_pricing_analyst`, `get_learned_pricing`, `set_learned_pricing`, `list_learned_price_changes`, `decide_learned_price_change`, `get_price_exploration`, `set_price_exploration`, `recommend_jale_price` (see `last-price-mcp`).
 
 ## Endpoints
 

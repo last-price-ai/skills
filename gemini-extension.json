@@ -1,11 +1,11 @@
 {
   "name": "lastprice",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Compute and verify prices from Gemini CLI with the Last Price MCP server and skills. Works keyless on a demo tenant.",
   "contextFileName": "GEMINI.md",
   "mcpServers": {
     "lastprice": {
-      "httpUrl": "https://api.last-price.ai/api/mcp/rpc?via=gemini-cli",
+      "httpUrl": "https://api.last-price.ai/api/mcp/rpc?profile=directory&via=gemini-cli",
       "headers": {
         "x-api-key": "${LASTPRICE_API_KEY:-}"
       }
