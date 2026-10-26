@@ -74,7 +74,7 @@ Record a payment against a customer: pass customer_id and amount, and optionally
 Mark a payment refunded: pass payment_id, and optionally amount (up to the payment amount; the whole payment otherwise) and reason. It records the refund in Last Price, and answers 400 when the payment is already refunded. Needs a claimed Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/payments/{paymentId}/refund`
 - **Errors and cautions:** It records the refund in Last Price, and answers 400 when the payment is already refunded. Needs a claimed Last Price credential with billing write scope.
 

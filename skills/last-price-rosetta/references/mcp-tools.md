@@ -26,7 +26,7 @@ Onboard a merchant feed with one call: send payload and canonical_target and Ros
 Ask Rosetta how a source schema maps onto a canonical one: for each source field the target field, the transform, a confidence and where the mapping came from, with a plan confidence and tier. Pass source_schema (an id and its fields, each a path and type) and canonical_schema (the id of a built-in schema from list_canonical_schemas, or a whole schema). A plan below the confidence bar is queued for review and the answer says so; list_rosetta_review shows the queue. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/rosetta/plan`
 - **Errors and cautions:** Needs a claimed Last Price credential.
 
@@ -40,7 +40,7 @@ Ask Rosetta how a source schema maps onto a canonical one: for each source field
 Translate one source record into a vendor's payload in one call: Rosetta plans the mapping, compiles source_record against it and validates the result against vendor_contract (an id and the fields the vendor requires). The answer says whether the payload is ready, the plan, the payload, any skipped fields and each validation issue. Set allow_extra to let fields the contract does not list through, and extensions for vendor extensions. A plan below the confidence bar is queued for review. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/rosetta/translate`
 - **Errors and cautions:** Needs a claimed Last Price credential.
 
@@ -71,7 +71,7 @@ Freeze a mapping plan into a pinned adapter: every mapping is stamped as frozen 
 Turn a vendor's response into the canonical shape using a plan from plan_rosetta_mapping: returns the canonical record, the fields that were missing, the lossy conversions and what passed through unmapped. Pass plan and vendor_response. Read-only. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/rosetta/normalize`
 - **Errors and cautions:** Needs a claimed Last Price credential.
 
@@ -85,7 +85,7 @@ Turn a vendor's response into the canonical shape using a plan from plan_rosetta
 List the mappings Rosetta held back for a person or agent to approve: each one's source, proposed canonical field, confidence and status. Pass status pending, approved or rejected to filter; with none you get all of them. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -96,7 +96,7 @@ List the mappings Rosetta held back for a person or agent to approve: each one's
 Approve or reject one mapping Rosetta held back, by id from list_rosetta_review. Pass action approve or reject, and reviewer to say who decided, otherwise the workspace is recorded. A decision is final: an item already decided answers 409. An agent or key that queued the item cannot decide it: that answers 403, and a person or a different agent or key decides. It sends the review-resolved webhook to the workspace's endpoints. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/rosetta/review`
 - **Errors and cautions:** A decision is final: an item already decided answers 409. An agent or key that queued the item cannot decide it: that answers 403, and a person or a different agent or key decides. Needs a claimed Last Price credential.
 
@@ -111,7 +111,7 @@ Approve or reject one mapping Rosetta held back, by id from list_rosetta_review.
 List the canonical schemas the Rosetta translator maps any vendor's data onto: product, offer, observation, match and action, with each one's id and fields. Use it to learn which canonical targets exist before you map a source. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/rosetta/canonical-schemas`
 
 _No arguments._

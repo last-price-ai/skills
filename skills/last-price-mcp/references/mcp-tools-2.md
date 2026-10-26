@@ -4,12 +4,485 @@
 
 Index: [mcp-tools.md](mcp-tools.md).
 
+## `get_wallet_balance`
+
+Read the USDC a wallet holds on the network pay-per-call uses, from the chain, and what it covers: paid calls and day passes. address is the wallet that signs your x402 payments. Check it before buy_day_pass, top_up_balance or a paid compute_price. Nothing is signed and no money moves. Needs a Last Price credential with the price:compute scope.
+
+- **Access:** key, price:compute scope
+- **Behaviour:** read-only, reaches outside Last Price
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `address` **(required)** | string | The 0x wallet address that pays. |
+
+## `get_x402_price_index`
+
+Read the x402 market price band: what paid x402 services list per call in public x402 discovery catalogs, as the 10th percentile, median and 90th percentile price per call for each category and over every category, with how many services stand behind each band and the day it describes. Pass category to narrow to one, and days with it for that band per day. Use it to see what a paid call usually costs before you pay; verify_price and check_purchase use the same band. List prices only, never evidence of demand: some sellers pay themselves. Public: needs no credential, limited per address. Until it is switched on it answers not released.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **Errors and cautions:** Public: needs no credential, limited per address. Until it is switched on it answers not released.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `category` | `all` / `inference` / `search` / `scraping` / `markets` / `media` / `social` / `weather` / `other` | Only this category, with the overall band. Leave out for every category. |
+| `days` | integer | With category: also that band for each of the last this many days. |
+
+## `browse_catalog`
+
+Browse the public marketplace catalog of pricing functions.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **REST:** `/api/functions/catalog`
+
+_No arguments._
+
+## `list_marketplace_listings`
+
+Browse the public marketplace: the pricing functions their owners listed for anyone to use, each cut to its public fields, with usage and rating. Page with limit and offset. Public: needs no credential, limited per address.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **Errors and cautions:** Public: needs no credential, limited per address.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | How many to return. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `list_my_marketplace_listings`
+
+List your own marketplace listings, public or not. Page with limit and offset. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | How many to return. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `create_marketplace_listing`
+
+List one of your functions on the marketplace: pass function_id, and optionally is_public (default false), commission_rate (default 0.30), min_payout_threshold (default 50) and payout_currency (default USD). A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Where payouts go is set by a person, not by this tool. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **REST:** `/api/marketplace/listings`
+- **Errors and cautions:** A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+| `is_public` | boolean | List it publicly. Defaults to false. |
+| `commission_rate` | number | The share of each sale the marketplace keeps. Defaults to 0.30. |
+| `min_payout_threshold` | number | The least balance that is paid out. Defaults to 50. |
+| `payout_currency` | string | The currency payouts are made in. Defaults to USD. |
+
+## `update_marketplace_listing`
+
+Change one of your marketplace listings: pass listing_id and at least one of is_public, commission_rate and min_payout_threshold. Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/marketplace/listings/{listingId}`
+- **Errors and cautions:** Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
+| `is_public` | boolean | Whether the listing is public. |
+| `commission_rate` | number | The share of each sale the marketplace keeps. |
+| `min_payout_threshold` | number | The least balance that is paid out. |
+
+## `delete_marketplace_listing`
+
+Remove one of your marketplace listings: pass listing_id. The function stays; it is no longer listed. Only the owner can remove a listing. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
+
+## `get_function_review`
+
+Read the latest marketplace review of one of your functions, from its listing: the report, whether the listing is public and the listing id. The review is null when the function has no listing or was never reviewed. Pass function_id. Only the owner can read it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+
+## `run_function_review`
+
+Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the listing is public. Pass function_id. The sample call spends your endpoint or provider key. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** reaches outside Last Price
+- **Errors and cautions:** Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+
+## `get_public_leaderboard`
+
+Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating. Pass window as 7d, 30d, 90d or all (default all). Public: needs no credential, limited per address.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **Errors and cautions:** Public: needs no credential, limited per address.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `window` | `7d` / `30d` / `90d` / `all` | How far back to rank. Defaults to all. |
+
+## `discover_offers`
+
+Find offers you can call for a task, ranked: describe what you are trying to do in task and get a short list of priced offers (marketplace pricing functions and paid x402 services), each with how to call it, its price per call, where that price sits against what paid x402 services list, and why it is in the list. Places marked ranked are earned on measured results (the Elo Index) and relevance; places marked explore are new offers not yet measured, about a fifth of the list by default. Nobody pays for a place. Narrow with category and max_price (USD per call). When you call an offer, send the feed reference it carries as the x-lp-feed-ref header. Public: needs no credential, limited per address. Until it is switched on it answers not released.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **Errors and cautions:** Public: needs no credential, limited per address. Until it is switched on it answers not released.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `task` **(required)** | string | What you are trying to do, in your own words. |
+| `category` | string | Only offers in this category (a marketplace vertical such as saas, or an x402 category such as inference). |
+| `max_price` | number | Most you will pay per call, in USD. |
+| `limit` | integer | How many offers. Defaults to 10. |
+| `explore_share` | number | Share of places for new, unmeasured offers. Defaults to 0.2. |
+
+## `get_marketplace_earnings`
+
+Read the payout ledger for the functions you own on the marketplace: what each call earned, its commission and its payout status. Filter by payout_status and page with limit and offset. Read-only. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `payout_status` | string | Only entries with this payout status. |
+| `limit` | integer | How many to return. Defaults to 50. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `request_payout_run`
+
+Ask what paying your marketplace ledger for a period would send, or request that payout. With dry_run true (the default) you get the report: what each connected account would be sent, and every entry skipped with the reason. Nothing moves. With dry_run false, for a period that has ended, the run waits for approval by someone other than whoever requested it: approve_payout_run refuses (403) the same API key or agent, and the same person through another of their keys, their sign-in or an agent they created. Payouts run in Stripe test mode, so no real money moves until Last Price switches live payouts on. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled). Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **REST:** `/api/marketplace/payouts/runs`
+- **Errors and cautions:** With dry_run false, for a period that has ended, the run waits for approval by someone other than whoever requested it: approve_payout_run refuses (403) the same API key or agent, and the same person through another of their keys, their sign-in or an agent they created. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `period_start` **(required)** | string | First day of the period (YYYY-MM-DD). |
+| `period_end` **(required)** | string | Last day of the period (YYYY-MM-DD). A request (dry_run false) needs a period that has ended. |
+| `dry_run` | boolean | true (the default): only report what would be paid. false: request the payout, which then waits for someone else to approve it. |
+
+## `list_payout_runs`
+
+List your workspace's marketplace payout runs, newest first: each run's id, status (a dry run, awaiting approval, rejected, stale, approved, processing, partial, paid or failed), period, total, Stripe mode, the transfers it plans and the entries it skips, who requested it and who decided it. execution says whether payout runs are switched on for your workspace and whether Stripe is ready. They are not switched on for every workspace yet: while they are off for yours, execution.enabled is false and no runs are listed. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** They are not switched on for every workspace yet: while they are off for yours, execution.enabled is false and no runs are listed.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | How many runs at most, newest first. Defaults to 20. |
+
+## `get_payout_run`
+
+Read one payout run with its Stripe transfers: each transfer's status (pending, processing, paid, waiting for a retry, or failed), attempts, last error, next retry time, Stripe transfer id and idempotency key. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled). Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `run_id` **(required)** | string | The payout run: id on a list_payout_runs or request_payout_run result. |
+
+## `approve_payout_run`
+
+Approve a payout run that is awaiting approval, and pay it: one Stripe Connect transfer per connected account, each with an idempotency key so a retry never pays twice. Never by the requester: whoever requested the run (the same API key or agent, or the same person through another of their keys, their sign-in or an agent they created) is refused with 403, so a run your own credential requested needs another person, or an agent a different person created, to approve it. Refused with nothing paid: 503 while Stripe is not ready for payouts, 409 when the run is not awaiting approval or the ledger changed since the request (the run becomes stale; request it again). Payouts run in Stripe test mode, so no real money moves until Last Price switches live payouts on. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled). Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**, reaches outside Last Price
+- **Errors and cautions:** Never by the requester: whoever requested the run (the same API key or agent, or the same person through another of their keys, their sign-in or an agent they created) is refused with 403, so a run your own credential requested needs another person, or an agent a different person created, to approve it. Refused with nothing paid: 503 while Stripe is not ready for payouts, 409 when the run is not awaiting approval or the ledger changed since the request (the run becomes stale; request it again). Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `run_id` **(required)** | string | The payout run: id on a list_payout_runs or request_payout_run result. |
+
+## `reject_payout_run`
+
+Reject a payout run that is awaiting approval: nothing is paid and the ledger stays as it was. The requester may reject their own request to withdraw it. 409 when the run is not awaiting approval. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled). Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** 409 when the run is not awaiting approval. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `run_id` **(required)** | string | The payout run: id on a list_payout_runs or request_payout_run result. |
+
+## `retry_payout_run`
+
+Send again the transfers of a partial payout run that are due for a retry (after a network error, a timeout or a Stripe outage), each with the same idempotency key as before, so Stripe never pays one twice. The amounts were approved already, so no new approval is needed. A transfer that failed for good is not retried: request a new run once the cause is fixed. 409 when nothing is due yet (the error's details say when the next retry is), 503 while Stripe is not ready. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled). Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**, reaches outside Last Price
+- **Errors and cautions:** 409 when nothing is due yet (the error's details say when the next retry is), 503 while Stripe is not ready. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `run_id` **(required)** | string | The payout run: id on a list_payout_runs or request_payout_run result. |
+
+## `get_payout_schedule`
+
+Read your workspace's payout schedule: whether it is on, weekly or monthly, its run day, whether it retries transfers on its own, the next run day, the period that day will request and what the last run day did. schedule is null when none is saved. Payout schedules are part of payout runs: while those are not switched on for your workspace, execution.enabled is false and schedule is null. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/marketplace/payouts/schedule`
+- **Errors and cautions:** Payout schedules are part of payout runs: while those are not switched on for your workspace, execution.enabled is false and schedule is null.
+
+_No arguments._
+
+## `set_payout_schedule`
+
+Save your workspace's payout schedule whole. On each run day (UTC) a payout run of every unpaid ledger entry whose billing period has ended is requested in the name of whoever saved the schedule, so it still waits for approval by someone else, never by that saver; while a request is still waiting, the next run day requests nothing new. Turning it on needs a person behind the credential: a signed-in user, or a key or agent a person created. Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled). Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/agents/{id}`, `/api/marketplace/payouts/schedule`
+- **Errors and cautions:** Answers 404 while payout runs are not switched on for your workspace (list_payout_runs says so in execution.enabled).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `enabled` **(required)** | boolean | true to request payouts on each run day, false to stop. |
+| `cadence` **(required)** | `weekly` / `monthly` | weekly or monthly. |
+| `run_day` **(required)** | integer | weekly: 1 (Monday) to 7 (Sunday). monthly: 1 to 28, so every month has it. |
+| `auto_retry` | boolean | Re-send transfers waiting for a retry each hour, with the same idempotency keys. Defaults to true. |
+
+## `list_webhooks`
+
+List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret (whsec_...; the secret is how you verify the x-lastprice-signature header on what it receives). Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/webhooks`
+
+_No arguments._
+
+## `create_webhook`
+
+Add an outbound webhook endpoint: Last Price sends a signed POST to the https url for each event you list. The answer carries the signing secret (whsec_...); keep it to verify deliveries. Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused. Send ping_webhook afterwards to check the endpoint answers. Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **REST:** `/api/webhooks`
+- **Errors and cautions:** Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `url` **(required)** | string | Where to send events. Must start with https://. |
+| `events` **(required)** | array | The events to send, at least one, e.g. ["approval.requested","dispute.opened"]. |
+| `secret` | string | Your own signing secret. Omit it and one is made for you. |
+
+## `update_webhook`
+
+Change a webhook endpoint: its url, the events it gets, or switch it off and on with status. Only the fields you send change; events replaces the whole list. Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
+| `url` | string | Where to send events. Must start with https://. |
+| `events` | array | Replaces the whole list of events, at least one. |
+| `status` | `active` / `inactive` | inactive stops deliveries; active resumes them. |
+
+## `delete_webhook`
+
+Delete a webhook endpoint and its delivery history. This cannot be undone: update_webhook with status inactive pauses it instead. Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** This cannot be undone: update_webhook with status inactive pauses it instead.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
+
+## `ping_webhook`
+
+Send one signed webhook.test event to an active endpoint now and record the result as a delivery, so you can check it receives and verifies events. Read the outcome with list_webhook_deliveries. Needs a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** reaches outside Last Price
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
+
+## `list_webhook_deliveries`
+
+List recent delivery attempts across your workspace's webhook endpoints, newest first: the event, the status your endpoint answered with and when. Use it to find an endpoint that is failing. Needs a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | Most deliveries to return. Defaults to 50. |
+
+## `verify_webhook_signature`
+
+Check a webhook signature the way Last Price signs them: pass payload (the raw body, up to 8 KB), signature and secret, and optionally encoding (hex or base64) and prefix. Answers whether it is valid. Public and limited per address; use a test secret rather than a live one when you can, because the secret travels in the request. Needs no credential.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **REST:** `/api/public/webhook-verify`
+- **Errors and cautions:** Public and limited per address; use a test secret rather than a live one when you can, because the secret travels in the request.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `payload` **(required)** | string | The raw body the signature covers. |
+| `signature` **(required)** | string | The signature to check. |
+| `secret` **(required)** | string | The signing secret. Use a test secret where you can. |
+| `encoding` | `hex` / `base64` | How the signature is encoded. Defaults to hex. |
+| `prefix` | string | A prefix the signature carries, for example sha256=. |
+
+## `list_notifications`
+
+List your workspace's notifications, newest first, with the unread count: approval requests, disputes, price proposals, email to agent inboxes and, for the agent that owns the workspace, failed webhook deliveries. Pass the next cursor a page returns back as cursor for the next page. Unread is per reader: an agent has one read state for all its keys and tokens, a plain key has its own. Needs a Last Price credential with notifications read scope; the agent that owns the workspace needs none.
+
+- **Access:** key, notifications read scope
+- **Behaviour:** read-only
+- **REST:** `/api/workspaces/{workspaceId}/notifications`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | Page size. Defaults to 50. |
+| `cursor` | string | The next cursor from the previous page, unchanged. |
+
+## `mark_notifications_read`
+
+Mark your workspace's notifications read for this reader only (your agent, or your key), up to read_through (default now). Send the creation time of the newest item you handled so anything newer stays unread. Needs a Last Price credential with notifications write scope; the agent that owns the workspace needs none.
+
+- **Access:** key, notifications write scope
+- **Behaviour:** changes data
+- **REST:** `/api/workspaces/{workspaceId}/notifications/read`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `read_through` | string | Mark everything created at or before this time read, ISO 8601. Defaults to now. |
+
+## `get_alert_preferences`
+
+Read your email alert settings for your workspace: for each alert type, whether it is on and whether it comes right away or in one daily summary, whether your role gets alerts at all, and whether alert email is switched on. The agent that owns an unclaimed workspace reads its own settings. Needs a Last Price credential with notifications read scope.
+
+- **Access:** key, notifications read scope
+- **Behaviour:** read-only
+- **REST:** `/api/workspaces/{workspaceId}/alert-preferences`
+
+_No arguments._
+
+## `update_alert_preferences`
+
+Turn email alert types on or off, or choose right away or one daily summary, for yourself in your workspace. Send preferences, delivery or both, naming at least one alert type; the types are approval requested, dispute opened, webhook failing, payout update and outcomes needed. A caller that gets no alerts is refused. Needs a Last Price credential with notifications write scope; the agent that owns an unclaimed workspace needs none.
+
+- **Access:** key, notifications write scope
+- **Behaviour:** **destructive**
+- **REST:** `/api/workspaces/{workspaceId}/alert-preferences`
+- **Errors and cautions:** A caller that gets no alerts is refused.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `preferences` | object | Alert types to switch on or off. |
+| `delivery` | object | Alert types to send right away or daily. |
+
+## `list_approvals`
+
+List the actions held for approval in your workspace, newest first: what was asked, who asked (agent or key), its status (pending, approved, rejected or expired) and when it expires. status pending lists what waits for a decision; pass its id to decide_approval. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, audit read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `pending` / `approved` / `rejected` / `expired` | Only approvals with this status, e.g. pending. |
+| `limit` | integer | Most approvals to return. Defaults to 50. |
+
+## `get_approval`
+
+Read one approval: the held action, who asked, its status, the reason given and when it was decided. approval_id is the id from list_approvals or the notification that announced it. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, audit read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/approvals/{id}`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `approval_id` **(required)** | string | The approval id, as list_approvals gives it. |
+
+## `decide_approval`
+
+Approve or reject an action held for approval. Approving lets whoever asked repeat the same request once; rejecting keeps it held back for good. Deciding is for the workspace owner: a person, or the owner's own key (made without scope limits and not bound to an agent). An agent never decides its own request, and an agent-bound key or token cannot decide at all. The audit log records who decided. Needs a Last Price credential with the commerce proposal approve scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce proposal approve scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `approval_id` **(required)** | string | The approval id, as list_approvals gives it. |
+| `decision` **(required)** | `approve` / `reject` | approve or reject. |
+| `reason` | string | Why, kept with the decision. Optional. |
+
+## `list_audit_events`
+
+Read the workspace audit log, newest first: who did what and when, including who decided each approval. Filter by action, subject_kind and subject_id, agent_id or since; pass the returned cursor to page on. The team's own rows are for owners and admins. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, audit read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `since` | string | Only events at or after this time. |
+| `action` | string | Only events with this action, e.g. approval.approve. |
+| `subject_kind` | string | Only events about this kind of subject. |
+| `subject_id` | string | Only events about this subject id. |
+| `agent_id` | string | Only events caused by this agent. |
+| `cursor` | string | The cursor a previous page returned. |
+| `limit` | integer | Most events to return. Defaults to 50. |
+
+## `get_workspace_settings`
+
+Read your workspace settings: company name, address, email, phone, website and description, tax id, default currency, payment terms, invoice prefix and footer, whether tax is on, the tax registrations and the sales playbook. Model keys are never shown. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/workspaces/{workspaceId}/settings`
+
+_No arguments._
+
 ## `update_workspace_settings`
 
 Change your workspace settings. Only the fields you send change: company details, tax id, default currency, payment terms in days, invoice prefix and footer, tax on or off, tax registrations (null clears them) and the sales playbook (null resets it). Model keys are managed in the dashboard, never here. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/workspaces/{workspaceId}/settings`
 
 | Argument | Type | Meaning |
@@ -35,7 +508,7 @@ Change your workspace settings. Only the fields you send change: company details
 List the people in your workspace and their roles. Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **Errors and cautions:** Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused.
 
 _No arguments._
@@ -59,7 +532,7 @@ Add a person who already has a Last Price account to your workspace with a role.
 Change a team member's role. The last owner cannot be demoted. Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/workspaces/{workspaceId}/team/{userId}`
 - **Errors and cautions:** Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused.
 
@@ -73,7 +546,7 @@ Change a team member's role. The last owner cannot be demoted. Needs an API key 
 Remove a person from your workspace. The last owner cannot be removed. Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/workspaces/{workspaceId}/team/{userId}`
 - **Errors and cautions:** Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused.
 
@@ -86,7 +559,7 @@ Remove a person from your workspace. The last owner cannot be removed. Needs an 
 Invite someone by email to join your workspace with a role. The invitation link is emailed to them, never returned. Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/workspaces/{workspaceId}/invitations`
 - **Errors and cautions:** Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused.
 
@@ -100,7 +573,7 @@ Invite someone by email to join your workspace with a role. The invitation link 
 List the invitations still waiting to be accepted: email, role and when each was sent. Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **Errors and cautions:** Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused.
 
 _No arguments._
@@ -110,7 +583,7 @@ _No arguments._
 Withdraw a pending invitation: invitation_id on a list_invitations result. Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/workspaces/{workspaceId}/invitations/{invitationId}`
 - **Errors and cautions:** Needs an API key sent as x-api-key that holds the team:admin scope, made by someone who is still an owner or admin of the workspace; a token or any other key is refused.
 
@@ -123,7 +596,7 @@ Withdraw a pending invitation: invitation_id on a list_invitations result. Needs
 See which model providers your workspace has connected for pricing functions that run on a model, and whether key storage is available. Status only: the keys are write-only and never returned. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/workspaces/{workspaceId}/inference-providers`
 
 _No arguments._
@@ -133,7 +606,7 @@ _No arguments._
 List the apps you connected to Last Price by signing in (Claude, ChatGPT and other MCP clients), newest first: each one's id, name, the host it returns to, the workspace, whether it has full access or which scopes, and when it was connected and last used. this_app marks the connection making this call. Read-only. Needs a credential that names a person: signing in to Last Price from this MCP client, or a person token. An API key names a workspace, not a person, and gets 403. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/user/connected-apps`
 - **Errors and cautions:** An API key names a workspace, not a person, and gets 403.
 
@@ -144,7 +617,7 @@ _No arguments._
 Disconnect an app you connected by signing in: its sign-in stops working at once, and it must ask you to sign in again to come back. Pass an id from list_connected_apps. A connection with less than full access can disconnect only itself; the dashboard can disconnect any, under Profile, Sessions, Connected apps. Cannot be undone. Needs a credential that names a person: signing in to Last Price from this MCP client, or a person token. An API key names a workspace, not a person, and gets 403. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/user/connected-apps/{grantId}`
 - **Errors and cautions:** Cannot be undone. An API key names a workspace, not a person, and gets 403.
 
@@ -157,7 +630,7 @@ Disconnect an app you connected by signing in: its sign-in stops working at once
 List the inference backends the AITune sidecar offers your workspace and the state of each one: which are available, which are loaded and why one is not. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 _No arguments._
 
@@ -182,7 +655,7 @@ Start a profiling run for a model on the AITune sidecar: pass model, and optiona
 Read the latest profiling report for a model on the AITune sidecar: measured latency, throughput and memory per backend, so you can choose how to serve it. Pass the model name as model. Read-only; it does not start a run. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -193,7 +666,7 @@ Read the latest profiling report for a model on the AITune sidecar: measured lat
 Read the AITune sidecar's current GPU and CPU load: utilisation, memory and temperature. Pass history true to get the readings over the last duration_minutes (1 to 1440, default 60) instead. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -205,7 +678,7 @@ Read the AITune sidecar's current GPU and CPU load: utilisation, memory and temp
 Read what one agent may do: its effective scopes with a description of each, how many approvals are pending for it, its rate limit and how idempotency keys work. Pass agent_id. Call it before a planned action to learn whether it will succeed instead of meeting a 403. An agent's own credential reads only its own agent; a workspace credential reads any agent in the workspace. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/capabilities`
 - **Errors and cautions:** Call it before a planned action to learn whether it will succeed instead of meeting a 403.
 
@@ -218,7 +691,7 @@ Read what one agent may do: its effective scopes with a description of each, how
 Read one agent's Value Receipt, measured: its signals over the period with the human value the workspace set for each, what it cost (Last Price compute plus costs recorded in the workspace) and the return when both are known. A figure that cannot be measured is null, with the reason under missing. Pass agent_id, and start_date and end_date to choose the period (default the last 30 days, at most 366). An agent's own credential reads only its own receipt. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/value-receipt`
 
 | Argument | Type | Meaning |
@@ -232,7 +705,7 @@ Read one agent's Value Receipt, measured: its signals over the period with the h
 Estimate what a task would cost to do by people across countries: pass task_description and countries (names or ISO codes), and optionally currency (default EUR), complexity (low, medium or high) and estimated_time_minutes. It makes a model call, billed to your provider key when you set one and to the platform's otherwise. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/agents/{id}`
 - **Errors and cautions:** Needs a claimed Last Price credential.
 
@@ -249,7 +722,7 @@ Estimate what a task would cost to do by people across countries: pass task_desc
 Read the newest messages in your own agent inbox: the inbox of the agent your key or token is bound to, and no other. Answers live from the mail provider when it is reachable, otherwise from the mail Last Price stored (source says which). Needs an agent key, or a token exchanged from one.
 
 - **Access:** key
-- **Behaviour:** changes data
+- **Behaviour:** read-only, reaches outside Last Price
 - **REST:** `/api/agents/{id}/inbox`
 
 | Argument | Type | Meaning |
@@ -262,7 +735,7 @@ Read the newest messages in your own agent inbox: the inbox of the agent your ke
 Read what the behaviour tests offer for one of your agents: whether they are released for your workspace, the scenario pack for the agent's kind, whether your workspace's own Anthropic key is connected, the limits and the recent runs. In early access: it answers released false or not_released until it is switched on for your workspace. Runs never send real mail. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/behaviour-tests`
 - **Errors and cautions:** In early access: it answers released false or not_released until it is switched on for your workspace.
 
@@ -275,7 +748,7 @@ Read what the behaviour tests offer for one of your agents: whether they are rel
 Run the behaviour test scenarios against one of your agents and answer the stored run with every scenario's result. It uses your workspace's own Anthropic key, so the model calls are billed to that key, and it is limited to 20 runs a day. Pass scenario_ids to run only some scenarios, or system_prompt_override to test a draft prompt. In early access: it answers released false or not_released until it is switched on for your workspace. Runs never send real mail. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/agents/{id}/behaviour-tests`
 - **Errors and cautions:** In early access: it answers released false or not_released until it is switched on for your workspace.
 
@@ -293,7 +766,7 @@ Run the behaviour test scenarios against one of your agents and answer the store
 Read one behaviour test run for one of your agents, with every scenario's result. In early access: it answers released false or not_released until it is switched on for your workspace. Runs never send real mail. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/behaviour-tests/{runId}`
 - **Errors and cautions:** In early access: it answers released false or not_released until it is switched on for your workspace.
 
@@ -307,7 +780,7 @@ Read one behaviour test run for one of your agents, with every scenario's result
 Read your Personal Agent Protocol file: the organization name and domain saved for it, whether the domain is verified, the file to publish (the poppy.json a personal agent reads to learn what you let it do) and the address to publish it at. Answers released false until agent protocol files are switched on for your workspace. Read-only. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/agent-protocol`
 
 _No arguments._
@@ -317,7 +790,7 @@ _No arguments._
 Save the organization name and domain your Personal Agent Protocol file carries: pass organization_name and domain (a host name such as acme-outdoor.com). A new domain gets a new verification value and has to be checked again. Returns the file to publish at https://<domain>/.well-known/poppy.json; publish it exactly as given, then call verify_agent_protocol. Answers 404 until agent protocol files are switched on for your workspace. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/agent-protocol`
 - **Errors and cautions:** Answers 404 until agent protocol files are switched on for your workspace.
 
@@ -331,7 +804,7 @@ Save the organization name and domain your Personal Agent Protocol file carries:
 Check the Personal Agent Protocol file you published: Last Price fetches https://<domain>/.well-known/poppy.json and compares it with the one get_agent_protocol gives. A match verifies the domain for your workspace; a failure returns reason and message saying what to fix, and a domain another workspace verified answers 409. Answers 404 until agent protocol files are switched on for your workspace. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/agent-protocol/verify`
 - **Errors and cautions:** A match verifies the domain for your workspace; a failure returns reason and message saying what to fix, and a domain another workspace verified answers 409. Answers 404 until agent protocol files are switched on for your workspace.
 
@@ -342,7 +815,7 @@ _No arguments._
 Read the spend policies your workspace's buyer agents spend under (the most per purchase, a daily cap in UTC days, when a person approves first, which sellers and categories), the defaults a save fills in, and what today's reservations hold. An agent key sees its own policy and the workspace default. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -353,7 +826,7 @@ Read the spend policies your workspace's buyer agents spend under (the most per 
 Save a spend policy whole: agent_id for one agent, or leave it out for the workspace default every other agent spends under. An omitted field takes its default, so read get_spend_policy first and send every rule you want to keep. An agent's own key cannot change the rules that bind it: use a workspace-wide key. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/spend-policy`
 
 | Argument | Type | Meaning |
@@ -394,6 +867,7 @@ Before you pay for something, ask whether your owner's spend policy lets you pay
 | `category` | string | Optional: its category, when the policy limits categories. |
 | `agent_id` | string | Only with a workspace-wide key: check on behalf of this agent. An agent key always checks as itself. |
 | `include_fair_price` | boolean | Also judge the price with verify_price and return its band. |
+| `pay_to` | string | Optional: the wallet address (bare or CAIP-10) or merchant account id the money goes to. A person's approval is then for that account only, and confirm_purchase and settle_purchase must name the same one: another is refused with code payee_changed. Only where the workspace has payee binding switched on (else an error with code not_released). |
 | `quotes` | array | Optional: competing offers for this purchase, yours among them. A procurement policy needs two above its two-quote threshold. |
 | `intent` | object | Optional: what the buyer approved for this purchase, from an American Express intent, an AP2 intent mandate, or declared by you. A purchase that names another seller, costs more than max_amount (counting every purchase under the same intent_id), is in another currency or comes after expires_at is denied, whatever the policy allows. evidence (the token or mandate) is kept only as a hash and is not verified yet. Only where the workspace has intents switched on (else an error with code not_released). |
 
@@ -409,6 +883,7 @@ Call right before you pay for a purchase check_purchase allowed. If the workspac
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `reservation_id` **(required)** | string | reservation.id from check_purchase. |
+| `pay_to` | string | The account you are about to pay, when check_purchase named pay_to (then required). Another account releases the hold with code payee_changed: do not pay. |
 
 ## `settle_purchase`
 
@@ -424,6 +899,7 @@ Close the reservation an allowed check_purchase gave you, once: outcome paid whe
 | `outcome` **(required)** | `paid` / `failed` / `unknown` | paid: the purchase went through. failed: it did not. unknown: you cannot tell yet. |
 | `amount` | number | With paid: what you actually paid, if less than reserved. |
 | `note` | string | Optional: an order or transaction reference, or why it failed or what you saw. |
+| `pay_to` | string | With paid, when check_purchase named pay_to (then required): the account the money went to. Another account keeps the amount held as unknown, with code payee_changed, for the owner to reconcile with reconcile_purchase. A retry cannot clear the hold. |
 
 ## `reconcile_purchase`
 
@@ -445,7 +921,7 @@ Close a reservation whose outcome you reported unknown with settle_purchase, onc
 Read one buyer intent across every check made under its intent_id: the intent as recorded (source, merchant, maximum, currency, expiry, the evidence hash, and verified, false until Last Price can check the evidence), how many checks were allowed, denied or asked about, and how much of the maximum is held, spent and left. Use it before the next purchase under the same intent. An agent key sees only its own checks. Only where the workspace has intents switched on (else an error with code not_released). Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/spend-policy/intents/{id}`
 - **Errors and cautions:** Only where the workspace has intents switched on (else an error with code not_released).
 
@@ -472,6 +948,7 @@ Before a run of small paid calls to one seller (a stream of x402 calls at a cent
 | `category` | string | Optional: its category, when the policy limits or budgets categories. |
 | `agent_id` | string | Only with a workspace-wide key: open it on behalf of this agent. An agent key always acts as itself. |
 | `ttl_seconds` | integer | How long the session stays open, in seconds. Defaults to 3600. |
+| `pay_to` | string | Optional: the wallet address (bare or CAIP-10) or merchant account id the calls pay. Every draw_session_spend must then name the same one: another is refused with code payee_changed. Only where the workspace has payee binding switched on (else an error with code not_released). |
 | `intent` | object | Optional: what the buyer approved for this purchase, from an American Express intent, an AP2 intent mandate, or declared by you. A purchase that names another seller, costs more than max_amount (counting every purchase under the same intent_id), is in another currency or comes after expires_at is denied, whatever the policy allows. evidence (the token or mandate) is kept only as a hash and is not verified yet. Only where the workspace has intents switched on (else an error with code not_released). |
 
 ## `draw_session_spend`
@@ -489,6 +966,7 @@ Right before you pay for one call in a session open_spend_session opened, draw t
 | `amount` **(required)** | number | This call's price, in the session's currency. |
 | `item` | string | Optional: what this call buys. |
 | `note` | string | Optional: a request or payment reference. |
+| `pay_to` | string | The account this call pays, when open_spend_session named pay_to (then required). Another account is refused with code payee_changed: do not pay; the session stays open. |
 
 ## `settle_session_draw`
 
@@ -511,7 +989,7 @@ Say what happened to a call you drew for with draw_session_spend. outcome failed
 Read a session: whether it is open, expired or closed, its maximum, what it has drawn and what remains, and its draws, newest first, each drawn, unknown or returned. Use it to resume a run, or to find a draw to settle. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/spend-policy/sessions/{id}`
 
 | Argument | Type | Meaning |
@@ -536,7 +1014,7 @@ Close a session when its run of calls is done, once: what you drew counts as spe
 Read how your workspace takes offers and counter-offers from buyers: whether offers are on, your public handle, the rounds, concession and expiry limits, the products open to offers with their list and floor prices, the last 30 days' negotiations, and the public URLs a buyer's agent uses. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/negotiation/settings`
 
 _No arguments._
@@ -546,7 +1024,7 @@ _No arguments._
 Turn offers and counter-offers on or off for your workspace and set the schedule every negotiation runs on. Omitted fields keep their saved value, or the default. A handle another workspace holds is refused. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/negotiation/settings`
 - **Errors and cautions:** A handle another workspace holds is refused.
 
@@ -565,7 +1043,7 @@ Turn offers and counter-offers on or off for your workspace and set the schedule
 Open one product to offers, or change it: this saves the product whole (create or replace). Buyers see the list price and never the floor price, which is never breached; the floor cannot exceed the list price. Each product has its own switch, off unless you set enabled. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/negotiation/products`
 
 | Argument | Type | Meaning |
@@ -584,7 +1062,7 @@ Open one product to offers, or change it: this saves the product whole (create o
 Take a product off offers. Negotiations already open on it stop, because a product that is not listed answers buyers with not found. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -595,7 +1073,7 @@ Take a product off offers. Negotiations already open on it stop, because a produ
 Try an offer against one of your own products and see the answer a buyer would get (accept, counter or reject), with the limits behind it. Nothing is recorded and nobody is bound, and it works while offers are off, so you can check your terms first. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/negotiation/preview`
 
 | Argument | Type | Meaning |
@@ -610,7 +1088,7 @@ Try an offer against one of your own products and see the answer a buyer would g
 Your workspace's negotiations, newest first: what a buyer sees plus the floor and asking price each one opened with. Use it to honour an accepted price at checkout: find the negotiation and charge its agreed price. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -622,7 +1100,7 @@ Your workspace's negotiations, newest first: what a buyer sees plus the floor an
 Read a seller's negotiable terms by their public handle: which products are open to offers, at what list price and currency, how many offers a negotiation allows and how long a counter stands. Never the floor price. Pass product_id to narrow it to one product. Public: needs no credential. An unknown handle, a seller with offers off and a product that is off all answer not found.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -651,7 +1129,7 @@ Name a price for a seller's product and get the answer: accept, counter or rejec
 Read your own negotiation with a seller: its status, the rounds used and left, the standing counter, the agreed price and the history. Needs the negotiation id and the buyer token the negotiation opened with, not an account. A wrong token and a missing negotiation answer the same not found. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -664,7 +1142,7 @@ Read your own negotiation with a seller: its status, the rounds used and left, t
 Take the seller's standing counter: the negotiation closes as accepted at that price. This commits the buyer to the price, so call it only when you mean to buy at it. A counter past its time, a closed negotiation, or a counter the seller can no longer allow answers with a conflict and binds nothing. Needs the negotiation id and the buyer token. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -677,7 +1155,7 @@ Take the seller's standing counter: the negotiation closes as accepted at that p
 Read Last Price's Universal Commerce Protocol business profile: the services, capabilities and payment handlers a UCP agent discovers before it shops here. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/ucp/discovery`
 
 _No arguments._
@@ -731,7 +1209,7 @@ Open a UCP checkout session: pass line_items, and optionally buyer, context, pay
 Read one UCP checkout session: pass checkout_id. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -742,7 +1220,7 @@ Read one UCP checkout session: pass checkout_id. Needs a Last Price credential w
 List your workspace's UCP checkout sessions, with each one's id, status and totals. Read-only. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/ucp/checkout-sessions`
 
 _No arguments._
@@ -752,7 +1230,7 @@ _No arguments._
 Change a UCP checkout session that is still open: pass checkout_id and at least one of line_items, buyer, context, payment, signals, fulfillment and discounts. A completed or canceled session answers 422. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/ucp/checkout-sessions/{id}`
 - **Errors and cautions:** A completed or canceled session answers 422.
 
@@ -772,7 +1250,7 @@ Change a UCP checkout session that is still open: pass checkout_id and at least 
 Complete a UCP checkout session: pass checkout_id. Payment processing is not configured yet, so an open session answers 501 until a payment provider is set up; a session that is already completed is returned as it is. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **Errors and cautions:** Payment processing is not configured yet, so an open session answers 501 until a payment provider is set up; a session that is already completed is returned as it is.
 
 | Argument | Type | Meaning |
@@ -784,7 +1262,7 @@ Complete a UCP checkout session: pass checkout_id. Payment processing is not con
 Cancel a UCP checkout session: pass checkout_id. A completed session cannot be canceled, and canceling one that is already canceled changes nothing. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -792,10 +1270,10 @@ Cancel a UCP checkout session: pass checkout_id. A completed session cannot be c
 
 ## `list_storefronts`
 
-List your workspace's storefronts: each one's subdomain, name, whether it is published, what it lists (functions, products open to offers, tag and product filters), its own domains with their DNS records and status, and the addresses agents use (page, agent card, llms.txt, MCP). Also the limits and a suggested subdomain. A storefront is your own front door for agents at <subdomain>.last-price.ai or a domain you own. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's storefronts: each one's subdomain, name, whether it is published, what it lists (functions, products open to offers, tag and product filters), its own domains with their DNS records and status, and the addresses agents use (page, agent card, llms.txt, MCP). Also the limits and a suggested subdomain. A storefront is your own front door for agents at <subdomain>.store.last-price.ai or a domain you own. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/storefronts`
 - **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
@@ -803,7 +1281,7 @@ _No arguments._
 
 ## `create_storefront`
 
-Create a storefront: an agent card, llms.txt and MCP endpoint listing a selection of your public offers at <subdomain>.last-price.ai (and /s/<subdomain> on last-price.ai). display_name is required; the subdomain defaults to one made from it. It stays unpublished unless published is true. A workspace may run several, one per product line or audience, but each must list a different selection (offer_tags, product_ids or the kinds shown): the same offers twice is refused. Every storefront says it is powered by Last Price. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Create a storefront: an agent card, llms.txt and MCP endpoint listing a selection of your public offers at <subdomain>.store.last-price.ai (and /s/<subdomain> on last-price.ai). display_name is required; the subdomain defaults to one made from it. It stays unpublished unless published is true. A workspace may run several, one per product line or audience, but each must list a different selection (offer_tags, product_ids or the kinds shown): the same offers twice is refused. Every storefront says it is powered by Last Price. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
@@ -812,7 +1290,7 @@ Create a storefront: an agent card, llms.txt and MCP endpoint listing a selectio
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `subdomain` | string | The <subdomain> in <subdomain>.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. Some names are reserved. |
+| `subdomain` | string | The <subdomain> in <subdomain>.store.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. Some names are reserved. |
 | `published` | boolean | true puts it live; false takes it down. |
 | `display_name` **(required)** | string | The name agents see. |
 | `tagline` | string / null | One line on what it sells. |
@@ -830,7 +1308,7 @@ Create a storefront: an agent card, llms.txt and MCP endpoint listing a selectio
 Read one storefront with its domains, addresses and the offers it lists right now. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/storefronts/{storefrontId}`
 - **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
@@ -843,14 +1321,14 @@ Read one storefront with its domains, addresses and the offers it lists right no
 Change a storefront. Only the fields you send change; an empty string clears optional text. Set published to put it live or take it down. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/storefronts/{storefrontId}`
 - **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
-| `subdomain` | string | The <subdomain> in <subdomain>.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. Some names are reserved. |
+| `subdomain` | string | The <subdomain> in <subdomain>.store.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. Some names are reserved. |
 | `published` | boolean | true puts it live; false takes it down. |
 | `display_name` | string | The name agents see. |
 | `tagline` | string / null | One line on what it sells. |
@@ -868,7 +1346,7 @@ Change a storefront. Only the fields you send change; an empty string clears opt
 Delete a storefront and its domains. Its addresses stop answering at once. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}`
 - **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
@@ -881,7 +1359,7 @@ Delete a storefront and its domains. Its addresses stop answering at once. Only 
 Find a domain for a storefront: send query (a name, tried with .com, .ai, .io, .co, .app, .dev, .shop and .store) or domains (up to 50 exact ones) and get whether each is available and its first-year price in USD. Read-only: nothing is registered or paid. Only where the workspace has storefronts and domain search switched on (else an error with code not_released). Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}`
 - **Errors and cautions:** Only where the workspace has storefronts and domain search switched on (else an error with code not_released).
 
@@ -895,7 +1373,7 @@ Find a domain for a storefront: send query (a name, tried with .com, .ai, .io, .
 Get a price for registering a domain for a storefront, held for 15 minutes. A quote costs nothing and registers nothing: only the workspace owner can buy it, in the dashboard. Only where domain search is switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domain-quotes`
 - **Errors and cautions:** Only where domain search is switched on (else an error with code not_released).
 
@@ -910,7 +1388,7 @@ Get a price for registering a domain for a storefront, held for 15 minutes. A qu
 List a storefront's domain quotes and registrations: domain, years, price, and quoted, ordered, failed or expired. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/storefronts/{storefrontId}/domain-quotes`
 
 | Argument | Type | Meaning |
@@ -936,7 +1414,7 @@ Serve a storefront on a domain your company owns (white label), such as agents.y
 Check a storefront domain's TXT record now. verified true means the domain is proven yours and the storefront answers there once routing is in place; otherwise reason and detail say what is missing. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/verify`
 - **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
@@ -950,7 +1428,7 @@ Check a storefront domain's TXT record now. verified true means the domain is pr
 Stop serving a storefront on one of your domains. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}`
 - **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
@@ -964,7 +1442,7 @@ Stop serving a storefront on one of your domains. Only where the workspace has s
 List the DNS records of a domain your workspace registered through Last Price. locked marks the records the storefront needs. A domain bought elsewhere is refused: manage its DNS where it was bought. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/dns-records`
 - **Errors and cautions:** A domain bought elsewhere is refused: manage its DNS where it was bought.
 
@@ -978,7 +1456,7 @@ List the DNS records of a domain your workspace registered through Last Price. l
 Add a DNS record to a domain your workspace registered through Last Price, to use it for more than the storefront: MX for email, TXT for SPF, DKIM, DMARC or site verification, CNAME or A for a subdomain. name is relative (blog for blog.<domain>, empty for the domain itself). Records the storefront needs cannot be replaced. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/dns-records`
 
 | Argument | Type | Meaning |
@@ -996,7 +1474,7 @@ Add a DNS record to a domain your workspace registered through Last Price, to us
 Remove a DNS record from a domain your workspace registered through Last Price. Records the storefront needs cannot be removed. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/dns-records/{recordId}`
 
 | Argument | Type | Meaning |
@@ -1010,7 +1488,7 @@ Remove a DNS record from a domain your workspace registered through Last Price. 
 Run the free agent-ready check on a store: pass url, the store address. It reports whether shopping agents can check out, whether bot blocking is in the way and whether margin survives an agent's cut. It fetches the store, so it is limited per address and answers 404 while the check is not released. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only, reaches outside Last Price
 - **REST:** `/api/public/agent-ready-check`
 - **Errors and cautions:** It fetches the store, so it is limited per address and answers 404 while the check is not released.
 
@@ -1023,7 +1501,7 @@ Run the free agent-ready check on a store: pass url, the store address. It repor
 List every launch kit for a feature built behind a release flag, for Last Price staff only: the flag's state, readiness (how many checks pass, warn and fail, and what blocks), the go code, what is scheduled, whether the launcher is on, and the release flags that have no kit yet. Read only: it never switches, schedules or sends anything; launching needs the owner's go code through the launch command. Needs an API key holding the launches:read scope by name, made by someone who is still Last Price staff, sent as x-api-key or as Authorization: Bearer lp_...; any other credential gets 404. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **Errors and cautions:** Needs an API key holding the launches:read scope by name, made by someone who is still Last Price staff, sent as x-api-key or as Authorization: Bearer lp_...; any other credential gets 404.
 
 _No arguments._
@@ -1033,7 +1511,7 @@ _No arguments._
 Read one launch kit's plan, for Last Price staff only: its checks, its steps in the order the launch runs them (marking the ones that send something outside Last Price), its go code, and the exact words the owner says to launch it ("go CODE", "go CODE at <UTC time>", or "go CODE without announcements"). Read only: it never switches, schedules or sends anything; launching needs the owner's go code through the launch command. Needs an API key holding the launches:read scope by name, made by someone who is still Last Price staff, sent as x-api-key or as Authorization: Bearer lp_...; any other credential gets 404. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **Errors and cautions:** Needs an API key holding the launches:read scope by name, made by someone who is still Last Price staff, sent as x-api-key or as Authorization: Bearer lp_...; any other credential gets 404.
 
 | Argument | Type | Meaning |
@@ -1045,7 +1523,7 @@ Read one launch kit's plan, for Last Price staff only: its checks, its steps in 
 What changed in Last Price: the newest release notes, optionally for one feature, written for agents as well as people. Pass feature (a tag such as billing, webhooks, mcp, agent-payments, approvals) to follow one part of the product, and since (YYYY-MM-DD, for example the date you last checked) to see only newer notes. Each note has its date, title, summary, category, feature tags, a link to the full note and, when there is one, the docs section and app screen it is about. Public: needs no credential. Check it at the start of a session and before changing integration code.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -1059,7 +1537,7 @@ What changed in Last Price: the newest release notes, optionally for one feature
 List the reels: short recipes for real tasks done with Last Price (price a SaaS seat, check a vendor quote, find an offer for a task), with the tools each one calls. A reel is the agent-readable alternative to a demo video: read one with get_reel and it runs live. Public: needs no credential. Until it is switched on it answers not released.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/public/reels`
 - **Errors and cautions:** Until it is switched on it answers not released.
 
@@ -1083,7 +1561,7 @@ Run a reel live and read its transcript: each step's tool, arguments, status, ti
 List the demo apps Last Price ships, each with its name, description, the experiment it runs and, once the demo workspace is seeded, that experiment's status, views and conversions. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 _No arguments._
 
@@ -1092,7 +1570,7 @@ _No arguments._
 Simulate how much of a sale to offer an agent platform (a shopping agent or agent marketplace that charges sellers a cut) if it ranks sellers partly by the cut they pay. No platform publishes such a ranking, so this is a simulation under your assumption (visibility_per_point_pct: percent more channel sales per extra point of cut), also run at half, double and zero of it. Returns the profit at each cut, the recommended cut, the cut with the smallest worst case, the break-even, and a channel rate ready for PUT /api/channel-rates. Changes nothing. Answers 404 until the cut advisor is switched on for your workspace. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/cut-advisor`
 - **Errors and cautions:** Answers 404 until the cut advisor is switched on for your workspace.
 
@@ -1117,7 +1595,7 @@ Simulate how much of a sale to offer an agent platform (a shopping agent or agen
 Read the settings behind simulate_agent_cut: whether the cut advisor is released for your workspace, the defaults it applies and the limits on each input. Free to call; read it before simulate_agent_cut to see what it will accept. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/cut-advisor`
 
 _No arguments._

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Caught up with production (308 tools): `last-price-mcp` now names the 26 tools prod gained since the pack was written (price checks from a photo or link, quote replies, reference pipelines, hosted price scraping, credit bundles, tax preview, Stripe invoices, monetization code), and every tool reference is regenerated.
+- The drift check now fails when it should: its steps ran under `bash -e` without pipefail, so `| tee` hid every failure and no drift pull request was ever opened. It also runs every three hours instead of once a weekday.
 - Removed the root `.mcp.json`: the Claude Code plugin's server lives in `.claude-plugin/plugin.json` (with the optional key), and the duplicate showed as a shadowed second server in the Claude plugin directory.
 - `scripts/sync.mjs` splits a tool reference over 200 kB into an index and parts, so the directory's 256 KiB scan reads every file in full (`last-price-mcp` now has `mcp-tools-1.md` and `mcp-tools-2.md`).
 

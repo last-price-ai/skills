@@ -7,7 +7,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 
 ## `create_function`
 
-Register a pricing function in your workspace. execution_type is how it prices: rule based, ML model, LLM prompt, external API (your own endpoint) or composite. name is its unique lowercase id, such as acme/surge. Set is_public to list it for other workspaces. A new function starts as a draft: make it active with update_function to have it routed to. Needs a Last Price credential with function publish scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Register a pricing function in your workspace. execution_type is how it prices: rule based, ML model, LLM prompt, external API (your own endpoint) or composite. name is its unique lowercase id, such as acme/surge. Set is_public to list it for other workspaces. A new function starts as a draft unless status is active: make it active with update_function to have it routed to. A rule_based function prices by the rule you send (base, then steps such as margin, tiers, floor and price ending). Needs a Last Price credential with function publish scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, function publish scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
@@ -29,13 +29,15 @@ Register a pricing function in your workspace. execution_type is how it prices: 
 | `tags` | array | The tag list. On update it replaces the whole list. |
 | `description` | string | What the function does. |
 | `is_public` | boolean | List it for other workspaces to use. Defaults to false. |
+| `rule` | object | For a rule based function: the rule it prices by. Its input schema is made from the rule, and a rule based function needs one before it can be active. On update null removes it. |
+| `status` | `draft` / `active` | draft (the default) or active, to have it routed to at once. A self-registered sandbox saves drafts only. |
 
 ## `test_function`
 
 Test-run one pricing function with sample data and see the price, explanation, confidence and alternatives it returns, without publishing it or touching live traffic. Your own draft functions can be tested here; a function that runs on a model provider can be tested only by its owner. Send context (for example the current price), constraints or options to override the sample. Needs a Last Price credential with function test scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, function test scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -77,7 +79,7 @@ Run a pricing chain: stages one after another, each stage's price feeding the ne
 
 ## `verify_price`
 
-Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (fair, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as fair. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale.
+Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (fair, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as fair. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** changes data
@@ -106,7 +108,7 @@ Ask whether a price makes sense for its context, rather than what the price shou
 Save the price guardrails for your workspace. max_change_pct, min_margin_pct and never_below_cost hold every final price your workspace is given, from compute_price and every other pricing call. band_lower_ratio and band_upper_ratio are only the range the optimizer and elasticity functions search when a call sends no minimum or maximum. This replaces the whole saved set: an omitted field takes its default, so read get_price_guardrails first and send every rule you want to keep. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/price-guardrails`
 
 | Argument | Type | Meaning |

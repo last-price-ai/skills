@@ -10,7 +10,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 Total your workspace's priced calls over a period, this calendar month by default: requests, units, compute time, cost, cached and prepaid calls, and the part of this month's cost still to be billed. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -22,7 +22,7 @@ Total your workspace's priced calls over a period, this calendar month by defaul
 See your usage grouped by pricing function: calls, spend and outcomes for each function over a period. Pass start_date and end_date to choose the period, and group_by function, the only grouping there is. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -35,7 +35,7 @@ See your usage grouped by pricing function: calls, spend and outcomes for each f
 List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -51,7 +51,7 @@ List your workspace's priced calls, newest first: each one's id (what report_out
 See what model calls cost your workspace over a period (this month so far by default): totals, how much ran on your own provider key and how much on the platform's, and a daily series. Pass start_date and end_date to choose the period. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -63,7 +63,7 @@ See what model calls cost your workspace over a period (this month so far by def
 Get the receipt for one of your workspace's priced calls, by its usage event id (the id list_usage_events returns and report_outcome takes): what was priced, by which function and agent, when, the amount, how it was paid, and the outcome if one was reported. Receipts are made only when you ask, never sent for every call. For CSV or a printable page, call GET /api/receipts/{id} with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/receipts/{id}`
 
 | Argument | Type | Meaning |
@@ -75,7 +75,7 @@ Get the receipt for one of your workspace's priced calls, by its usage event id 
 Get receipts for many of your workspace's priced calls at once, as one statement with totals: name up to 50 usage event ids, or a period (this calendar month by default, at most 366 days), optionally for one function or agent. A period statement also counts, for each agent, the value signals set up in Settings, Value receipts. Receipts are made only when you ask. For CSV or a printable page, call GET /api/receipts with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -92,7 +92,7 @@ Get receipts for many of your workspace's priced calls at once, as one statement
 Read your workspace's prepaid balance and billing settings: the balance in USDC, whether balance billing and outcome pricing are on, the auto top-up offer, the latest ledger rows and the terms. Needs a Last Price credential with price compute scope.
 
 - **Access:** key, price compute scope
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/billing/balance`
 
 _No arguments._
@@ -102,7 +102,7 @@ _No arguments._
 Change your workspace's billing settings. Only the settings you send change. outcome_pricing turns on paying in full only when a price is used: a rejection reported with report_outcome within its window gives part back. balance_billing makes every compute call draw on the prepaid balance, and a call the balance cannot cover is refused. auto_topup is an offer, not a charge: below the threshold, results carry a top-up hint and nothing is paid automatically. A self-registered agent workspace cannot change outcome_pricing or balance_billing until it is claimed. Needs a Last Price credential with price compute scope; a person also needs the owner, admin or billing role.
 
 - **Access:** key, price compute scope
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/billing/balance`
 - **Errors and cautions:** balance_billing makes every compute call draw on the prepaid balance, and a call the balance cannot cover is refused.
 
@@ -117,7 +117,7 @@ Change your workspace's billing settings. Only the settings you send change. out
 Read your workspace's outcome pricing: whether it is on, its terms, counts of open, accepted and rejected windows with the total refunded, and the windows themselves, newest first. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -129,7 +129,7 @@ Read your workspace's outcome pricing: whether it is on, its terms, counts of op
 Add USDC to your workspace's prepaid balance with one x402 payment signed by your own wallet. amount is in USDC, such as "25". Called without payment it spends nothing and returns the payment requirements to sign. Sign them, then call again with the same amount and payment set to the base64 payment (the value of the X-PAYMENT or PAYMENT-SIGNATURE header). The result gives the credited amount, any bonus and the new balance; get_billing_settings shows the terms. Needs a Last Price credential with the price:compute scope.
 
 - **Access:** key, price:compute scope
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/billing/topup`
 
 | Argument | Type | Meaning |
@@ -142,7 +142,7 @@ Add USDC to your workspace's prepaid balance with one x402 payment signed by you
 Add to your workspace's prepaid balance by card, when no crypto wallet is at hand to sign an x402 payment. amount is in US dollars with whole cents, such as "25". Nothing is charged by this call: it returns a checkout link, a card payment page for exactly that amount, and the top-up id. Give the link to the person who runs you; once they pay, the balance is credited one USDC per dollar. Poll get_card_topup with the top-up id until its status is paid. Not every workspace has card top-ups yet: a refusal lists the other ways to pay. Needs a Last Price credential with the price:compute scope.
 
 - **Access:** key, price:compute scope
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/billing/topup/card`
 - **Errors and cautions:** Not every workspace has card top-ups yet: a refusal lists the other ways to pay.
 
@@ -155,7 +155,7 @@ Add to your workspace's prepaid balance by card, when no crypto wallet is at han
 List the costs recorded in your workspace, newest first: what each was for, its amount, currency and the agent or customer it belongs to. Filter by customer_id and by start_date and end_date, and page with limit and offset. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -170,7 +170,7 @@ List the costs recorded in your workspace, newest first: what each was for, its 
 Total the costs recorded in your workspace over a period, grouped by day (the default), week, month, agent, customer or type: count, total, average, smallest and largest amount for each group and currency, and overall totals. Pass start_date and end_date to choose the period. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

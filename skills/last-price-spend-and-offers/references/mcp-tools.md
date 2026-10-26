@@ -10,7 +10,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 Read the spend policies your workspace's buyer agents spend under (the most per purchase, a daily cap in UTC days, when a person approves first, which sellers and categories), the defaults a save fills in, and what today's reservations hold. An agent key sees its own policy and the workspace default. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -21,7 +21,7 @@ Read the spend policies your workspace's buyer agents spend under (the most per 
 Save a spend policy whole: agent_id for one agent, or leave it out for the workspace default every other agent spends under. An omitted field takes its default, so read get_spend_policy first and send every rule you want to keep. An agent's own key cannot change the rules that bind it: use a workspace-wide key. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/spend-policy`
 
 | Argument | Type | Meaning |
@@ -62,6 +62,7 @@ Before you pay for something, ask whether your owner's spend policy lets you pay
 | `category` | string | Optional: its category, when the policy limits categories. |
 | `agent_id` | string | Only with a workspace-wide key: check on behalf of this agent. An agent key always checks as itself. |
 | `include_fair_price` | boolean | Also judge the price with verify_price and return its band. |
+| `pay_to` | string | Optional: the wallet address (bare or CAIP-10) or merchant account id the money goes to. A person's approval is then for that account only, and confirm_purchase and settle_purchase must name the same one: another is refused with code payee_changed. Only where the workspace has payee binding switched on (else an error with code not_released). |
 | `quotes` | array | Optional: competing offers for this purchase, yours among them. A procurement policy needs two above its two-quote threshold. |
 | `intent` | object | Optional: what the buyer approved for this purchase, from an American Express intent, an AP2 intent mandate, or declared by you. A purchase that names another seller, costs more than max_amount (counting every purchase under the same intent_id), is in another currency or comes after expires_at is denied, whatever the policy allows. evidence (the token or mandate) is kept only as a hash and is not verified yet. Only where the workspace has intents switched on (else an error with code not_released). |
 
@@ -77,6 +78,7 @@ Call right before you pay for a purchase check_purchase allowed. If the workspac
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `reservation_id` **(required)** | string | reservation.id from check_purchase. |
+| `pay_to` | string | The account you are about to pay, when check_purchase named pay_to (then required). Another account releases the hold with code payee_changed: do not pay. |
 
 ## `settle_purchase`
 
@@ -92,6 +94,7 @@ Close the reservation an allowed check_purchase gave you, once: outcome paid whe
 | `outcome` **(required)** | `paid` / `failed` / `unknown` | paid: the purchase went through. failed: it did not. unknown: you cannot tell yet. |
 | `amount` | number | With paid: what you actually paid, if less than reserved. |
 | `note` | string | Optional: an order or transaction reference, or why it failed or what you saw. |
+| `pay_to` | string | With paid, when check_purchase named pay_to (then required): the account the money went to. Another account keeps the amount held as unknown, with code payee_changed, for the owner to reconcile with reconcile_purchase. A retry cannot clear the hold. |
 
 ## `reconcile_purchase`
 
@@ -127,6 +130,7 @@ Before a run of small paid calls to one seller (a stream of x402 calls at a cent
 | `category` | string | Optional: its category, when the policy limits or budgets categories. |
 | `agent_id` | string | Only with a workspace-wide key: open it on behalf of this agent. An agent key always acts as itself. |
 | `ttl_seconds` | integer | How long the session stays open, in seconds. Defaults to 3600. |
+| `pay_to` | string | Optional: the wallet address (bare or CAIP-10) or merchant account id the calls pay. Every draw_session_spend must then name the same one: another is refused with code payee_changed. Only where the workspace has payee binding switched on (else an error with code not_released). |
 | `intent` | object | Optional: what the buyer approved for this purchase, from an American Express intent, an AP2 intent mandate, or declared by you. A purchase that names another seller, costs more than max_amount (counting every purchase under the same intent_id), is in another currency or comes after expires_at is denied, whatever the policy allows. evidence (the token or mandate) is kept only as a hash and is not verified yet. Only where the workspace has intents switched on (else an error with code not_released). |
 
 ## `draw_session_spend`
@@ -144,6 +148,7 @@ Right before you pay for one call in a session open_spend_session opened, draw t
 | `amount` **(required)** | number | This call's price, in the session's currency. |
 | `item` | string | Optional: what this call buys. |
 | `note` | string | Optional: a request or payment reference. |
+| `pay_to` | string | The account this call pays, when open_spend_session named pay_to (then required). Another account is refused with code payee_changed: do not pay; the session stays open. |
 
 ## `settle_session_draw`
 
@@ -179,7 +184,7 @@ Close a session when its run of calls is done, once: what you drew counts as spe
 Read a seller's negotiable terms by their public handle: which products are open to offers, at what list price and currency, how many offers a negotiation allows and how long a counter stands. Never the floor price. Pass product_id to narrow it to one product. Public: needs no credential. An unknown handle, a seller with offers off and a product that is off all answer not found.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -208,7 +213,7 @@ Name a price for a seller's product and get the answer: accept, counter or rejec
 Read your own negotiation with a seller: its status, the rounds used and left, the standing counter, the agreed price and the history. Needs the negotiation id and the buyer token the negotiation opened with, not an account. A wrong token and a missing negotiation answer the same not found. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -221,7 +226,7 @@ Read your own negotiation with a seller: its status, the rounds used and left, t
 Take the seller's standing counter: the negotiation closes as accepted at that price. This commits the buyer to the price, so call it only when you mean to buy at it. A counter past its time, a closed negotiation, or a counter the seller can no longer allow answers with a conflict and binds nothing. Needs the negotiation id and the buyer token. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -234,7 +239,7 @@ Take the seller's standing counter: the negotiation closes as accepted at that p
 Read how your workspace takes offers and counter-offers from buyers: whether offers are on, your public handle, the rounds, concession and expiry limits, the products open to offers with their list and floor prices, the last 30 days' negotiations, and the public URLs a buyer's agent uses. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/negotiation/settings`
 
 _No arguments._
@@ -244,7 +249,7 @@ _No arguments._
 Turn offers and counter-offers on or off for your workspace and set the schedule every negotiation runs on. Omitted fields keep their saved value, or the default. A handle another workspace holds is refused. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/negotiation/settings`
 - **Errors and cautions:** A handle another workspace holds is refused.
 
@@ -263,7 +268,7 @@ Turn offers and counter-offers on or off for your workspace and set the schedule
 Open one product to offers, or change it: this saves the product whole (create or replace). Buyers see the list price and never the floor price, which is never breached; the floor cannot exceed the list price. Each product has its own switch, off unless you set enabled. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/negotiation/products`
 
 | Argument | Type | Meaning |
@@ -282,7 +287,7 @@ Open one product to offers, or change it: this saves the product whole (create o
 Take a product off offers. Negotiations already open on it stop, because a product that is not listed answers buyers with not found. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -293,7 +298,7 @@ Take a product off offers. Negotiations already open on it stop, because a produ
 Try an offer against one of your own products and see the answer a buyer would get (accept, counter or reject), with the limits behind it. Nothing is recorded and nobody is bound, and it works while offers are off, so you can check your terms first. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/negotiation/preview`
 
 | Argument | Type | Meaning |
@@ -308,7 +313,7 @@ Try an offer against one of your own products and see the answer a buyer would g
 Your workspace's negotiations, newest first: what a buyer sees plus the floor and asking price each one opened with. Use it to honour an accepted price at checkout: find the negotiation and charge its agreed price. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

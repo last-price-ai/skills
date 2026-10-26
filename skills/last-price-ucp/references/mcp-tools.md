@@ -10,7 +10,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 Read Last Price's Universal Commerce Protocol business profile: the services, capabilities and payment handlers a UCP agent discovers before it shops here. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/ucp/discovery`
 
 _No arguments._
@@ -64,7 +64,7 @@ Open a UCP checkout session: pass line_items, and optionally buyer, context, pay
 Read one UCP checkout session: pass checkout_id. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -75,7 +75,7 @@ Read one UCP checkout session: pass checkout_id. Needs a Last Price credential w
 List your workspace's UCP checkout sessions, with each one's id, status and totals. Read-only. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/ucp/checkout-sessions`
 
 _No arguments._
@@ -85,7 +85,7 @@ _No arguments._
 Change a UCP checkout session that is still open: pass checkout_id and at least one of line_items, buyer, context, payment, signals, fulfillment and discounts. A completed or canceled session answers 422. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/ucp/checkout-sessions/{id}`
 - **Errors and cautions:** A completed or canceled session answers 422.
 
@@ -105,7 +105,7 @@ Change a UCP checkout session that is still open: pass checkout_id and at least 
 Complete a UCP checkout session: pass checkout_id. Payment processing is not configured yet, so an open session answers 501 until a payment provider is set up; a session that is already completed is returned as it is. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **Errors and cautions:** Payment processing is not configured yet, so an open session answers 501 until a payment provider is set up; a session that is already completed is returned as it is.
 
 | Argument | Type | Meaning |
@@ -117,7 +117,7 @@ Complete a UCP checkout session: pass checkout_id. Payment processing is not con
 Cancel a UCP checkout session: pass checkout_id. A completed session cannot be canceled, and canceling one that is already canceled changes nothing. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

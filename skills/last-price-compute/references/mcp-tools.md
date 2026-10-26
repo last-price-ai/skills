@@ -10,7 +10,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. To pay for this one call with x402 instead of a key or a balance, pass payment: a signed payment for the price it asks (call it without payment to read what it asks). Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **Errors and cautions:** Missing business inputs return an error naming them.
 
 | Argument | Type | Meaning |
@@ -34,6 +34,7 @@ Compute a price for a product/context via the Last Price Pricing Compute Network
 | `function_id` | string | Optional explicit pricing function UUID to use. |
 | `include_explanation` | boolean | If true, ask for an explanation and confidence with the price. |
 | `no_explore` | boolean | If true, give this price exactly as computed, without the small per-call variation a workspace may run so learned pricing can learn what buyers will pay (see get_price_exploration). |
+| `include_buyer_envelope` | boolean | If true, and metadata.category names a category, the result carries buyer_envelope: what buyers' own spend checks allowed in that category (p25 to p75, the median, and how often checks were refused over a limit, pooled over 5 or more buyer workspaces; no numbers below 5) and where this price sits. A limit, not a valuation: it never changes the price. Where it is not switched on for the workspace it is ignored. |
 | `metadata` | object | Optional context. For competitive pricing: competitor_price, competitor_currency and competitive_action (match or undercut); undercut requires undercut_pct. Confirm product comparability before calling. |
 | `idempotency_key` | string | Optional. A new value (e.g. a UUID) for each call you mean to make; send the SAME value if you retry after a timeout or error you cannot interpret, and the call is computed and charged once. Ignored without a credential. |
 | `payment` | string | Optional. The signed x402 payment, base64, as sent in an X-PAYMENT or PAYMENT-SIGNATURE header. Omit it to read what the call costs and how to pay; nothing is charged until you send it. |
@@ -57,7 +58,7 @@ Price up to 100 requests in one call. Each item in requests is the same request 
 List the pricing functions registered for the authenticated tenant.
 
 - **Access:** key
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/functions`
 
 _No arguments._
