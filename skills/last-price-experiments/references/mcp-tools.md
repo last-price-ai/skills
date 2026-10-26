@@ -26,7 +26,7 @@ Create a price experiment in draft. It needs two to ten variants, one named cont
 List your workspace's price experiments: each one's key, name, status, variants (arms) and target sample size. Pass status to see only drafts, active, paused or completed ones. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/tenants/{tenantId}/experiments`
 
 | Argument | Type | Meaning |
@@ -38,7 +38,7 @@ List your workspace's price experiments: each one's key, name, status, variants 
 Read one experiment's definition: its key, name, description, status, variants with their prices and weights, target sample size and dates. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -49,7 +49,7 @@ Read one experiment's definition: its key, name, description, status, variants w
 Read how an experiment is doing: for each variant the views, conversions, conversion rate and revenue, and a comparison of every variant against the control. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -60,7 +60,7 @@ Read how an experiment is doing: for each variant the views, conversions, conver
 Read whether one of your stored experiments can stop: the verdict (stop, keep running, or no winner yet) with its reason and a one-line headline, from a sequential test against control that stays valid however often you look (mSPRT, adjusted for the number of arms), with each arm's chance to beat control and expected loss. Also the traffic split in force now, whether bandit allocation is on with its floors and the weights it would set now, and the weight history: every change the bandit made and every change to its settings. Answers "not enabled" until sequential testing is switched on for your workspace. Needs a Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/experiments/{experimentId}/sequential`
 - **Errors and cautions:** Answers "not enabled" until sequential testing is switched on for your workspace.
 
@@ -74,7 +74,7 @@ Read whether one of your stored experiments can stop: the verdict (stop, keep ru
 Switch bandit allocation on or off for one of your stored experiments, and set its floors: pass experiment_key and bandit_enabled, and optionally min_weight_pct (1 to 50, the least traffic any arm keeps) and control_min_weight_pct (1 to 90, the least control keeps). The floors have to fit the number of arms. Read the result with get_experiment_stopping. Answers "not enabled" until sequential testing is switched on for your workspace. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** **destructive**
 - **REST:** `/api/experiments/{experimentId}/sequential`
 - **Errors and cautions:** Answers "not enabled" until sequential testing is switched on for your workspace. Needs a claimed Last Price credential for the workspace that owns the experiment.
 
@@ -106,7 +106,7 @@ Add one price arm to an existing experiment: pass experiment_key and the price, 
 Is there a winner yet in a price test? Send the trials and conversions of two to ten variants and get, for each, its chance of being best, its expected loss and a 95% credible interval, and a verdict of winner, equivalent or continue. With exactly two variants, the first is the control and a sequential probability ratio test is added. Change the prior, win_probability, loss_threshold or sprt settings to be stricter or looser. Billed as one call to the significance function. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/compute/significance`
 
 | Argument | Type | Meaning |
@@ -122,7 +122,7 @@ Is there a winner yet in a price test? Send the trials and conversions of two to
 How should traffic be split next between price variants? Send the trials and conversions of two to ten variants and get each one's share of the next traffic by Thompson sampling: its chance of being best, with a floor so none is starved (min_weight). Exact by default; in Monte Carlo mode it samples draws times, reproducibly for a given seed. Billed as one call to the allocator function. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/compute/allocation`
 
 | Argument | Type | Meaning |

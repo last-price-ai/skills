@@ -10,7 +10,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 Browse the public marketplace catalog of pricing functions.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **REST:** `/api/functions/catalog`
 
 _No arguments._
@@ -20,7 +20,7 @@ _No arguments._
 Browse the public marketplace: the pricing functions their owners listed for anyone to use, each cut to its public fields, with usage and rating. Page with limit and offset. Public: needs no credential, limited per address.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **Errors and cautions:** Public: needs no credential, limited per address.
 
 | Argument | Type | Meaning |
@@ -33,7 +33,7 @@ Browse the public marketplace: the pricing functions their owners listed for any
 List your own marketplace listings, public or not. Page with limit and offset. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -45,7 +45,7 @@ List your own marketplace listings, public or not. Page with limit and offset. N
 Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the listing is public. Pass function_id. The sample call spends your endpoint or provider key. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **Errors and cautions:** Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
@@ -57,7 +57,7 @@ Run the marketplace review of one of your functions now, as a dry run: it makes 
 Read the latest marketplace review of one of your functions, from its listing: the report, whether the listing is public and the listing id. The review is null when the function has no listing or was never reviewed. Pass function_id. Only the owner can read it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -68,7 +68,7 @@ Read the latest marketplace review of one of your functions, from its listing: t
 Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating. Pass window as 7d, 30d, 90d or all (default all). Public: needs no credential, limited per address.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 - **Errors and cautions:** Public: needs no credential, limited per address.
 
 | Argument | Type | Meaning |
@@ -80,7 +80,7 @@ Read the public pricing-function leaderboard: the functions the community uses m
 Read the payout ledger for the functions you own on the marketplace: what each call earned, its commission and its payout status. Filter by payout_status and page with limit and offset. Read-only. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

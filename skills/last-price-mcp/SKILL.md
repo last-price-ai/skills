@@ -5,14 +5,16 @@ description: Use when the Last Price MCP connector is available and the task is 
 # Last Price: using the MCP connector
 
 - Endpoint (install/reconnect): `https://api.last-price.ai/api/mcp/rpc`. Discovery: `https://api.last-price.ai/.well-known/mcp.json`.
-- The connector exposes roughly 280 tools and grows often. Always list the live tools (and read the full schema of the one you call) before calling; treat the map below as a guide, not a frozen schema.
+- The connector exposes roughly 300 tools and grows often. Always list the live tools (and read the full schema of the one you call) before calling; treat the map below as a guide, not a frozen schema.
 - Credential: set `LASTPRICE_API_KEY` in the connector config (an `lp_...` key). Without one, the compute/verify tools silently run the **public demo** (one pinned function, `metadata` and constraints dropped, elasticity assumed -1.2). Read `_lastprice_notice` on every response and label demo results as demo.
 - Many tools state "Needs a claimed workspace": a self-registered sandbox key gets 403 until a person claims it (see `last-price-auth`).
 
 ## Tool map by job
 
 **Price**
-- `pricing_conversation` (prepare is free and keyless: returns the questions to ask; then resend `continuation.request` + answers), `compute_price`, `compute_prices_batch` (up to 100), `verify_price`, `list_verification_strategies`, `run_pricing_chain`, `report_outcome`, `verify_signed_quote`.
+- `pricing_conversation` (prepare is free and keyless: returns the questions to ask; then resend `continuation.request` + answers), `compute_price`, `compute_prices_batch` (up to 100), `verify_price`, `list_verification_strategies`, `run_pricing_chain`, `report_outcome`, `verify_signed_quote`, `read_quote_reply` (reads a buyer's reply to a quote: accept, too high, counter, question, decline).
+- From a photo, link, PDF, barcode or description: `price_from_capture`, `describe_item_so_far` (while the person is still typing), `list_price_checks`, `get_price_check`, `report_problem` (the person says a price or answer is wrong).
+- `run_reference_pipeline` runs one of the seven reference pipelines without a key (10 per hour per IP; 501 `pipeline_execution_unavailable` while its flag is off).
 
 **Functions and routing**
 - `list_functions`, `get_function`, `create_function`, `update_function`, `delete_function`, `test_function`, `get_function_health`, `run_function_health_probe`.
@@ -33,10 +35,12 @@ description: Use when the Last Price MCP connector is available and the task is 
 
 **Commerce pipeline**
 - `list_commerce_connectors`, `create_commerce_connector`, `set_commerce_connector_active`, `sync_commerce_connector`, `sync_commerce_orders`, `list_commerce_catalog`, `list_commerce_observations`, `add_commerce_observation`, `list_commerce_policies`, `get_commerce_policy`, `create_commerce_policy`, `update_commerce_policy`, `delete_commerce_policy`, `test_commerce_policy`, `run_commerce_cycle`, `list_commerce_proposals`, `approve_commerce_proposal`, `reject_commerce_proposal`, `execute_commerce_proposals` (changes live store prices), `list_commerce_audit_events`, `seed_commerce_sample`.
+- Hosted price scraping (501 `hosted_scraping_not_enabled` until its release flag is on for the workspace): `preview_scrape_job` (try selectors, stores nothing), `create_scrape_job`, `list_scrape_jobs`, `update_scrape_job` (`enabled: false` pauses), `run_scrape_job`, `list_scrape_job_runs`, `delete_scrape_job` (also deletes run history).
 
 **Order to cash**
 - Customers, contacts, orders: `list_customers`, `get_customer`, `get_customer_by_external_id`, `create_customer`, `update_customer`, `delete_customer`, `list_contacts`, `get_contact`, `get_contact_by_external_id`, `create_contact`, `update_contact`, `delete_contact`, `list_orders`, `get_order`, `create_order`, `update_order`, `delete_order`, `add_order_line`, `list_order_lines`, `activate_order`.
 - Payments, disputes, invoices, credits, costs: `list_payments`, `get_payment`, `create_payment`, `refund_payment`, `list_disputes`, `get_dispute`, `create_dispute`, `update_dispute`, `list_invoices`, `get_invoice`, `create_invoice`, `update_invoice`, `delete_invoice`, `send_invoice` (sends a real email), `list_credits`, `get_credit`, `create_credit`, `delete_credit`, `get_credit_balance`, `list_costs`, `record_cost`, `get_cost_analytics`.
+- Monetization (early access): credit bundles `list_credit_bundle_plans`, `create_credit_bundle_plan`, `update_credit_bundle_plan`, `grant_credit_bundle_plan` (adds credits and drafts an invoice), `list_credit_bundle_subscriptions`, `cancel_credit_bundle_subscription`; tax preview `calculate_tax` (saves nothing); Stripe `get_stripe_connection`, `issue_invoice_with_stripe` (bills the customer on Stripe); integration code `generate_monetization_code` (writes nothing), `get_github_app_connection`, `open_monetization_pull_request` (opens a PR in the workspace's own repo, never merges).
 
 **Usage, receipts, billing**
 - `get_usage`, `get_usage_breakdown`, `list_usage_events`, `get_llm_usage`, `list_llm_usage_events`, `get_receipt`, `list_receipts`, `get_billing_settings`, `update_billing_settings`, `list_outcomes`, `top_up_balance`, `create_card_topup`, `get_card_topup`, `list_day_passes`, `buy_day_pass`, `get_wallet_balance`, `get_x402_price_index`.
@@ -74,6 +78,6 @@ description: Use when the Last Price MCP connector is available and the task is 
 
 ## Rules
 
-- Tools that change live prices, money, access, or delete data (`set_price_guardrails`, `update_function` status, `execute_commerce_proposals`, `update_billing_settings`, `top_up_balance`, `buy_day_pass`, `refund_payment`, `send_invoice`, `approve_payout_run`, `accept_counter`, every `delete_*`): read current state first, confirm with the user, verify after.
+- Tools that change live prices, money, access, or delete data (`set_price_guardrails`, `update_function` status, `execute_commerce_proposals`, `update_billing_settings`, `top_up_balance`, `buy_day_pass`, `refund_payment`, `send_invoice`, `issue_invoice_with_stripe`, `grant_credit_bundle_plan`, `cancel_credit_bundle_subscription`, `open_monetization_pull_request`, `approve_payout_run`, `accept_counter`, every `delete_*`): read current state first, confirm with the user, verify after.
 - A tool that "returns payment requirements" without a payment spends nothing; never fabricate a payment signature.
 - Report numbers verbatim with their period; never invent prices, findings, ids, or verdicts.
