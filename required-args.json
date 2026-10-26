@@ -29,9 +29,6 @@
   "storefront_id",
   "domain"
  ],
- "add_team_member": [
-  "user_id"
- ],
  "allocate_variant_traffic": [
   "variants"
  ],
@@ -41,14 +38,10 @@
  "approve_commerce_proposal": [
   "proposal_id"
  ],
- "approve_payout_run": [
-  "run_id"
- ],
  "ask_pricing_analyst": [
   "question"
  ],
  "browse_catalog": [],
- "buy_day_pass": [],
  "calculate_tax": [
   "amount",
   "currency"
@@ -59,22 +52,11 @@
  "cancel_ucp_checkout": [
   "checkout_id"
  ],
- "change_team_member_role": [
-  "user_id",
-  "role"
- ],
  "check_agent_readiness": [
   "url"
  ],
- "check_purchase": [
-  "seller",
-  "amount"
- ],
  "check_variant_significance": [
   "variants"
- ],
- "close_spend_session": [
-  "session_id"
  ],
  "complete_ucp_checkout": [
   "checkout_id"
@@ -85,9 +67,6 @@
  "compute_prices_batch": [
   "requests"
  ],
- "confirm_purchase": [
-  "reservation_id"
- ],
  "contribute_price_data": [
   "vertical",
   "source_url",
@@ -96,9 +75,6 @@
  ],
  "contribute_price_data_batch": [
   "contributions"
- ],
- "create_card_topup": [
-  "amount"
  ],
  "create_commerce_connector": [
   "platform",
@@ -234,13 +210,6 @@
  "disconnect_connected_app": [
   "connected_app_id"
  ],
- "discover_offers": [
-  "task"
- ],
- "draw_session_spend": [
-  "session_id",
-  "amount"
- ],
  "estimate_task_cost": [
   "task_description",
   "countries"
@@ -270,17 +239,12 @@
   "model"
  ],
  "get_aitune_system_stats": [],
- "get_alert_preferences": [],
  "get_analyst_brief": [],
  "get_analyst_settings": [],
  "get_approval": [
   "approval_id"
  ],
- "get_billing_settings": [],
  "get_buyer_aware_pricing": [],
- "get_card_topup": [
-  "topup_id"
- ],
  "get_changelog": [],
  "get_channel_rates": [],
  "get_commerce_policy": [
@@ -320,9 +284,6 @@
   "experiment_key"
  ],
  "get_feature_contract": [],
- "get_feature_launch_plan": [
-  "flag"
- ],
  "get_forge_status": [],
  "get_frontier_model": [],
  "get_function": [
@@ -362,10 +323,6 @@
  "get_payment": [
   "payment_id"
  ],
- "get_payout_run": [
-  "run_id"
- ],
- "get_payout_schedule": [],
  "get_price_check": [
   "check_id"
  ],
@@ -374,22 +331,12 @@
  "get_pricing_analysis": [],
  "get_prompt_class_benchmarks": [],
  "get_public_leaderboard": [],
- "get_purchase_intent": [
-  "intent_id"
- ],
  "get_receipt": [
   "usage_event_id"
- ],
- "get_reel": [
-  "reel_id"
  ],
  "get_rosetta_health": [],
  "get_routing_policy": [
   "policy_id"
- ],
- "get_spend_policy": [],
- "get_spend_session": [
-  "session_id"
  ],
  "get_storefront": [
   "storefront_id"
@@ -404,11 +351,6 @@
  ],
  "get_usage": [],
  "get_usage_breakdown": [],
- "get_wallet_balance": [
-  "address"
- ],
- "get_workspace_settings": [],
- "get_x402_price_index": [],
  "grant_credit_bundle_plan": [
   "plan_id",
   "customer_id"
@@ -419,9 +361,6 @@
  "ingest_with_rosetta": [
   "canonical_target",
   "payload"
- ],
- "invite_team_member": [
-  "email"
  ],
  "issue_invoice_with_stripe": [
   "invoice_id"
@@ -445,15 +384,11 @@
  ],
  "list_credits": [],
  "list_customers": [],
- "list_day_passes": [],
  "list_demo_apps": [],
  "list_disputes": [],
  "list_experiments": [],
- "list_feature_launches": [],
  "list_functions": [],
  "list_hosted_models": [],
- "list_inference_providers": [],
- "list_invitations": [],
  "list_invoices": [],
  "list_jale_contributions": [],
  "list_learned_price_changes": [],
@@ -461,19 +396,15 @@
  "list_marketplace_listings": [],
  "list_my_marketplace_listings": [],
  "list_negotiations": [],
- "list_notifications": [],
  "list_order_lines": [
   "order_id"
  ],
  "list_orders": [],
- "list_outcomes": [],
  "list_payments": [],
- "list_payout_runs": [],
  "list_price_checks": [],
  "list_pricing_pipelines": [],
  "list_product_categories": [],
  "list_receipts": [],
- "list_reels": [],
  "list_rosetta_review": [],
  "list_routing_policies": [],
  "list_scrape_job_runs": [
@@ -488,7 +419,6 @@
   "storefront_id"
  ],
  "list_storefronts": [],
- "list_team_members": [],
  "list_ucp_checkouts": [],
  "list_usage_events": [],
  "list_vendor_adapters": [],
@@ -500,7 +430,6 @@
   "product_id",
   "offered_price"
  ],
- "mark_notifications_read": [],
  "normalize_with_rosetta": [
   "plan",
   "vendor_response"
@@ -508,10 +437,6 @@
  "open_monetization_pull_request": [
   "repository",
   "framework"
- ],
- "open_spend_session": [
-  "seller",
-  "max_amount"
  ],
  "ping_webhook": [
   "webhook_id"
@@ -547,17 +472,11 @@
   "storefront_id",
   "domain"
  ],
- "read_my_inbox": [],
  "read_quote_reply": [
   "text"
  ],
  "recommend_jale_price": [
   "experiment_id"
- ],
- "reconcile_purchase": [
-  "reservation_id",
-  "outcome",
-  "note"
  ],
  "record_cost": [
   "amount"
@@ -575,9 +494,6 @@
  "reject_forge_candidate": [
   "candidate_id"
  ],
- "reject_payout_run": [
-  "run_id"
- ],
  "remove_offer_product": [
   "product_id"
  ],
@@ -590,24 +506,11 @@
   "storefront_id",
   "domain_id"
  ],
- "remove_team_member": [
-  "user_id"
- ],
  "report_outcome": [
   "outcome"
  ],
  "report_problem": [
   "reason"
- ],
- "request_payout_run": [
-  "period_start",
-  "period_end"
- ],
- "retry_payout_run": [
-  "run_id"
- ],
- "revoke_invitation": [
-  "invitation_id"
  ],
  "rollback_hosted_model": [
   "model_id"
@@ -665,26 +568,11 @@
  "set_offer_settings": [
   "enabled"
  ],
- "set_payout_schedule": [
-  "enabled",
-  "cadence",
-  "run_day"
- ],
  "set_price_exploration": [],
  "set_price_guardrails": [],
  "set_product_category": [
   "product_id",
   "category_id"
- ],
- "set_spend_policy": [],
- "settle_purchase": [
-  "reservation_id",
-  "outcome"
- ],
- "settle_session_draw": [
-  "session_id",
-  "draw_id",
-  "outcome"
  ],
  "simulate_agent_cut": [
   "price",
@@ -711,9 +599,6 @@
  "test_function": [
   "function_id"
  ],
- "top_up_balance": [
-  "amount"
- ],
  "train_hosted_model": [
   "model_id"
  ],
@@ -723,8 +608,6 @@
   "canonical_schema",
   "vendor_contract"
  ],
- "update_alert_preferences": [],
- "update_billing_settings": [],
  "update_commerce_policy": [
   "policy_id"
  ],
@@ -767,7 +650,6 @@
  "update_webhook": [
   "webhook_id"
  ],
- "update_workspace_settings": [],
  "upload_hosted_model_version": [
   "model_id",
   "artifact_base64",

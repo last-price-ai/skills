@@ -4,42 +4,31 @@ Agent skills for [Last Price](https://last-price.ai), the Pricing Compute Networ
 
 Each skill is a folder with a `SKILL.md` in the open [Agent Skills](https://agentskills.io) format: YAML frontmatter (`name`, `description` saying when to use it) and a concise body of instructions. These skills work in Cursor, Claude Code, Codex, and other agents that support Agent Skills, or as plain reference docs for any agent.
 
-## Pay per call
-
-Pay for a computation with a wallet, without an account or API key. Send a request to `POST /api/compute/price`, read the HTTP 402 payment requirements, then submit the same request with an x402 payment authorization. Payment uses USDC on Base.
-
-- [Pay-per-call skill](skills/last-price-x402/SKILL.md): payment terms, signing, settlement and errors.
-- [Wallet recipe](recipes/01-price-with-a-wallet-x402.md): request and payment flow.
-- [TypeScript client](clients/x402-safe-client/): validates the recipient, token, amount and spending cap before signing.
-
-Pay-per-call uses the paid compute endpoint. The free demo is a separate, limited endpoint at `/api/public/compute/demo`.
-
 ## Skills
 
 | Skill | Use it for |
 |---|---|
-| [`last-price-x402`](skills/last-price-x402/SKILL.md) | HTTP 402 pay-per-call with USDC on Base, day passes, top-ups |
 | [`last-price-overview`](skills/last-price-overview/SKILL.md) | Start here: what Last Price is, MCP vs HTTP, which skill does what |
 | [`last-price-auth`](skills/last-price-auth/SKILL.md) | Getting and verifying a key, request headers, sandbox limits, scopes |
-| [`last-price-mcp`](skills/last-price-mcp/SKILL.md) | Using the MCP connector: ~280 tools mapped by job |
+| [`last-price-mcp`](skills/last-price-mcp/SKILL.md) | Using the MCP connector: ~260 tools mapped by job |
 | [`last-price-compute`](skills/last-price-compute/SKILL.md) | Quoting prices: single, batch, demo, input clarifier, errors |
 | [`last-price-functions-and-routing`](skills/last-price-functions-and-routing/SKILL.md) | Pricing functions, routing policies, router, chains, verify, guardrails |
 | [`last-price-experiments`](skills/last-price-experiments/SKILL.md) | A/B and multi-arm price experiments, stopping, significance, bandits |
 | [`last-price-learning-loop`](skills/last-price-learning-loop/SKILL.md) | Outcomes, learned elasticity, analyst findings, JALE optimize, data exchange |
 | [`last-price-rosetta`](skills/last-price-rosetta/SKILL.md) | Mapping merchant payloads onto canonical records |
-| [`last-price-marketplace`](skills/last-price-marketplace/SKILL.md) | Listings, reviews, earnings, payout runs, Elo Index leaderboard |
+| [`last-price-marketplace`](skills/last-price-marketplace/SKILL.md) | Listings, reviews, earnings and payout history, Elo Index leaderboard |
 | [`last-price-webhooks`](skills/last-price-webhooks/SKILL.md) | Outbound webhooks and signature verification |
-| [`last-price-agents`](skills/last-price-agents/SKILL.md) | Workspace agents, agent keys, capabilities, day passes, claim |
+| [`last-price-agents`](skills/last-price-agents/SKILL.md) | Workspace agents, agent keys, capabilities, claim |
 | [`last-price-commerce-pipeline`](skills/last-price-commerce-pipeline/SKILL.md) | Store connectors, competitor observations, price proposals, execution |
 | [`last-price-workspace-admin`](skills/last-price-workspace-admin/SKILL.md) | Team, roles, API keys, embed tokens, approvals, audit, notifications |
 | [`last-price-order-to-cash`](skills/last-price-order-to-cash/SKILL.md) | Customers, contacts, orders, payments, disputes |
-| [`last-price-usage-and-billing`](skills/last-price-usage-and-billing/SKILL.md) | Usage, receipts, costs, prepaid balance, top-ups, credits, invoices |
+| [`last-price-usage-and-billing`](skills/last-price-usage-and-billing/SKILL.md) | Usage, receipts, costs, credits, invoices |
 | [`last-price-ucp`](skills/last-price-ucp/SKILL.md) | Universal Commerce Protocol quotes and checkout sessions |
-| [`last-price-spend-and-offers`](skills/last-price-spend-and-offers/SKILL.md) | Buyer-agent spend policy checks, negotiated offers and counters |
+| [`last-price-offers`](skills/last-price-offers/SKILL.md) | Negotiated offers and counters |
 
 ## Install
 
-This repository is a plugin for Claude Code, Cursor, Codex and ChatGPT, and an extension for Gemini CLI. Each one installs the skills and the Last Price MCP server (`https://api.last-price.ai/api/mcp/rpc`) together. Without an API key, `compute_price` and `verify_price` answer from a rate limited demo; add a key for everything else.
+This repository is a plugin for Claude Code, Cursor, Codex and ChatGPT, and an extension for Gemini CLI. Each one installs the skills and the Last Price MCP server (`https://api.last-price.ai/api/mcp/rpc?profile=directory`, the directory tool set with no payment tools) together. Without an API key, `compute_price` and `verify_price` answer from a rate limited demo; add a key for everything else.
 
 **Claude Code**
 
@@ -82,7 +71,7 @@ cp -R last-price-agent-skills/skills/* .cursor/skills/
 **VS Code (GitHub Copilot agent mode)**
 
 ```bash
-code --add-mcp '{"name":"lastprice","type":"http","url":"https://api.last-price.ai/api/mcp/rpc?via=vscode"}'
+code --add-mcp '{"name":"lastprice","type":"http","url":"https://api.last-price.ai/api/mcp/rpc?profile=directory&via=vscode"}'
 ```
 
 **Google Antigravity**
@@ -93,7 +82,7 @@ Open the Agent panel's menu, MCP Servers, Manage MCP Servers, View raw config, a
 {
   "mcpServers": {
     "lastprice": {
-      "serverUrl": "https://api.last-price.ai/api/mcp/rpc?via=antigravity"
+      "serverUrl": "https://api.last-price.ai/api/mcp/rpc?profile=directory&via=antigravity"
     }
   }
 }
@@ -105,25 +94,25 @@ The Antigravity CLI reads the same block from `.agents/mcp_config.json` in a pro
 
 **Grok**
 
-At grok.com/connectors choose New Connector, Custom, and enter `https://api.last-price.ai/api/mcp/rpc?via=grok`. The demo tools work with no key.
+At grok.com/connectors choose New Connector, Custom, and enter `https://api.last-price.ai/api/mcp/rpc?profile=directory&via=grok`. The demo tools work with no key.
 
 **Zed, Warp, Kiro, JetBrains (Junie and AI Assistant), Goose, Windsurf**
 
-Add a remote (HTTP) MCP server named `lastprice` with the URL `https://api.last-price.ai/api/mcp/rpc?via=<tag>`, where the tag is `zed`, `warp`, `kiro`, `jetbrains`, `goose` or `windsurf`, and an optional `x-api-key` header.
+Add a remote (HTTP) MCP server named `lastprice` with the URL `https://api.last-price.ai/api/mcp/rpc?profile=directory&via=<tag>`, where the tag is `zed`, `warp`, `kiro`, `jetbrains`, `goose` or `windsurf`, and an optional `x-api-key` header.
 
 **v0 and Microsoft Copilot Studio**
 
-Add `https://api.last-price.ai/api/mcp/rpc?via=v0` or `https://api.last-price.ai/api/mcp/rpc?via=copilot-studio` as a custom MCP server (Streamable HTTP), with an optional `x-api-key` header.
+Add `https://api.last-price.ai/api/mcp/rpc?profile=directory&via=v0` or `https://api.last-price.ai/api/mcp/rpc?profile=directory&via=copilot-studio` as a custom MCP server (Streamable HTTP), with an optional `x-api-key` header.
 
 **Clients that only run local (stdio) servers**
 
 ```bash
-npx -y mcp-remote https://api.last-price.ai/api/mcp/rpc?via=mcp-remote
+npx -y mcp-remote https://api.last-price.ai/api/mcp/rpc?profile=directory&via=mcp-remote
 ```
 
 **ChatGPT, Claude.ai, Perplexity and other MCP clients**
 
-Add `https://api.last-price.ai/api/mcp/rpc` as a custom connector or remote MCP server. For an API key, send it as the `x-api-key` header where the client allows headers.
+Add `https://api.last-price.ai/api/mcp/rpc?profile=directory` as a custom connector or remote MCP server. For an API key, send it as the `x-api-key` header where the client allows headers.
 
 **Other Agent Skills-compatible agents**
 
@@ -135,7 +124,7 @@ The [skills CLI](https://skills.sh) installs the skills into Claude Code, Cursor
 
 ## What the plugin connects to
 
-The plugin, extension and manifests in this repository contain no code that runs on install. They point the assistant at one remote server, `https://api.last-price.ai/api/mcp/rpc`, run by Last Price. Each manifest adds a `via` tag to that address (`?via=claude-plugin`, `cursor-plugin`, `openai-plugin`, `gemini-cli`) so Last Price can count installs by assistant; the tag changes nothing about the answers. Tool calls send the arguments the assistant chooses (pricing context such as currency, cost and product type) and, if you set one, your API key in the `x-api-key` header. Nothing else is read from your machine. Privacy policy: https://last-price.ai/privacy.
+The plugin, extension and manifests in this repository contain no code that runs on install. They point the assistant at one remote server, `https://api.last-price.ai/api/mcp/rpc`, run by Last Price. Each manifest asks for the directory tool set (`profile=directory`) and adds a `via` tag (`via=claude-plugin`, `cursor-plugin`, `openai-plugin`, `gemini-cli`) so Last Price can count installs by assistant; the tag changes nothing about the answers. Tool calls send the arguments the assistant chooses (pricing context such as currency, cost and product type) and, if you set one, your API key in the `x-api-key` header. Nothing else is read from your machine. Privacy policy: https://last-price.ai/privacy.
 
 ## Plugin files
 
@@ -158,13 +147,13 @@ Store the key in your environment or secret store:
 - HTTP: `LP_API_KEY`, sent as `x-api-key: $LP_API_KEY`.
 - MCP: `LASTPRICE_API_KEY` in the connector configuration.
 
-Verify a key with `GET https://api.last-price.ai/api/me`. See [authentication](skills/last-price-auth/SKILL.md) for scopes, sandbox limits and OAuth. Pay-per-call needs a wallet instead of an API key.
+Verify a key with `GET https://api.last-price.ai/api/me`. See [authentication](skills/last-price-auth/SKILL.md) for scopes, sandbox limits and OAuth.
 
 ## MCP vs HTTP
 
 Both are first class and reach the same backend.
 
-- **MCP connector** (`https://api.last-price.ai/api/mcp/rpc`, discovery at `/.well-known/mcp.json`): structured tools for nearly every surface. Best inside agents that support MCP. Without a key, compute and verify tools fall back to the rate-limited public demo, which pins one function and drops metadata and constraints, so label those results as demo.
+- **MCP connector** (`https://api.last-price.ai/api/mcp/rpc?profile=directory`, discovery at `/.well-known/mcp.json`): structured tools for nearly every surface. Best inside agents that support MCP. Without a key, compute and verify tools fall back to the rate-limited public demo, which pins one function and drops metadata and constraints, so label those results as demo.
 - **HTTP API** (`https://api.last-price.ai`, OpenAPI at `/api/openapi`): covers everything, including the few surfaces without a tool. Best for scripts, CI, and agents without MCP.
 
 ## Keeping skills current
@@ -194,9 +183,13 @@ node scripts/sync.mjs           # regenerate references/mcp-tools.md
 - Read state before writing; confirm with the user before changing live prices, money, access, or deleting data.
 - Keep API keys, claim tokens, webhook secrets, embed tokens, and payment headers out of chat and logs.
 
-## Recipes and client
+## Recipes
 
-[Recipes](recipes/) cover wallet payments, keyed compute, marketplace publishing, experiments and Rosetta. The [TypeScript x402 client](clients/x402-safe-client/) provides payment validation and settlement handling.
+[Recipes](recipes/) cover keyed compute, marketplace publishing, experiments and Rosetta.
+
+## Payments (not in the plugins)
+
+The plugins and the `skills/` folder leave out payments: they use the connector's directory tool set (`?profile=directory`), which has no wallet, top-up, day-pass, spend-session or payout tools. Integrators who pay per call with x402 (USDC on Base) can read [`payments/`](payments/): the [pay-per-call skill](payments/last-price-x402/SKILL.md), the [spend policy skill](payments/last-price-spend-policy/SKILL.md), the [wallet recipe](payments/01-price-with-a-wallet-x402.md) and the [TypeScript x402 client](payments/x402-safe-client/). No plugin loads them.
 
 ## License
 

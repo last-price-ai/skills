@@ -42,7 +42,7 @@ Rules for every function: whole cents; floors round up; if no cent fits between 
 3. Turn on explanation, confidence, and alternatives for reviews.
 4. Call compute. On 4xx, fix inputs per the table below; never invent a price.
 5. Report `computed_price` + currency, `function_name`, `confidence`, explanation (including stated assumptions), `alternatives`, `metering.cost`, `trace` (route reason, fallback, cache, constrain), and `savings` when present.
-6. Act on `next_actions`: usually record the outcome later via `PATCH /api/usage/events/{id}/outcome` with `receipt.id`. `remaining` shows calls, day pass, balance, and rate limit left.
+6. Act on `next_actions`: usually record the outcome later via `PATCH /api/usage/events/{id}/outcome` with `receipt.id`. `remaining` shows calls and rate limit left.
 7. Many SKUs: `POST /api/compute/batch` (<= 100 items, positional; an item can fail without failing the call). Not available on self-registered sandboxes (403 `sandbox_restricted`); with balance billing on it is drawn all-or-nothing (402 `insufficient_balance`).
 8. Multi-step pricing (cost-plus, then clamp, then psychological ending): `POST /api/price-router/chain` (see `last-price-functions-and-routing`).
 
@@ -56,20 +56,16 @@ Rules for every function: whole cents; floors round up; if no cent fits between 
 | 400 `missing_pricing_basis` | Cost-plus with no `unit_cost` and no full band. |
 | 400 `conflicting_pricing_inputs` | Currency mismatch, min > max, max below floor: correct inputs, don't add more. |
 | 401 | Invalid credential; read the error code before replacing it. |
-| 402 `payment_required` | Pay per call with x402 (see `last-price-x402`). |
+| 402 `payment_required` | This skill pack does not make payments: on a 402, ask the user for a workspace key or to claim the sandbox. |
 | 403 | Missing `price:compute`. |
 | 404 | `function_id` unknown or not reachable by this workspace (deliberately indistinguishable). |
 | 422 `not_a_pricing_function` | The UUID is a non-pricing built-in (Rosetta, significance, allocator). Nothing metered. |
-| 429 | `rate_limited` (wait `Retry-After`) or `quota_exceeded`; `next` offers pay per call, day pass, claim. |
+| 429 | `rate_limited` (wait `Retry-After`) or `quota_exceeded`; `next` offers ways to continue, such as claiming the sandbox. |
 | 503 | Function inactive or circuit open; retry after `Retry-After`. `payment_settlement_unknown` is never retryable. |
-
-## Pay per call
-
-Use `/api/compute/price` with an x402 payment authorization instead of an API key. Read `last-price-x402` for payment validation and settlement handling. Paid calls can use metadata, constraints and available pricing functions.
 
 ## Free demo
 
-`POST /api/public/compute/demo` pins `lastprice/jale-optimizer` on a demo workspace, ignores `function_id`/`routing_preference`, strips `constraints` and `metadata`, caps the body at 4 KB and about 30 calls per IP per hour (`X-Demo-Remaining`). A missing or zero `current_price` is a 400 pointing at cost-plus on `/api/compute/price`, using an API key or x402 payment. Label demo results as demo.
+`POST /api/public/compute/demo` pins `lastprice/jale-optimizer` on a demo workspace, ignores `function_id`/`routing_preference`, strips `constraints` and `metadata`, caps the body at 4 KB and about 30 calls per IP per hour (`X-Demo-Remaining`). A missing or zero `current_price` is a 400 pointing at cost-plus on `/api/compute/price` with an API key. Label demo results as demo.
 
 ```bash
 curl -sS -X POST https://api.last-price.ai/api/public/compute/demo \

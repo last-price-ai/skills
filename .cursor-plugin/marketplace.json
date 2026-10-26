@@ -8,7 +8,7 @@
     {
       "name": "lastprice",
       "source": "./",
-      "description": "Last Price skills for pricing, x402 wallet payments, and workspace operations over HTTP and MCP."
+      "description": "Last Price skills for pricing, price checks, and workspace operations over HTTP and MCP."
     }
   ]
 }

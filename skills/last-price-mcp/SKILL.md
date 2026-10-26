@@ -1,11 +1,11 @@
 ---
 name: last-price-mcp
-description: Use when the Last Price MCP connector is available and the task is any last-price.ai job (compute, verify, functions, routing, guardrails, experiments, learned pricing, Rosetta, commerce, order-to-cash, webhooks, billing, team, marketplace, offers, spend policy). Maps jobs to tool names and explains keyless demo fallback and credential setup.
+description: Use when the Last Price MCP connector is available and the task is any last-price.ai job (compute, verify, functions, routing, guardrails, experiments, learned pricing, Rosetta, commerce, order-to-cash, webhooks, billing, team, marketplace, offers). Maps jobs to tool names and explains keyless demo fallback and credential setup.
 ---
 # Last Price: using the MCP connector
 
-- Endpoint (install/reconnect): `https://api.last-price.ai/api/mcp/rpc`. Discovery: `https://api.last-price.ai/.well-known/mcp.json`.
-- The connector exposes roughly 300 tools and grows often. Always list the live tools (and read the full schema of the one you call) before calling; treat the map below as a guide, not a frozen schema.
+- Endpoint (install/reconnect): `https://api.last-price.ai/api/mcp/rpc?profile=directory`. This skill pack covers the directory tool set, which leaves out payments, wallets and payouts. Discovery: `https://api.last-price.ai/.well-known/mcp.json`.
+- The connector exposes roughly 260 tools and grows often. Always list the live tools (and read the full schema of the one you call) before calling; treat the map below as a guide, not a frozen schema.
 - Credential: set `LASTPRICE_API_KEY` in the connector config (an `lp_...` key). Without one, the compute/verify tools silently run the **public demo** (one pinned function, `metadata` and constraints dropped, elasticity assumed -1.2). Read `_lastprice_notice` on every response and label demo results as demo.
 - Many tools state "Needs a claimed workspace": a self-registered sandbox key gets 403 until a person claims it (see `last-price-auth`).
 
@@ -43,22 +43,21 @@ description: Use when the Last Price MCP connector is available and the task is 
 - Monetization (early access): credit bundles `list_credit_bundle_plans`, `create_credit_bundle_plan`, `update_credit_bundle_plan`, `grant_credit_bundle_plan` (adds credits and drafts an invoice), `list_credit_bundle_subscriptions`, `cancel_credit_bundle_subscription`; tax preview `calculate_tax` (saves nothing); Stripe `get_stripe_connection`, `issue_invoice_with_stripe` (bills the customer on Stripe); integration code `generate_monetization_code` (writes nothing), `get_github_app_connection`, `open_monetization_pull_request` (opens a PR in the workspace's own repo, never merges).
 
 **Usage, receipts, billing**
-- `get_usage`, `get_usage_breakdown`, `list_usage_events`, `get_llm_usage`, `list_llm_usage_events`, `get_receipt`, `list_receipts`, `get_billing_settings`, `update_billing_settings`, `list_outcomes`, `top_up_balance`, `create_card_topup`, `get_card_topup`, `list_day_passes`, `buy_day_pass`, `get_wallet_balance`, `get_x402_price_index`.
+- `get_usage`, `get_usage_breakdown`, `list_usage_events`, `get_llm_usage`, `list_llm_usage_events`, `get_receipt`, `list_receipts`.
 
 **Marketplace**
-- `browse_catalog`, `list_marketplace_listings` (public), `list_my_marketplace_listings`, `create_marketplace_listing`, `update_marketplace_listing`, `delete_marketplace_listing`, `get_function_review`, `run_function_review`, `get_public_leaderboard`, `discover_offers`, `get_marketplace_earnings`, payout runs (`request_payout_run`, `list_payout_runs`, `get_payout_run`, `approve_payout_run`, `reject_payout_run`, `retry_payout_run`, `get_payout_schedule`, `set_payout_schedule`).
+- `browse_catalog`, `list_marketplace_listings` (public), `list_my_marketplace_listings`, `create_marketplace_listing`, `update_marketplace_listing`, `delete_marketplace_listing`, `get_function_review`, `run_function_review`, `get_public_leaderboard`, `get_marketplace_earnings`.
 
 **Webhooks, notifications, approvals, audit**
 - `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `ping_webhook`, `list_webhook_deliveries`, `verify_webhook_signature`.
-- `list_notifications`, `mark_notifications_read`, `get_alert_preferences`, `update_alert_preferences`, `list_approvals`, `get_approval`, `decide_approval`, `list_audit_events`.
+- `list_approvals`, `get_approval`, `decide_approval`, `list_audit_events`.
 
 **Workspace, team, agents**
-- `get_workspace_settings`, `update_workspace_settings`, `list_team_members`, `add_team_member`, `change_team_member_role`, `remove_team_member`, `invite_team_member`, `list_invitations`, `revoke_invitation` (team tools need an `x-api-key` with `team:admin`), `list_inference_providers`, `list_connected_apps`, `disconnect_connected_app`.
+- Workspace settings, team and notifications are managed in the dashboard (`https://app.last-price.ai`). Connected apps: `list_connected_apps`, `disconnect_connected_app`.
 - Self-hosted inference sidecar (AITune): `list_aitune_backends`, `start_aitune_profiling`, `get_aitune_profiling`, `get_aitune_system_stats`.
-- Agents: `get_agent_capabilities`, `get_agent_value_receipt`, `estimate_task_cost`, `read_my_inbox`, `get_agent_behaviour_tests`, `run_agent_behaviour_tests`, `get_agent_behaviour_test_run`, `get_agent_protocol`, `set_agent_protocol`, `verify_agent_protocol`.
+- Agents: `get_agent_capabilities`, `get_agent_value_receipt`, `estimate_task_cost`, `get_agent_behaviour_tests`, `run_agent_behaviour_tests`, `get_agent_behaviour_test_run`, `get_agent_protocol`, `set_agent_protocol`, `verify_agent_protocol`.
 
-**Buyer agents: spend policy and offers**
-- Spend control: `get_spend_policy`, `set_spend_policy`, `check_purchase`, `confirm_purchase`, `settle_purchase`, `reconcile_purchase`, `get_purchase_intent`, `open_spend_session`, `draw_session_spend`, `settle_session_draw`, `get_spend_session`, `close_spend_session`.
+**Offers**
 - Negotiation: sellers use `get_offer_settings`, `set_offer_settings`, `set_offer_product`, `remove_offer_product`, `preview_offer`, `list_negotiations`; buyers use `get_offer_terms`, `make_offer`, `get_negotiation`, `accept_counter` (commits the buyer).
 
 **UCP and storefronts**
@@ -66,18 +65,17 @@ description: Use when the Last Price MCP connector is available and the task is 
 - Storefronts (early access): `list_storefronts`, `create_storefront`, `get_storefront`, `update_storefront`, `delete_storefront`, domain tools (`search_storefront_domains`, `quote_storefront_domain`, `list_storefront_domain_quotes`, `add_storefront_domain`, `verify_storefront_domain`, `remove_storefront_domain`, `list_storefront_dns_records`, `add_storefront_dns_record`, `remove_storefront_dns_record`), `check_agent_readiness`.
 
 **Discovery and help**
-- Staff-only launch tools (`list_feature_launches`, `get_feature_launch_plan`) are for Last Price staff; ignore them.
-- `get_changelog`, `list_reels`, `get_reel`, `list_demo_apps`, `simulate_agent_cut`, `get_cut_advisor_settings`.
+- `get_changelog`, `list_demo_apps`, `simulate_agent_cut`, `get_cut_advisor_settings`.
 
 ## Common flows
 
 - **Quote with missing inputs:** `pricing_conversation` prepare, ask the user the returned questions, resend with answers, then compute.
 - **Quote, then learn:** `compute_price` (keep `receipt.id`), later `report_outcome` with what really happened.
-- **Workspace health check:** `get_pricing_analysis`, `get_price_guardrails`, `get_usage`, `list_notifications`, `list_approvals`.
+- **Workspace health check:** `get_pricing_analysis`, `get_price_guardrails`, `get_usage`, `list_approvals`.
 - **Tighten guardrails safely:** `get_price_guardrails`, merge the change, `set_price_guardrails` with every rule, read back.
 
 ## Rules
 
-- Tools that change live prices, money, access, or delete data (`set_price_guardrails`, `update_function` status, `execute_commerce_proposals`, `update_billing_settings`, `top_up_balance`, `buy_day_pass`, `refund_payment`, `send_invoice`, `issue_invoice_with_stripe`, `grant_credit_bundle_plan`, `cancel_credit_bundle_subscription`, `open_monetization_pull_request`, `approve_payout_run`, `accept_counter`, every `delete_*`): read current state first, confirm with the user, verify after.
-- A tool that "returns payment requirements" without a payment spends nothing; never fabricate a payment signature.
+- Tools that change live prices, money, access, or delete data (`set_price_guardrails`, `update_function` status, `execute_commerce_proposals`, `refund_payment`, `send_invoice`, `issue_invoice_with_stripe`, `grant_credit_bundle_plan`, `cancel_credit_bundle_subscription`, `open_monetization_pull_request`, `accept_counter`, every `delete_*`): read current state first, confirm with the user, verify after.
+- These tools never pay anyone: `create_payment` and `refund_payment` only record, `issue_invoice_with_stripe` sends an invoice the customer pays. Never fabricate a payment signature.
 - Report numbers verbatim with their period; never invent prices, findings, ids, or verdicts.

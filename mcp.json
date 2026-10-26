@@ -3,7 +3,7 @@
   "mcpServers": {
     "lastprice": {
       "type": "streamable-http",
-      "url": "https://api.last-price.ai/api/mcp/rpc?via=openai-plugin",
+      "url": "https://api.last-price.ai/api/mcp/rpc?profile=directory&via=openai-plugin",
       "extensions": {
         "com.openai": {
           "auth": {

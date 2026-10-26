@@ -1,10 +1,10 @@
 ---
-name: last-price-spend-and-offers
-description: Use when a buyer agent must check a purchase against its owner's last-price.ai spend policy before paying (check, reserve, confirm, consume, release, spend sessions), when an owner sets spend policies, or when buying or selling through Last Price offers and counter-offers (negotiation handles, make an offer, accept a counter, seller offer settings).
+name: last-price-spend-policy
+description: Use when a buyer agent must check a purchase against its owner's last-price.ai spend policy before paying (check, reserve, confirm, consume, release, spend sessions), or when an owner sets spend policies.
 ---
-# Last Price: spend policy and negotiated offers
+# Last Price: buyer-agent spend policy
 
-Two buyer-agent safety and commerce surfaces. Several parts are early access (404 `not_released` until enabled). Re-read OpenAPI before relying on a field. MCP equivalents: `get_spend_policy`, `set_spend_policy`, `check_purchase`, `confirm_purchase`, `settle_purchase`, `reconcile_purchase`, `open_spend_session`, `draw_session_spend`, `settle_session_draw`, `close_spend_session`; `get_offer_terms`, `make_offer`, `get_negotiation`, `accept_counter`, `get_offer_settings`, `set_offer_settings`, `set_offer_product`, `remove_offer_product`, `preview_offer`, `list_negotiations`.
+Not part of the directory plugin bundle (it lives under `payments/`). Several parts are early access (404 `not_released` until enabled). Re-read OpenAPI before relying on a field. MCP equivalents (full connector only): `get_spend_policy`, `set_spend_policy`, `check_purchase`, `confirm_purchase`, `settle_purchase`, `reconcile_purchase`, `open_spend_session`, `draw_session_spend`, `settle_session_draw`, `close_spend_session`.
 
 ## Spend policy (owner sets, buyer agent asks)
 
@@ -23,17 +23,7 @@ Two buyer-agent safety and commerce surfaces. Several parts are early access (40
 
 Buyer flow: check -> (on `ask`, wait for the person's approval, then send the identical check again) -> confirm -> pay -> consume (or release / unknown + reconcile). Holds never expire by time, so always settle. Deny codes include `no_policy`, `currency_mismatch`, `seller_blocked`, `seller_not_allowed`, `category_not_allowed`, `over_max_per_purchase`, `over_daily_cap`, `price_too_high`. An agent never approves its own `ask`.
 
-## Offers and counter-offers
-
-Seller side (`pcn:routing:read|write`): `GET/PUT /api/negotiation/settings` (turn offers on, public handle, rounds, concession and expiry), `PUT/DELETE /api/negotiation/products` (list price, hidden floor, optional unit cost, currency), `POST /api/negotiation/preview` (dry run an offer), `GET /api/negotiation/negotiations`.
-
-Buyer side (public, no credential):
-- `GET /api/negotiation/public/{handle}`: products open to offers, list prices, `min_offer`, rounds, how long a counter stands. Never the floor.
-- `POST /api/negotiation/public/{handle}/offers`: name a price; answer is `accept`, `counter`, or `reject`. The first offer returns `buyer_token` once (send it later in `x-negotiation-token` with `negotiation_id`). An offer at or above the asking price is accepted at the asking price.
-- `GET /api/negotiation/public/{handle}/offers/{negotiationId}` reads it; `POST .../accept` takes the standing counter and **commits the buyer to that price**.
-
 ## Rules
 
 - A buyer agent runs `check_purchase` / `/api/spend-policy/check` before every purchase when its owner uses spend policy, and settles every reservation.
-- Accepting a counter or paying is a purchase decision: only within the user's explicit instruction and budget.
-- Keep `buyer_token` values secret.
+- Paying is a purchase decision: only within the user's explicit instruction and budget.

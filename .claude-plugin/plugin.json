@@ -1,8 +1,8 @@
 {
   "name": "lastprice",
   "displayName": "Last Price",
-  "description": "Last Price skills for pricing, x402 wallet payments, and workspace operations over HTTP and MCP.",
-  "version": "0.2.0",
+  "description": "Last Price skills for pricing, price checks, and workspace operations over HTTP and MCP.",
+  "version": "0.3.0",
   "author": {
     "name": "Last Price",
     "email": "support@last-price.ai",
@@ -14,7 +14,6 @@
   "keywords": [
     "pricing",
     "mcp",
-    "x402",
     "agents",
     "commerce"
   ],
@@ -34,7 +33,7 @@
   "mcpServers": {
     "lastprice": {
       "type": "http",
-      "url": "https://api.last-price.ai/api/mcp/rpc?via=claude-plugin",
+      "url": "https://api.last-price.ai/api/mcp/rpc?profile=directory&via=claude-plugin",
       "headers": {
         "x-api-key": "${user_config.api_key}"
       }
