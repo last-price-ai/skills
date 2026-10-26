@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Publishes to ClawHub as `@last-price/lastprice`: `openclaw.plugin.json` gives OpenClaw the skills in `skills/` and the connector (directory tool set, tagged `via=openclaw`), `package.json` carries the scoped name, and `assets/icon.png` is the catalog icon. Keep their versions in step with `.claude-plugin/plugin.json`. Passes `clawhub package validate` with no findings.
+
 ## 0.3.0
 
 - No payments in the plugins: every manifest now points at the connector's directory tool set (`?profile=directory`, 258 tools), the same one listed in the Claude connector directory, so wallet balance, top-ups, day passes, spend sessions, purchase settlement, payouts and the x402 price index are no longer installed. The skills match it: `scripts/sync.mjs` and the drift check read the directory tool set, `last-price-x402` and the spend policy half of `last-price-spend-and-offers` moved to `payments/` (with the wallet recipe and the x402 client), which no plugin loads, and the offers half is now `last-price-offers`. Workspace settings, team, notifications and agent inbox tools are left out too, since a directory sign-in cannot call them.

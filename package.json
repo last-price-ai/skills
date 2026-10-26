@@ -1,0 +1,35 @@
+{
+  "name": "@last-price/lastprice",
+  "version": "0.3.0",
+  "description": "Price computation as a service: price anything, check a price, and run your Last Price workspace from OpenClaw.",
+  "license": "MIT",
+  "homepage": "https://last-price.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/last-price-ai/skills"
+  },
+  "keywords": [
+    "pricing",
+    "price-check",
+    "mcp",
+    "commerce",
+    "agents"
+  ],
+  "files": [
+    "openclaw.plugin.json",
+    ".claude-plugin",
+    "skills",
+    "assets",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "openclaw": {
+    "compat": {
+      "pluginApi": ">=2026.10.0"
+    },
+    "build": {
+      "openclawVersion": "2026.10.7"
+    }
+  }
+}

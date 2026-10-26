@@ -1,0 +1,18 @@
+{
+  "id": "lastprice",
+  "name": "Last Price",
+  "description": "Price computation as a service: price anything, check a price, and run your Last Price workspace from OpenClaw.",
+  "version": "0.3.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  },
+  "skills": ["skills"],
+  "mcpServers": {
+    "lastprice": {
+      "transport": "streamable-http",
+      "url": "https://api.last-price.ai/api/mcp/rpc?profile=directory&via=openclaw"
+    }
+  }
+}
