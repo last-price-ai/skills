@@ -19,6 +19,8 @@ const openai = read("plugin.json");
 const openaiMcp = read("mcp.json");
 const openaiMarket = read(".agents/plugins/marketplace.json");
 const gemini = read("gemini-extension.json");
+const openclaw = read("openclaw.plugin.json");
+const npmPackage = read("package.json");
 
 const errors = [];
 const expect = (ok, message) => {
@@ -39,11 +41,28 @@ const urls = [
   ["cursor mcp.json", cursorMcp.mcpServers?.lastprice?.url, "cursor-plugin"],
   ["openai mcp.json", openaiMcp.mcpServers?.lastprice?.url, "openai-plugin"],
   ["gemini-extension.json", gemini.mcpServers?.lastprice?.httpUrl, "gemini-cli"],
+  ["openclaw.plugin.json", openclaw.mcpServers?.lastprice?.url, "openclaw"],
 ];
 for (const [label, url, via] of urls) {
   const expected = `${SERVER_URL}?profile=directory&via=${via}`;
   expect(url === expected, `${label}: server URL is ${url}, expected ${expected}`);
 }
+
+expect(openclaw.id === "lastprice", `openclaw.plugin.json: id is ${openclaw.id}, expected lastprice`);
+expect(openclaw.version === claude.version, `openclaw.plugin.json: version ${openclaw.version} differs from Claude's ${claude.version}`);
+
+// ClawHub names the plugin after the publisher scope and packs only `files`,
+// so payments/ never ships.
+expect(npmPackage.name === "@last-price/lastprice", `package.json: name is ${npmPackage.name}, expected @last-price/lastprice`);
+expect(npmPackage.version === claude.version, `package.json: version ${npmPackage.version} differs from Claude's ${claude.version}`);
+expect(
+  Array.isArray(npmPackage.files) && !npmPackage.files.some((f) => f.startsWith("payments")),
+  "package.json: files must list what ships and leave out payments/",
+);
+expect(
+  JSON.stringify(openclaw.skills) === JSON.stringify(["skills"]),
+  "openclaw.plugin.json: skills must be [\"skills\"] (never payments/)",
+);
 
 const keyRef = claude.mcpServers?.lastprice?.headers?.["x-api-key"];
 expect(keyRef === "${user_config.api_key}", "claude plugin.json: x-api-key must read ${user_config.api_key}");
@@ -66,6 +85,7 @@ const paths = [
   openai.extensions?.["com.openai"]?.interface?.logo,
   openai.extensions?.["com.openai"]?.interface?.composerIcon,
   gemini.contextFileName,
+  ...(npmPackage.files ?? []),
 ].filter(Boolean);
 for (const p of paths) {
   expect(existsSync(join(root, p)), `missing file named by a manifest: ${p}`);

@@ -15,6 +15,15 @@
     "commerce",
     "agents"
   ],
+  "files": [
+    "openclaw.plugin.json",
+    ".claude-plugin",
+    "skills",
+    "assets",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "openclaw": {
     "compat": {
       "pluginApi": ">=2026.10.0"
