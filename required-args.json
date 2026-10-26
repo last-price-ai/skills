@@ -696,6 +696,9 @@
   "artifact_base64",
   "spec"
  ],
+ "value_investment": [
+  "stage"
+ ],
  "verify_agent_protocol": [],
  "verify_price": [
   "proposed_price"

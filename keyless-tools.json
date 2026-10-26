@@ -19,6 +19,7 @@
  "list_verification_strategies",
  "make_offer",
  "pricing_conversation",
+ "value_investment",
  "verify_price",
  "verify_signed_quote",
  "verify_webhook_signature"

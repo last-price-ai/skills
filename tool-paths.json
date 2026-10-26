@@ -481,6 +481,9 @@
  "update_workspace_settings": [
   "/api/workspaces/{workspaceId}/settings"
  ],
+ "value_investment": [
+  "/api/public/investment-valuation"
+ ],
  "verify_agent_protocol": [
   "/api/agent-protocol/verify"
  ],

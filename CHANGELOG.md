@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- New skill `last-price-investment-valuation`: a fair price for a startup round for investor agents (`POST /api/public/investment-valuation`, MCP `value_investment`, keyless).
 - Removed the root `.mcp.json`: the Claude Code plugin's server lives in `.claude-plugin/plugin.json` (with the optional key), and the duplicate showed as a shadowed second server in the Claude plugin directory.
 - `scripts/sync.mjs` splits a tool reference over 200 kB into an index and parts, so the directory's 256 KiB scan reads every file in full (`last-price-mcp` now has `mcp-tools-1.md` and `mcp-tools-2.md`).
 

@@ -61,6 +61,9 @@ description: Use when the Last Price MCP connector is available and the task is 
 - `get_ucp_profile` (public), `get_ucp_quote`, `create_ucp_checkout`, `get_ucp_checkout`, `list_ucp_checkouts`, `update_ucp_checkout`, `complete_ucp_checkout`, `cancel_ucp_checkout`.
 - Storefronts (early access): `list_storefronts`, `create_storefront`, `get_storefront`, `update_storefront`, `delete_storefront`, domain tools (`search_storefront_domains`, `quote_storefront_domain`, `list_storefront_domain_quotes`, `add_storefront_domain`, `verify_storefront_domain`, `remove_storefront_domain`, `list_storefront_dns_records`, `add_storefront_dns_record`, `remove_storefront_dns_record`), `check_agent_readiness`.
 
+**Investment valuation**
+- `value_investment` (public): a fair post-money range for a venture round from its stage, traction, team, market and comparable rounds, with a verdict on the offer on the table. See `last-price-investment-valuation`.
+
 **Discovery and help**
 - Staff-only launch tools (`list_feature_launches`, `get_feature_launch_plan`) are for Last Price staff; ignore them.
 - `get_changelog`, `list_reels`, `get_reel`, `list_demo_apps`, `simulate_agent_cut`, `get_cut_advisor_settings`.

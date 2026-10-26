@@ -36,6 +36,7 @@ Pay-per-call uses the paid compute endpoint. The free demo is a separate, limite
 | [`last-price-usage-and-billing`](skills/last-price-usage-and-billing/SKILL.md) | Usage, receipts, costs, prepaid balance, top-ups, credits, invoices |
 | [`last-price-ucp`](skills/last-price-ucp/SKILL.md) | Universal Commerce Protocol quotes and checkout sessions |
 | [`last-price-spend-and-offers`](skills/last-price-spend-and-offers/SKILL.md) | Buyer-agent spend policy checks, negotiated offers and counters |
+| [`last-price-investment-valuation`](skills/last-price-investment-valuation/SKILL.md) | A fair price for a startup round: post-money range, ownership, offer verdict (keyless) |
 
 ## Install
 

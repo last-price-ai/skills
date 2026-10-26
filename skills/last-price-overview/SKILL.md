@@ -50,6 +50,7 @@ HTTP: `x-api-key: $LP_API_KEY`. MCP connector: `LASTPRICE_API_KEY`. Never paste 
 | Usage, costs, prepaid balance, credits, invoices | `last-price-usage-and-billing` |
 | Agent shopping: UCP quote and checkout sessions | `last-price-ucp` |
 | Buyer-agent spend policy, offers and counter-offers | `last-price-spend-and-offers` |
+| Value a startup round for an investor (fair post-money, offer verdict) | `last-price-investment-valuation` |
 
 ## Rules for every skill
 
