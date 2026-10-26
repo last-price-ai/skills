@@ -8,5 +8,19 @@
     "type": "git",
     "url": "https://github.com/last-price-ai/skills"
   },
-  "keywords": ["pricing", "price-check", "mcp", "commerce", "agents"]
+  "keywords": [
+    "pricing",
+    "price-check",
+    "mcp",
+    "commerce",
+    "agents"
+  ],
+  "openclaw": {
+    "compat": {
+      "pluginApi": ">=2026.10.0"
+    },
+    "build": {
+      "openclawVersion": "2026.10.7"
+    }
+  }
 }
