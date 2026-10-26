@@ -20,7 +20,7 @@
         "termsOfServiceURL": "https://last-price.ai/terms",
         "defaultPrompt": [
           "Use Last Price to price a 12-month SaaS seat that costs us $4 a month to serve.",
-          "Use Last Price to check whether $89 is a fair price for these noise-cancelling headphones."
+          "Use Last Price to check what these noise-cancelling headphones should cost before I pay $89."
         ],
         "brandColor": "#047857",
         "composerIcon": "./assets/logo-128.png",
