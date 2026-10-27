@@ -1,0 +1,51 @@
+name: Package Publish
+
+# Publishes @last-price/lastprice to ClawHub (OpenClaw's registry) with the
+# clawhub CLI. The package is `npm pack` of this repo, so only what
+# package.json `files` lists ships (never payments/). ClawHub trusts this
+# workflow by file name (trusted publishing): the CLI exchanges the job's
+# GitHub OIDC token, so no ClawHub token is stored here. Bump the version in
+# every manifest before a real publish; ClawHub refuses a version it already
+# has.
+#
+# This calls the CLI directly rather than ClawHub's reusable workflow, whose
+# plugin validation step needs Node 22.13+ but runs on the runner's default
+# Node and fails.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Preview only. Untick to publish.
+        type: boolean
+        default: true
+
+permissions: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Real publishes only from main; any branch can preview.
+    if: github.ref == 'refs/heads/main' || inputs.dry_run
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      CLAWHUB: npx -y clawhub@0.23.3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/check-manifests.mjs
+      - run: mkdir dist && npm pack --pack-destination dist
+      - run: $CLAWHUB package validate . --out "$RUNNER_TEMP/plugin-inspector"
+      - name: Publish to ClawHub
+        run: |
+          $CLAWHUB package publish "$GITHUB_WORKSPACE"/dist/*.tgz \
+            --owner last-price \
+            --family bundle-plugin \
+            --source-repo "$GITHUB_REPOSITORY" \
+            --source-commit "$GITHUB_SHA" \
+            --source-ref "$GITHUB_REF" \
+            --json \
+            ${{ inputs.dry_run && '--dry-run' || '' }}

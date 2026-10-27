@@ -1,17 +1,17 @@
 ---
 name: last-price-agents
-description: Use when managing last-price.ai workspace agents - create, list, draft from a prompt, revoke, mint agent-bound keys, read capabilities, agent inbox, value receipts, behaviour tests, day-pass allowance, wallet balance, claiming a self-registered sandbox, or estimating human-labor cost for a task.
+description: Use when managing last-price.ai workspace agents - create, list, draft from a prompt, revoke, mint agent-bound keys, read capabilities, agent inbox, value receipts, behaviour tests, claiming a self-registered sandbox, or estimating human-labor cost for a task.
 ---
 # Last Price: agent lifecycle
 
-First-time self-registration and key storage are in `last-price-auth`. Public discovery: `GET /.well-known/agents.json` (access options, scopes, day-pass terms, attribution rules).
+First-time self-registration and key storage are in `last-price-auth`. Public discovery: `GET /.well-known/agents.json` (access options, scopes, attribution rules).
 
 ## Credential matrix
 
 | Surface | Credential |
 |---|---|
 | `GET/POST /api/agents`, `GET/DELETE /api/agents/{id}`, `/api/agents/{id}/inbox`, `POST /api/agents/{id}/keys` | **Person credential only** (dashboard session or a person JWT). API keys answer 401; agent-bound JWTs 403. |
-| `POST /api/agents/generate`, `GET /api/agents/{id}/capabilities`, `GET/POST /api/agents/allowance`, `POST /api/agents/estimate-task`, `GET /api/agents/wallet` | Bearer JWT or `x-api-key`. |
+| `POST /api/agents/generate`, `GET /api/agents/{id}/capabilities`, `POST /api/agents/estimate-task` | Bearer JWT or `x-api-key`. |
 | `POST /api/agents/register` | Public. |
 | `POST /api/agents/claim` | Dashboard session or `x-api-key` holding exactly `workspace:claim`. |
 
@@ -27,8 +27,6 @@ First-time self-registration and key storage are in `last-price-auth`. Public di
 | GET | `/api/agents/{id}/capabilities` | Effective scopes, pending approvals, rate limits, idempotency rules |
 | GET | `/api/agents/{id}/value-receipt` | Measured value signals vs cost over a period |
 | GET / POST | `/api/agents/{id}/behaviour-tests` | Scenario pack / run graded behaviour tests (uses the workspace's model key; early access) |
-| GET / POST | `/api/agents/allowance` | List / buy x402 day passes |
-| GET | `/api/agents/wallet` | USDC a wallet holds for pay-per-call, read from chain |
 | POST | `/api/agents/claim` | Claim a sandbox into a person-owned workspace |
 | POST | `/api/agents/estimate-task` | LLM estimate of human-labor cost by country |
 
@@ -43,10 +41,9 @@ First-time self-registration and key storage are in `last-price-auth`. Public di
 
 - GET `?cursor=&limit=` (1-100). POST requires `to` (1-50 addresses) and `subject`; optional `cc`, `bcc`, `text`, `html`, `reply_to_message_id`. Confirm with the user before sending mail.
 
-## Day passes and claim
+## Claim
 
-- `GET /api/agents/allowance`: passes, `remaining_calls`, `offer`. `POST` with no payment answers 402 with requirements; resend with `PAYMENT-SIGNATURE` (v2) or `X-PAYMENT` (v1). Only self-registered workspaces. Confirm before paying; never invent signatures (see `last-price-x402`).
-- `POST /api/agents/claim` `{"token":"lpc_...", "workspace_id"?, "dry_run": true, "keep_agent_key": false}`. Run `dry_run: true` first. `keep_agent_key: false` (default) revokes the agent key: confirm before a real claim. Claiming forfeits unused day-pass calls.
+- `POST /api/agents/claim` `{"token":"lpc_...", "workspace_id"?, "dry_run": true, "keep_agent_key": false}`. Run `dry_run: true` first. `keep_agent_key: false` (default) revokes the agent key: confirm before a real claim.
 
 ## Estimate task
 
@@ -54,9 +51,9 @@ First-time self-registration and key storage are in `last-price-auth`. Public di
 
 ## Steps
 
-1. Person credential for list/create/keys/inbox/revoke; workspace or agent key for generate/capabilities/allowance/estimate.
+1. Person credential for list/create/keys/inbox/revoke; workspace or agent key for generate/capabilities/estimate.
 2. List before create.
 3. Mint keys only on explicit intent; store once.
-4. Confirm before revoke, inbox send, day-pass payment, or a real claim.
+4. Confirm before revoke, inbox send, or a real claim.
 
 Tips: agents read their own record via capabilities, not `GET /api/agents/{id}`. Revoking an agent does not revoke its keys. LLM features meter under `/api/usage/llm`, not PCN usage.

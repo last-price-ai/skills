@@ -4,15 +4,18 @@ DELETE /api/blocks/{blockId}
 DELETE /api/commerce/observations/{id}
 DELETE /api/commerce/policies/{id}
 DELETE /api/contacts/{contactId}
+DELETE /api/credit-bundle-plans/{planId}
 DELETE /api/credits/{creditId}
 DELETE /api/customers/{customerId}
 DELETE /api/embed-tokens/{tokenId}
 DELETE /api/experiments/{experimentId}
 DELETE /api/experiments/{experimentId}/conversions
 DELETE /api/functions/{id}
+DELETE /api/github/app
 DELETE /api/hosted-models/{modelId}
 DELETE /api/invoices/{invoiceId}
 DELETE /api/learned-elasticity/feature-contract
+DELETE /api/live-tags/sessions/{id}
 DELETE /api/marketplace/listings/{listingId}
 DELETE /api/mcp
 DELETE /api/mcp/rpc
@@ -25,10 +28,12 @@ DELETE /api/price-guardrails
 DELETE /api/price-router/checks/{id}
 DELETE /api/rosetta/adapters/{id}
 DELETE /api/routing-policies/{id}
+DELETE /api/scrape-jobs/{jobId}
 DELETE /api/spend-policy
 DELETE /api/storefronts/{storefrontId}
 DELETE /api/storefronts/{storefrontId}/domains/{domainId}
 DELETE /api/storefronts/{storefrontId}/domains/{domainId}/dns-records/{recordId}
+DELETE /api/stripe/connect
 DELETE /api/tenants/{tenantId}
 DELETE /api/user/account
 DELETE /api/user/connected-apps/{grantId}
@@ -86,6 +91,9 @@ GET /api/contacts/external/{externalId}
 GET /api/contacts/{contactId}
 GET /api/costs
 GET /api/costs/analytics
+GET /api/credit-bundle-plans
+GET /api/credit-bundle-plans/{planId}
+GET /api/credit-bundle-plans/{planId}/subscriptions
 GET /api/credits
 GET /api/credits/balance
 GET /api/credits/{creditId}
@@ -111,6 +119,8 @@ GET /api/functions/catalog
 GET /api/functions/{id}
 GET /api/functions/{id}/health
 GET /api/functions/{id}/review
+GET /api/github/app
+GET /api/github/app/callback
 GET /api/handover/businesses
 GET /api/handover/businesses/{id}
 GET /api/handover/businesses/{id}/pack
@@ -131,6 +141,8 @@ GET /api/learned-elasticity/changes
 GET /api/learned-elasticity/curve
 GET /api/learned-elasticity/exploration
 GET /api/learned-elasticity/feature-contract
+GET /api/live-tags/sessions
+GET /api/live-tags/sessions/{id}
 GET /api/marketplace/earnings
 GET /api/marketplace/listings
 GET /api/marketplace/payouts
@@ -197,6 +209,9 @@ GET /api/routing-policies/{id}
 GET /api/routing-policies/{id}/learned
 GET /api/routing/learned
 GET /api/routing/prompt-class-benchmarks
+GET /api/scrape-jobs
+GET /api/scrape-jobs/{jobId}
+GET /api/scrape-jobs/{jobId}/runs
 GET /api/spend-policy
 GET /api/spend-policy/intents/{id}
 GET /api/spend-policy/reservations
@@ -206,6 +221,9 @@ GET /api/storefronts/{storefrontId}
 GET /api/storefronts/{storefrontId}/domain-quotes
 GET /api/storefronts/{storefrontId}/domains
 GET /api/storefronts/{storefrontId}/domains/{domainId}/dns-records
+GET /api/stripe/connect
+GET /api/stripe/connect/callback
+GET /api/tax/calculate
 GET /api/tenants
 GET /api/tenants/{tenantId}
 GET /api/tenants/{tenantId}/experiments
@@ -244,6 +262,7 @@ PATCH /api/billing/balance
 PATCH /api/commerce/connectors/{id}
 PATCH /api/commerce/policies/{id}
 PATCH /api/contacts/{contactId}
+PATCH /api/credit-bundle-plans/{planId}
 PATCH /api/customers/{customerId}
 PATCH /api/disputes/{disputeId}
 PATCH /api/experiments/{experimentId}
@@ -254,6 +273,7 @@ PATCH /api/invoices/{invoiceId}
 PATCH /api/marketplace/listings/{listingId}
 PATCH /api/orders/{orderId}
 PATCH /api/routing-policies/{id}
+PATCH /api/scrape-jobs/{jobId}
 PATCH /api/tenants/{tenantId}
 PATCH /api/usage/events/{id}/outcome
 PATCH /api/usage/llm/events/{id}/outcome
@@ -274,6 +294,7 @@ POST /api/agents/estimate-task
 POST /api/agents/generate
 POST /api/agents/register
 POST /api/agents/{id}/behaviour-tests
+POST /api/agents/{id}/behaviour-tests/{runId}/cancel
 POST /api/agents/{id}/inbox
 POST /api/agents/{id}/keys
 POST /api/alerts/learned-pricing/unsubscribe
@@ -310,6 +331,9 @@ POST /api/compute/significance
 POST /api/contacts
 POST /api/convert
 POST /api/costs
+POST /api/credit-bundle-plans
+POST /api/credit-bundle-plans/{planId}/grant
+POST /api/credit-bundle-subscriptions/{subscriptionId}/cancel
 POST /api/credits
 POST /api/customers
 POST /api/cut-advisor
@@ -324,6 +348,7 @@ POST /api/functions
 POST /api/functions/{id}/health
 POST /api/functions/{id}/review
 POST /api/functions/{id}/test
+POST /api/github/app
 POST /api/handover/businesses
 POST /api/handover/businesses/{id}/publish
 POST /api/handover/public/{slug}/orders
@@ -337,6 +362,7 @@ POST /api/hosted-models/{modelId}/versions
 POST /api/invitations/accept
 POST /api/invoices
 POST /api/invoices/{invoiceId}/send
+POST /api/invoices/{invoiceId}/stripe
 POST /api/jale/contribute
 POST /api/jale/contribute/batch
 POST /api/jale/optimize
@@ -344,6 +370,7 @@ POST /api/jale/propose-variant
 POST /api/learned-elasticity/changes/{id}/approve
 POST /api/learned-elasticity/changes/{id}/reject
 POST /api/learned-elasticity/feature-contract/infer
+POST /api/live-tags/sessions/{id}/uploads
 POST /api/marketplace/listings
 POST /api/marketplace/payouts/runs
 POST /api/marketplace/payouts/runs/{runId}/approve
@@ -353,7 +380,11 @@ POST /api/mcp
 POST /api/mcp/rpc
 POST /api/mcp/session-key
 POST /api/mcp/{server}
+POST /api/mobile/errors
+POST /api/mobile/events
 POST /api/mobile/push-token
+POST /api/monetization/scaffold
+POST /api/monetization/scaffold/pull-request
 POST /api/negotiation/preview
 POST /api/negotiation/public/{handle}/offers
 POST /api/negotiation/public/{handle}/offers/{negotiationId}/accept
@@ -371,8 +402,10 @@ POST /api/payments/{paymentId}/refund
 POST /api/payouts/connect
 POST /api/price-router
 POST /api/price-router/chain
+POST /api/price-router/checks/{id}/outcome
 POST /api/price-router/identify
 POST /api/price-router/pipelines
+POST /api/price-router/tag
 POST /api/price-router/verify
 POST /api/pricing-analyst/ask
 POST /api/pricing-models
@@ -392,6 +425,9 @@ POST /api/rosetta/plan
 POST /api/rosetta/review
 POST /api/rosetta/translate
 POST /api/routing-policies
+POST /api/scrape-jobs
+POST /api/scrape-jobs/preview
+POST /api/scrape-jobs/{jobId}/run
 POST /api/spend-policy/check
 POST /api/spend-policy/reservations/{id}/confirm
 POST /api/spend-policy/reservations/{id}/consume
@@ -409,6 +445,9 @@ POST /api/storefronts/{storefrontId}/domains
 POST /api/storefronts/{storefrontId}/domains/{domainId}/dns-records
 POST /api/storefronts/{storefrontId}/domains/{domainId}/transfer-code
 POST /api/storefronts/{storefrontId}/domains/{domainId}/verify
+POST /api/stripe/connect
+POST /api/stripe/connect/webhook
+POST /api/tax/calculate
 POST /api/tenants
 POST /api/tenants/{tenantId}/experiments
 POST /api/ucp/checkout-sessions
@@ -443,6 +482,7 @@ PUT /api/learned-elasticity
 PUT /api/learned-elasticity/buyer-models
 PUT /api/learned-elasticity/exploration
 PUT /api/learned-elasticity/feature-contract
+PUT /api/live-tags/sessions/{id}
 PUT /api/marketplace/payouts/schedule
 PUT /api/negotiation/products
 PUT /api/negotiation/settings

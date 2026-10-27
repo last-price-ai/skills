@@ -2,11 +2,13 @@ name: spec-drift
 
 # Re-checks every skill against the live Last Price API: the OpenAPI
 # operations (check-spec-drift.py) and the MCP connector's tools
-# (scripts/sync.mjs). Runs every weekday, on demand, and when Last Price
-# sends a repository_dispatch "api-changed" event after a release.
+# (scripts/sync.mjs). api.last-price.ai is production, which ships from the
+# last-price `release` branch, so this keeps the skills in step with prod
+# (not with last-price main). Runs every three hours, on demand, and when
+# Last Price sends a repository_dispatch "api-changed" event after a release.
 on:
   schedule:
-    - cron: "0 6 * * 1-5"
+    - cron: "17 */3 * * *"
   workflow_dispatch:
   repository_dispatch:
     types: [api-changed]
@@ -14,6 +16,12 @@ on:
 permissions:
   contents: write
   pull-requests: write
+
+# Without an explicit shell, `run` steps use `bash -e` with no pipefail, so
+# `check | tee file` always succeeded and drift never opened a pull request.
+defaults:
+  run:
+    shell: bash
 
 jobs:
   check:

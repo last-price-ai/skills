@@ -1,10 +1,10 @@
 ---
 name: last-price-marketplace
-description: Use when listing, updating, reviewing, or retiring last-price.ai marketplace listings for pricing functions, browsing the public catalogue, checking publisher earnings, payouts and payout runs, or reading the public Elo Index leaderboard.
+description: Use when listing, updating, reviewing, or retiring last-price.ai marketplace listings for pricing functions, browsing the public catalogue, checking publisher earnings and payout history, or reading the public Elo Index leaderboard.
 ---
 # Last Price: marketplace, earnings, and the Elo Index
 
-Registering and testing functions is in `last-price-functions-and-routing`. MCP equivalents: `browse_catalog`, `list_marketplace_listings`, `list_my_marketplace_listings`, `create_/update_/delete_marketplace_listing`, `run_function_review`, `get_function_review`, `get_public_leaderboard`, `get_marketplace_earnings`, payout-run tools.
+Registering and testing functions is in `last-price-functions-and-routing`. MCP equivalents: `browse_catalog`, `list_marketplace_listings`, `list_my_marketplace_listings`, `create_/update_/delete_marketplace_listing`, `run_function_review`, `get_function_review`, `get_public_leaderboard`, `get_marketplace_earnings`. Payout runs and schedules are managed by a person in the dashboard.
 
 ## Surfaces
 
@@ -19,13 +19,6 @@ Registering and testing functions is in `last-price-functions-and-routing`. MCP 
 | GET/POST | `/api/functions/{id}/review` | `pcn:function:read` / `pcn:function:test` | Read or run (dry run) the marketplace review |
 | GET | `/api/marketplace/earnings` | `billing:read` | Payout ledger rows (paged) |
 | GET | `/api/marketplace/payouts` | `billing:read` | Payout history |
-| GET/POST | `/api/marketplace/payouts/runs` | `billing:read` / `billing:write` | List runs; request a run (`dry_run` true by default) |
-| GET | `/api/marketplace/payouts/runs/{runId}` | `billing:read` | One run with its transfers |
-| POST | `/api/marketplace/payouts/runs/{runId}/approve`, `/reject`, `/retry` | `billing:write` | Decide or retry a run (approve pays real money) |
-| GET/PUT | `/api/marketplace/payouts/schedule` | `billing:read` / `billing:write` | Automatic payout schedule |
-| POST | `/api/payouts/connect`, GET `/api/payouts/account` | owner/admin | Stripe Express onboarding link and account status (browser step for a person) |
-
-Payout execution is behind a release flag; while off, runs list `execution.enabled: false`.
 
 ## Browsing the catalogue
 
@@ -50,7 +43,7 @@ Payout execution is behind a release flag; while off, runs list `execution.enabl
 
 - `GET /api/marketplace/earnings` returns `{earnings: [...], pagination}` ledger rows (`total_invocations`, `total_revenue`, `platform_commission`, `owner_earnings`, `payout_status` `pending|processing|paid|failed`). Sum rows yourself; empty is normal before paid traffic.
 - `GET /api/marketplace/payouts` returns `{payouts, total}` with different names (`gross_revenue`, `platform_fee`, `net_payout`, status `completed`). Do not mix vocabularies.
-- Approving a payout run sends real Stripe transfers: only on the user's explicit decision, and never by the requester of that run.
+- Requesting, approving and scheduling payouts is a person's job in the dashboard (`https://app.last-price.ai`); this skill only reads earnings and payout history.
 
 ## Elo Index leaderboard
 
@@ -58,7 +51,7 @@ Payout execution is behind a release flag; while off, runs list `execution.enabl
 - Entry: `rank`, `function_id`, `function_name`, `category`, `index_score` (0-100), `data_status`, `components` (adoption, confidence, speed, cost efficiency, and in v4 outcome and head-to-head), `first_party`, `stats`.
 - **Rank is not score order:** `measured` ranks above `partial` above `unmeasured` before score is compared.
 - Components without data are left out and weights renormalised.
-- Adoption counts distinct outside consumers only: the owner's own calls, the keyless demo, x402 pay-per-call, and sandboxes are excluded, so publishers cannot climb by self-calling.
+- Adoption counts distinct outside consumers only: the owner's own calls, the keyless demo, paid pay-per-call, and sandboxes are excluded, so publishers cannot climb by self-calling.
 - Cached about 60 seconds at the CDN.
 
 ## Steps

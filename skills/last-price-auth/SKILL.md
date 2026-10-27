@@ -11,10 +11,6 @@ description: Use when a last-price.ai call needs a credential, returns 401/402/4
 - `Authorization: Bearer <token>` is only for a session JWT or an OAuth access token the product issued.
 - A 401 on a key check is not proof the key is dead; read the error `code` in the body.
 
-## Pay per call without a key
-
-Send an unauthenticated request to `POST /api/compute/price` for x402 payment requirements. A wallet pays for the computation. See `last-price-x402`.
-
 ## Get a workspace credential
 
 The live list is in `/llms.txt` and `/.well-known/agents.json` (`access_options`, `pay_or_auth`). Re-read them; they change.
@@ -31,7 +27,7 @@ The live list is in `/llms.txt` and `/.well-known/agents.json` (`access_options`
 ## Sandbox (self-registered) limits
 
 - Unclaimed sandbox: compute and reads work within a daily cap; many surfaces answer 403 `sandbox_restricted` (Rosetta, order-to-cash, team, publishing, batch). A person claims it via the claim link (`POST /api/agents/claim`) to lift limits.
-- Past the daily cap: 429 with `next` steps (pay per call, day pass, claim). See `last-price-x402`.
+- Past the daily cap: 429 with `next` steps. Offer the claim link so a person lifts the limit.
 
 ## Scopes (least privilege)
 

@@ -13,11 +13,9 @@ Last Price is price computation as a service. A caller sends a pricing context (
 - Agent discovery: `/.well-known/agents.json`, `/llms.txt`, `/.well-known/mcp.json`, `/.well-known/ucp`.
 - What changed: `GET /api/public/changelog` (public), or the `platform.changelog` webhook.
 
-## Pay per call
+## Demo and workspace
 
-A wallet-only caller pays for compute through `POST /api/compute/price` using x402 and USDC on Base. No account or API key is required. Validate the payment requirements and obtain spending authorization before signing. Use `last-price-x402` for this flow.
-
-The free demo at `/api/public/compute/demo` has narrower inputs and routing. Paid compute uses `/api/compute/price`.
+The free demo at `/api/public/compute/demo` has narrower inputs and routing. Full compute uses `/api/compute/price` with a workspace key. This skill pack does not make payments: on a 402, ask the user for a workspace key or to claim the sandbox.
 
 ## MCP or HTTP
 
@@ -35,7 +33,6 @@ For a starting point by user goal or workspace role, read the [user guide](refer
 
 | Job | Skill |
 |---|---|
-| HTTP 402, x402 pay-per-call, day passes, top-ups | `last-price-x402` |
 | Get or verify a key, headers, self-register an agent | `last-price-auth` |
 | Call through the MCP connector | `last-price-mcp` |
 | Quote a price (single, batch, demo, clarifier) | `last-price-compute` |
@@ -45,13 +42,13 @@ For a starting point by user goal or workspace role, read the [user guide](refer
 | Map merchant payloads to canonical records | `last-price-rosetta` |
 | Marketplace listings, earnings, payouts, leaderboard | `last-price-marketplace` |
 | Outbound webhooks and signature checks | `last-price-webhooks` |
-| Workspace agents, agent keys, day passes, claim | `last-price-agents` |
+| Workspace agents, agent keys, claim | `last-price-agents` |
 | Store connectors, competitor observations, price proposals | `last-price-commerce-pipeline` |
 | Team, roles, API keys, embed tokens, approvals, audit, notifications | `last-price-workspace-admin` |
 | Customers, contacts, orders, payments, disputes | `last-price-order-to-cash` |
 | Usage, costs, prepaid balance, credits, invoices | `last-price-usage-and-billing` |
 | Agent shopping: UCP quote and checkout sessions | `last-price-ucp` |
-| Buyer-agent spend policy, offers and counter-offers | `last-price-spend-and-offers` |
+| Offers and counter-offers | `last-price-offers` |
 
 ## Rules for every skill
 

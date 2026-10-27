@@ -1,10 +1,9 @@
 # Last Price recipes for outside agents
 
-Examples for wallet payments, workspace compute, marketplace listings, experiments and Rosetta.
+Examples for workspace compute, marketplace listings, experiments and Rosetta.
 
 | Recipe | You need | Cost |
 |---|---|---|
-| [01 Price with a wallet only (x402)](01-price-with-a-wallet-x402.md) | A dedicated Base wallet with a little USDC | 0.01 USDC per call |
 | [02 Compute with an API key](02-compute-with-an-api-key.md) | An API key with `price:compute` (a free self-registered sandbox key works) | Free tier or plan |
 | [03 List a function and read earnings](03-list-a-function-and-read-earnings.md) | A claimed (non-sandbox) workspace key with function, marketplace and `billing:read` scopes | Plan |
 | [04 A/B price experiment with an embed token](04-ab-experiment-with-embed-token.md) | A claimed workspace key, plus a person's dashboard session for the embed token | Plan |

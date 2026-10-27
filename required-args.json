@@ -29,9 +29,6 @@
   "storefront_id",
   "domain"
  ],
- "add_team_member": [
-  "user_id"
- ],
  "allocate_variant_traffic": [
   "variants"
  ],
@@ -41,33 +38,25 @@
  "approve_commerce_proposal": [
   "proposal_id"
  ],
- "approve_payout_run": [
-  "run_id"
- ],
  "ask_pricing_analyst": [
   "question"
  ],
  "browse_catalog": [],
- "buy_day_pass": [],
+ "calculate_tax": [
+  "amount",
+  "currency"
+ ],
+ "cancel_credit_bundle_subscription": [
+  "subscription_id"
+ ],
  "cancel_ucp_checkout": [
   "checkout_id"
- ],
- "change_team_member_role": [
-  "user_id",
-  "role"
  ],
  "check_agent_readiness": [
   "url"
  ],
- "check_purchase": [
-  "seller",
-  "amount"
- ],
  "check_variant_significance": [
   "variants"
- ],
- "close_spend_session": [
-  "session_id"
  ],
  "complete_ucp_checkout": [
   "checkout_id"
@@ -78,9 +67,6 @@
  "compute_prices_batch": [
   "requests"
  ],
- "confirm_purchase": [
-  "reservation_id"
- ],
  "contribute_price_data": [
   "vertical",
   "source_url",
@@ -89,9 +75,6 @@
  ],
  "contribute_price_data_batch": [
   "contributions"
- ],
- "create_card_topup": [
-  "amount"
  ],
  "create_commerce_connector": [
   "platform",
@@ -109,6 +92,13 @@
  "create_credit": [
   "customer_id",
   "amount"
+ ],
+ "create_credit_bundle_plan": [
+  "name",
+  "currency",
+  "price",
+  "billing_frequency",
+  "credits"
  ],
  "create_customer": [
   "name"
@@ -148,6 +138,11 @@
  "create_routing_policy": [
   "name",
   "strategy"
+ ],
+ "create_scrape_job": [
+  "name",
+  "url",
+  "price_selector"
  ],
  "create_storefront": [
   "display_name"
@@ -200,21 +195,20 @@
  "delete_routing_policy": [
   "policy_id"
  ],
+ "delete_scrape_job": [
+  "job_id"
+ ],
  "delete_storefront": [
   "storefront_id"
  ],
  "delete_webhook": [
   "webhook_id"
  ],
+ "describe_item_so_far": [
+  "text"
+ ],
  "disconnect_connected_app": [
   "connected_app_id"
- ],
- "discover_offers": [
-  "task"
- ],
- "draw_session_spend": [
-  "session_id",
-  "amount"
  ],
  "estimate_task_cost": [
   "task_description",
@@ -223,6 +217,9 @@
  "execute_commerce_proposals": [],
  "freeze_rosetta_adapter": [
   "plan"
+ ],
+ "generate_monetization_code": [
+  "framework"
  ],
  "get_agent_behaviour_test_run": [
   "agent_id",
@@ -242,17 +239,12 @@
   "model"
  ],
  "get_aitune_system_stats": [],
- "get_alert_preferences": [],
  "get_analyst_brief": [],
  "get_analyst_settings": [],
  "get_approval": [
   "approval_id"
  ],
- "get_billing_settings": [],
  "get_buyer_aware_pricing": [],
- "get_card_topup": [
-  "topup_id"
- ],
  "get_changelog": [],
  "get_channel_rates": [],
  "get_commerce_policy": [
@@ -292,9 +284,6 @@
   "experiment_key"
  ],
  "get_feature_contract": [],
- "get_feature_launch_plan": [
-  "flag"
- ],
  "get_forge_status": [],
  "get_frontier_model": [],
  "get_function": [
@@ -306,6 +295,7 @@
  "get_function_review": [
   "function_id"
  ],
+ "get_github_app_connection": [],
  "get_hosted_model": [
   "model_id"
  ],
@@ -333,35 +323,25 @@
  "get_payment": [
   "payment_id"
  ],
- "get_payout_run": [
-  "run_id"
+ "get_price_check": [
+  "check_id"
  ],
- "get_payout_schedule": [],
  "get_price_exploration": [],
  "get_price_guardrails": [],
  "get_pricing_analysis": [],
  "get_prompt_class_benchmarks": [],
  "get_public_leaderboard": [],
- "get_purchase_intent": [
-  "intent_id"
- ],
  "get_receipt": [
   "usage_event_id"
- ],
- "get_reel": [
-  "reel_id"
  ],
  "get_rosetta_health": [],
  "get_routing_policy": [
   "policy_id"
  ],
- "get_spend_policy": [],
- "get_spend_session": [
-  "session_id"
- ],
  "get_storefront": [
   "storefront_id"
  ],
+ "get_stripe_connection": [],
  "get_ucp_checkout": [
   "checkout_id"
  ],
@@ -371,11 +351,10 @@
  ],
  "get_usage": [],
  "get_usage_breakdown": [],
- "get_wallet_balance": [
-  "address"
+ "grant_credit_bundle_plan": [
+  "plan_id",
+  "customer_id"
  ],
- "get_workspace_settings": [],
- "get_x402_price_index": [],
  "infer_feature_contract": [
   "samples"
  ],
@@ -383,8 +362,8 @@
   "canonical_target",
   "payload"
  ],
- "invite_team_member": [
-  "email"
+ "issue_invoice_with_stripe": [
+  "invoice_id"
  ],
  "list_aitune_backends": [],
  "list_approvals": [],
@@ -399,17 +378,17 @@
  "list_connected_apps": [],
  "list_contacts": [],
  "list_costs": [],
+ "list_credit_bundle_plans": [],
+ "list_credit_bundle_subscriptions": [
+  "plan_id"
+ ],
  "list_credits": [],
  "list_customers": [],
- "list_day_passes": [],
  "list_demo_apps": [],
  "list_disputes": [],
  "list_experiments": [],
- "list_feature_launches": [],
  "list_functions": [],
  "list_hosted_models": [],
- "list_inference_providers": [],
- "list_invitations": [],
  "list_invoices": [],
  "list_jale_contributions": [],
  "list_learned_price_changes": [],
@@ -417,20 +396,21 @@
  "list_marketplace_listings": [],
  "list_my_marketplace_listings": [],
  "list_negotiations": [],
- "list_notifications": [],
  "list_order_lines": [
   "order_id"
  ],
  "list_orders": [],
- "list_outcomes": [],
  "list_payments": [],
- "list_payout_runs": [],
+ "list_price_checks": [],
  "list_pricing_pipelines": [],
  "list_product_categories": [],
  "list_receipts": [],
- "list_reels": [],
  "list_rosetta_review": [],
  "list_routing_policies": [],
+ "list_scrape_job_runs": [
+  "job_id"
+ ],
+ "list_scrape_jobs": [],
  "list_storefront_dns_records": [
   "storefront_id",
   "domain_id"
@@ -439,7 +419,6 @@
   "storefront_id"
  ],
  "list_storefronts": [],
- "list_team_members": [],
  "list_ucp_checkouts": [],
  "list_usage_events": [],
  "list_vendor_adapters": [],
@@ -451,14 +430,13 @@
   "product_id",
   "offered_price"
  ],
- "mark_notifications_read": [],
  "normalize_with_rosetta": [
   "plan",
   "vendor_response"
  ],
- "open_spend_session": [
-  "seller",
-  "max_amount"
+ "open_monetization_pull_request": [
+  "repository",
+  "framework"
  ],
  "ping_webhook": [
   "webhook_id"
@@ -475,6 +453,11 @@
   "product_id",
   "offered_price"
  ],
+ "preview_scrape_job": [
+  "url",
+  "price_selector"
+ ],
+ "price_from_capture": [],
  "pricing_conversation": [],
  "promote_hosted_model_version": [
   "model_id",
@@ -489,14 +472,11 @@
   "storefront_id",
   "domain"
  ],
- "read_my_inbox": [],
+ "read_quote_reply": [
+  "text"
+ ],
  "recommend_jale_price": [
   "experiment_id"
- ],
- "reconcile_purchase": [
-  "reservation_id",
-  "outcome",
-  "note"
  ],
  "record_cost": [
   "amount"
@@ -504,15 +484,15 @@
  "refund_payment": [
   "payment_id"
  ],
+ "register_agent": [
+  "name"
+ ],
  "reject_commerce_proposal": [
   "proposal_id",
   "reason"
  ],
  "reject_forge_candidate": [
   "candidate_id"
- ],
- "reject_payout_run": [
-  "run_id"
  ],
  "remove_offer_product": [
   "product_id"
@@ -526,21 +506,11 @@
   "storefront_id",
   "domain_id"
  ],
- "remove_team_member": [
-  "user_id"
- ],
  "report_outcome": [
   "outcome"
  ],
- "request_payout_run": [
-  "period_start",
-  "period_end"
- ],
- "retry_payout_run": [
-  "run_id"
- ],
- "revoke_invitation": [
-  "invitation_id"
+ "report_problem": [
+  "reason"
  ],
  "rollback_hosted_model": [
   "model_id"
@@ -558,6 +528,10 @@
  "run_pricing_chain": [
   "stages",
   "context"
+ ],
+ "run_reference_pipeline": [],
+ "run_scrape_job": [
+  "job_id"
  ],
  "search_storefront_domains": [],
  "seed_commerce_sample": [],
@@ -594,26 +568,11 @@
  "set_offer_settings": [
   "enabled"
  ],
- "set_payout_schedule": [
-  "enabled",
-  "cadence",
-  "run_day"
- ],
  "set_price_exploration": [],
  "set_price_guardrails": [],
  "set_product_category": [
   "product_id",
   "category_id"
- ],
- "set_spend_policy": [],
- "settle_purchase": [
-  "reservation_id",
-  "outcome"
- ],
- "settle_session_draw": [
-  "session_id",
-  "draw_id",
-  "outcome"
  ],
  "simulate_agent_cut": [
   "price",
@@ -640,9 +599,6 @@
  "test_function": [
   "function_id"
  ],
- "top_up_balance": [
-  "amount"
- ],
  "train_hosted_model": [
   "model_id"
  ],
@@ -652,13 +608,14 @@
   "canonical_schema",
   "vendor_contract"
  ],
- "update_alert_preferences": [],
- "update_billing_settings": [],
  "update_commerce_policy": [
   "policy_id"
  ],
  "update_contact": [
   "contact_id"
+ ],
+ "update_credit_bundle_plan": [
+  "plan_id"
  ],
  "update_customer": [
   "customer_id"
@@ -681,6 +638,9 @@
  "update_routing_policy": [
   "policy_id"
  ],
+ "update_scrape_job": [
+  "job_id"
+ ],
  "update_storefront": [
   "storefront_id"
  ],
@@ -690,11 +650,13 @@
  "update_webhook": [
   "webhook_id"
  ],
- "update_workspace_settings": [],
  "upload_hosted_model_version": [
   "model_id",
   "artifact_base64",
   "spec"
+ ],
+ "use_api_key": [
+  "api_key"
  ],
  "verify_agent_protocol": [],
  "verify_price": [
