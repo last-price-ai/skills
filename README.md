@@ -13,6 +13,7 @@
   <a href="https://clawhub.ai/last-price/plugins/lastprice"><img src="https://img.shields.io/badge/ClawHub-lastprice-10b981?style=for-the-badge" alt="ClawHub"></a>
   <a href="#mcp-vs-http"><img src="https://img.shields.io/badge/MCP-connector-10b981?style=for-the-badge" alt="MCP connector"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0a7cc2?style=for-the-badge" alt="License: MIT"></a>
+  <a href="https://github.com/last-price-ai/skills"><img src="https://komarev.com/ghpvc/?username=last-price-ai-skills&color=10b981&style=for-the-badge&label=Views" alt="Views"></a>
 </p>
 
 <p align="center"><b>Price computation as a service</b>, as agent skills for Claude Code, Codex, Cursor, OpenClaw and more.</p>
