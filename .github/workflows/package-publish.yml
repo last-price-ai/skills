@@ -36,6 +36,8 @@ jobs:
 
   publish:
     needs: pack
+    # Real publishes only from main; any branch can preview.
+    if: github.ref == 'refs/heads/main' || inputs.dry_run
     permissions:
       actions: read
       contents: read
