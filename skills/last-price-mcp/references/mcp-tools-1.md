@@ -20,7 +20,7 @@ Ask Last Price what pricing inputs are missing. Start with request: {}, return i
 
 ## `compute_price`
 
-Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after.
+Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after. Pass intent (the limit the buyer approved) to learn whether the price fits it.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -43,13 +43,15 @@ Compute a price for a product/context via the Last Price Pricing Compute Network
 | `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
 | `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
 | `routing_preference` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How to route across pricing functions. Defaults to "default". |
+| `routing` | object | Optional. Which functions may answer this one call, by UUID from list_functions. A call these leave with no function is refused, naming why, before anything runs or is charged. Where routing preferences are not yet on for your workspace they are ignored. |
 | `learned_routing` | boolean | Optional. With routing_preference cheapest, fastest, round robin or weighted, let the router learn which of the functions that strategy chooses from serves your workspace best (from your own routed calls), falling back to the strategy while there is too little data. Ignored for any other preference or a function_id, and until learned routing is released for your workspace. get_learned_routing with strategy shows what it learned. |
 | `function_id` | string | Optional explicit pricing function UUID to use. |
 | `include_explanation` | boolean | If true, ask for an explanation and confidence with the price. |
 | `no_explore` | boolean | If true, give this price exactly as computed, without the small per-call variation a workspace may run so learned pricing can learn what buyers will pay (see get_price_exploration). |
 | `include_buyer_envelope` | boolean | If true, and metadata.category names a category, the result carries buyer_envelope: what buyers' own spend checks allowed in that category (p25 to p75, the median, and how often checks were refused over a limit, pooled over 5 or more buyer workspaces; no numbers below 5) and where this price sits. A limit, not a valuation: it never changes the price. Where it is not switched on for the workspace it is ignored. |
-| `metadata` | object | Optional context. For competitive pricing: competitor_price, competitor_currency and competitive_action (match or undercut); undercut requires undercut_pct. Confirm product comparability before calling. |
+| `metadata` | object | Optional context. For competitive pricing: competitor_price, competitor_currency and competitive_action (match or undercut); undercut requires undercut_pct. Confirm product comparability before calling. Or send market_query (the job, in plain words) instead of competitor_price: where market prices are switched on, the market is looked up first and the answer carries market_prices (low, median, high and the pages); with competitive_action and no competitor_price, the lowest market price is used to undercut and the median to match (market_reference: low, median or high chooses). |
 | `idempotency_key` | string | Optional. A new value (e.g. a UUID) for each call you mean to make; send the SAME value if you retry after a timeout or error you cannot interpret, and the call is computed and charged once. Ignored without a credential. |
+| `intent` | object | Optional. The spending limit the buyer approved, such as a card network or payment rail mandate. Where this is switched on for the workspace, the result says whether the price fits it, with the reasons when not, and a signed quote binds the same so an issuer or buyer can check it. |
 
 ## `compute_prices_batch`
 
@@ -70,7 +72,7 @@ Price up to 100 requests in one call. Each item in requests is the same request 
 Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (fair, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as fair. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/price-router/verify`, `/api/public/price-router/verify`
 
 | Argument | Type | Meaning |
@@ -161,7 +163,7 @@ Read a buyer's reply to a quote you sent: does it accept, say the price is too h
 
 ## `price_from_capture`
 
-Price an item from what you have about it, the way a person would look at it: send photos, screenshots, PDFs, product page links, a description or a barcode in artifacts and get one price with its range, what the item is and its condition, any prices read off the attachments, and a write-up for your side of the sale: a listing to post with the price when selling, or a message to the seller with your opening offer filled in when buying. side says which (selling by default); the value is the same either way, and the range reads as quick sale to top of range for a seller and opening offer to most to pay for a buyer. current_price is the price you have in mind: it is compared with the estimate, never used as it. No item recognized means no price (computed_price null, confidence 0), never a guess. With a price, share_url is a public link to a card showing it, to send to the person or post with the listing. check_id is its place in the workspace's price history (list_price_checks, get_price_check) where that is kept. A photo or PDF goes as base64 with its mime_type, or as a public http or https link to the file; the hosted MCP endpoint takes requests up to 64 KB, so send larger photos as links. A photo on disk with no link: with a shell, upload it in one command instead, with the same answer: curl -X POST https://api.last-price.ai/api/price-router/pipelines -H "x-api-key: YOUR_KEY" -F photo=@item.jpg, adding -F photo=@another.jpg, -F file=@receipt.pdf, -F text="...", -F side=buying or -F current_price=120 as needed (about 4 MB per request in all). In a chat app that hands attached files to tools (ChatGPT), a photo or PDF the person attached goes in photo or file as it arrives. One model call reads everything (your workspace's own Anthropic key when it has one), so allow up to 30 seconds; it is recorded as model usage, not drawn from your balance, and changes no price or setting. Until it is switched on for your workspace it answers 501. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Price an item from what you have about it, the way a person would look at it: send photos, screenshots, PDFs, product page links, a description or a barcode in artifacts and get one price with its range, what the item is and its condition, any prices read off the attachments, and a write-up for your side of the sale: a listing to post with the price when selling, or a message to the seller with your opening offer filled in when buying. side says which (selling by default); the value is the same either way, and the range reads as quick sale to top of range for a seller and opening offer to most to pay for a buyer. current_price is the price you have in mind: it is compared with the estimate, never used as it. No item recognized means no price (computed_price null, confidence 0), never a guess. Where market prices are on, the item is also looked up online: with at least 3 pages showing a price, the price is what it sold for (or, short of sold prices, what it is listed at), and market_evidence in valuation shows the search, how many sold and listed prices were found, their low, median and high, each page with its price, and the estimate from what was sent; with fewer pages the price stays that estimate and market_evidence says so. Show the person the pages. With a price, share_url is a public link to a card showing it, to send to the person or post with the listing. check_id is its place in the workspace's price history (list_price_checks, get_price_check) where that is kept. A photo or PDF goes as base64 with its mime_type, or as a public http or https link to the file; the hosted MCP endpoint takes requests up to 64 KB, so send larger photos as links. A photo on disk with no link: with a shell, upload it in one command instead, with the same answer: curl -X POST https://api.last-price.ai/api/price-router/pipelines -H "x-api-key: YOUR_KEY" -F photo=@item.jpg, adding -F photo=@another.jpg, -F file=@receipt.pdf, -F text="...", -F side=buying or -F current_price=120 as needed (about 4 MB per request in all). In a chat app that hands attached files to tools (ChatGPT), a photo or PDF the person attached goes in photo or file as it arrives. One model call reads everything (your workspace's own Anthropic key when it has one), so allow up to 30 seconds; it is recorded as model usage, not drawn from your balance, and changes no price or setting. Until it is switched on for your workspace it answers 501. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
@@ -263,7 +265,7 @@ _No arguments._
 
 ## `get_function`
 
-Read one pricing function your workspace can use: its name, description, status, tags, cost per unit, cost multiplier, and input and output schemas. Its owner also sees whether a credential is saved for it. Needs a Last Price credential with function read scope.
+Read one pricing function your workspace can use: its name, description, status, tags, cost per unit, cost multiplier, and input and output schemas. Its owner also sees whether a credential is saved for it. Another workspace's function is readable only once Last Price staff approve its marketplace listing; until then it answers Function not found, as pricing does. Needs a Last Price credential with function read scope.
 
 - **Access:** key, function read scope
 - **Behaviour:** read-only
@@ -404,7 +406,7 @@ Add a routing policy: how a price request picks a pricing function. The strategy
 | :-- | :-- | :-- |
 | `name` **(required)** | string | A name for the policy. |
 | `strategy` **(required)** | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How a function is picked. |
-| `config` | object | What the strategy needs. weights gives each function id a share (weighted). rules each send requests whose field matches to a function (policy). fallback_chain lists function ids to try in order when the strategy picks none. |
+| `config` | object | What the strategy needs. weights gives each function id a share (weighted). rules each send requests whose field matches to a function (policy). fallback_chain lists function ids to try in order when the strategy picks none. experiment runs an A/B test inside the policy, one function per arm. |
 | `fallback_function_id` | string / null | A function to use when the strategy picks none. |
 | `is_default` | boolean | Make this the workspace default. Defaults to false. |
 
@@ -420,7 +422,7 @@ Change a routing policy. Only the fields you send change; config replaces the wh
 | `policy_id` **(required)** | string | The routing policy UUID: id on a list_routing_policies result. |
 | `name` | string | A new name. |
 | `strategy` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | A new strategy. |
-| `config` | object | What the strategy needs. weights gives each function id a share (weighted). rules each send requests whose field matches to a function (policy). fallback_chain lists function ids to try in order when the strategy picks none. |
+| `config` | object | What the strategy needs. weights gives each function id a share (weighted). rules each send requests whose field matches to a function (policy). fallback_chain lists function ids to try in order when the strategy picks none. experiment runs an A/B test inside the policy, one function per arm. |
 | `fallback_function_id` | string / null | A function to use when the strategy picks none. Null clears it. |
 | `is_default` | boolean | Make this the workspace default. |
 
@@ -2643,38 +2645,3 @@ Run the marketplace review of one of your functions now, as a dry run: it makes 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
-
-## `get_public_leaderboard`
-
-Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating. Pass window as 7d, 30d, 90d or all (default all). Public: needs no credential, limited per address.
-
-- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** read-only
-- **Errors and cautions:** Public: needs no credential, limited per address.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `window` | `7d` / `30d` / `90d` / `all` | How far back to rank. Defaults to all. |
-
-## `get_marketplace_earnings`
-
-Read the payout ledger for the functions you own on the marketplace: what each call earned, its commission and its payout status. Filter by payout_status and page with limit and offset. Read-only. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `payout_status` | string | Only entries with this payout status. |
-| `limit` | integer | How many to return. Defaults to 50. |
-| `offset` | integer | How many to skip, for the next page. |
-
-## `list_webhooks`
-
-List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret (whsec_...; the secret is how you verify the x-lastprice-signature header on what it receives). Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-- **REST:** `/api/webhooks`
-
-_No arguments._

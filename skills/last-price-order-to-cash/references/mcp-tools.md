@@ -102,3 +102,39 @@ Open a payment dispute: pass payment_id and amount, and optionally currency (def
 | `reason` | string | Why it is disputed. |
 | `status` | `open` / `under_review` / `resolved` / `rejected` | The dispute status. |
 | `metadata` | object | Anything worth keeping with the record. |
+
+## `get_customer_overview`
+
+Read one customer's summary: lifetime revenue and the last 30 and 90 days, outstanding and overdue invoices, payments collected, credit left, costs and margin, orders, contacts, last activity, a 90-day usage trend, the agents linked to them, and a health status with the reasons behind it. Answers 404 (not released) until the customer Overview and Intel release is on for your workspace. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers 404 (not released) until the customer Overview and Intel release is on for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `customer_id` **(required)** | string | The customer UUID. |
+
+## `get_customer_intel`
+
+Read what is known about how one customer buys: price sensitivity set against their segment's learned elasticity, negotiation history and outcomes, their buyer agents and spend policies, the price experiments they were in, the price changes they saw and the team's notes. Answers 404 (not released) until the customer Overview and Intel release is on for your workspace. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers 404 (not released) until the customer Overview and Intel release is on for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `customer_id` **(required)** | string | The customer UUID. |
+
+## `read_payable_invoice`
+
+Read an invoice someone sent you through its Last Price pay link, the way an accounts-payable agent would: pass invoice, the pay link (the page or JSON address) or the 43-character token in it. Paying is a separate step, at the pay or checkout address each method gives, after the person you work for approves it. Answers 404 for an unknown link or one whose seller has not switched pay links on. Public: needs no credential.
+
+- **Access:** no key
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers 404 for an unknown link or one whose seller has not switched pay links on.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `invoice` **(required)** | string | The pay link (https://last-price.ai/invoice/... or https://api.last-price.ai/api/public/invoices/...) or its 43-character token. |
