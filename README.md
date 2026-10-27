@@ -9,7 +9,7 @@
 <h1 align="center">Last Price Agent Skills</h1>
 
 <p align="center">
-  <a href="https://github.com/last-price-ai/skills/actions/workflows/manifests.yml"><img src="https://img.shields.io/github/actions/workflow/status/last-price-ai/skills/manifests.yml?branch=main&style=for-the-badge&label=build" alt="Build"></a>
+  <a href="https://github.com/last-price-ai/skills/actions/workflows/manifests.yml"><img src="https://img.shields.io/github/actions/workflow/status/last-price-ai/skills/manifests.yml?branch=main&style=for-the-badge&label=checks" alt="Checks"></a>
   <a href="https://clawhub.ai/last-price/plugins/lastprice"><img src="https://img.shields.io/badge/ClawHub-lastprice-10b981?style=for-the-badge" alt="ClawHub"></a>
   <a href="#mcp-vs-http"><img src="https://img.shields.io/badge/MCP-connector-10b981?style=for-the-badge" alt="MCP connector"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0a7cc2?style=for-the-badge" alt="License: MIT"></a>
