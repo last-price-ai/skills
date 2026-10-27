@@ -1,5 +1,7 @@
 # Last Price Agent Skills
 
+[![Views](https://komarev.com/ghpvc/?username=last-price-ai-skills&color=blueviolet&style=flat-square&label=Views)](https://github.com/last-price-ai/skills) [![ClawHub](https://img.shields.io/badge/ClawHub-%40last--price%2Flastprice-blueviolet?style=flat-square)](https://clawhub.ai/last-price/plugins/lastprice) [![License: MIT](https://img.shields.io/badge/license-MIT-blueviolet?style=flat-square)](LICENSE)
+
 Agent skills for [Last Price](https://last-price.ai), the Pricing Compute Network: compute, verify, route, experiment on, and learn from prices through the Last Price API or MCP connector.
 
 Each skill is a folder with a `SKILL.md` in the open [Agent Skills](https://agentskills.io) format: YAML frontmatter (`name`, `description` saying when to use it) and a concise body of instructions. These skills work in Cursor, Claude Code, Codex, and other agents that support Agent Skills, or as plain reference docs for any agent.
