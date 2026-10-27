@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo-512.png" alt="Last Price logo" width="120" height="120">
+  <img src="assets/readme-logo.png" alt="Last Price logo" width="120" height="120">
 </p>
 
 <p align="center">
@@ -9,11 +9,13 @@
 <h1 align="center">Last Price Agent Skills</h1>
 
 <p align="center">
-  <a href="https://github.com/last-price-ai/skills/actions/workflows/manifests.yml"><img src="https://img.shields.io/github/actions/workflow/status/last-price-ai/skills/manifests.yml?branch=main&style=flat-square&label=build" alt="Build"></a>
-  <a href="https://clawhub.ai/last-price/plugins/lastprice"><img src="https://img.shields.io/badge/ClawHub-%40last--price%2Flastprice-10b981?style=flat-square" alt="ClawHub"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-10b981?style=flat-square" alt="License: MIT"></a>
-  <a href="https://github.com/last-price-ai/skills"><img src="https://komarev.com/ghpvc/?username=last-price-ai-skills&color=10b981&style=flat-square&label=Views" alt="Views"></a>
+  <a href="https://github.com/last-price-ai/skills/actions/workflows/manifests.yml"><img src="https://img.shields.io/github/actions/workflow/status/last-price-ai/skills/manifests.yml?branch=main&style=for-the-badge&label=build" alt="Build"></a>
+  <a href="https://clawhub.ai/last-price/plugins/lastprice"><img src="https://img.shields.io/badge/ClawHub-lastprice-10b981?style=for-the-badge" alt="ClawHub"></a>
+  <a href="#mcp-vs-http"><img src="https://img.shields.io/badge/MCP-connector-10b981?style=for-the-badge" alt="MCP connector"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0a7cc2?style=for-the-badge" alt="License: MIT"></a>
 </p>
+
+<p align="center"><b>Price computation as a service</b>, as agent skills for Claude Code, Codex, Cursor, OpenClaw and more.</p>
 
 Agent skills for [Last Price](https://last-price.ai), the Pricing Compute Network: compute, verify, route, experiment on, and learn from prices through the Last Price API or MCP connector.
 
