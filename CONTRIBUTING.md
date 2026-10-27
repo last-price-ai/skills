@@ -13,12 +13,12 @@ Thanks for helping. This repository is the Last Price agent skills and the plugi
 1. Fork the repository and branch from `main`.
 2. Edit the skill under `skills/<name>/SKILL.md`. Keep the frontmatter `name` and a `description` that says when to use the skill. Keep the body short and practical.
 3. Never invent tools, endpoints, fields or prices. Each one must exist in the live API (`https://api.last-price.ai/api/openapi`) or the connector's directory tool set.
-4. Don't edit `references/mcp-tools*.md` by hand. `node scripts/sync.mjs` regenerates them from the live server.
+4. Don't edit `skills/*/references/mcp-tools*.md` by hand. `node scripts/sync.mjs` regenerates them from the live server. References under `payments/` are maintained by hand.
 5. Run the checks:
 
    ```bash
    node scripts/check-manifests.mjs   # manifests agree on name, version, server URL and files
-   node scripts/sync.mjs --check      # every live tool is named in a skill
+   node scripts/sync.mjs --check      # every non-staff directory tool is named in a skill
    python3 scripts/check-spec-drift.py  # API paths in skills still exist
    ```
 
@@ -26,8 +26,8 @@ Thanks for helping. This repository is the Last Price agent skills and the plugi
 
 ## Rules that keep the plugins safe
 
-- **No payments in the plugins.** Every manifest points at `?profile=directory`, which has no wallet, top-up, spend-session or payout tools. Payment material lives in `payments/`, which no plugin loads. Don't move it into `skills/`.
-- **One server.** Manifests connect only to `https://api.last-price.ai/api/mcp/rpc`, with a `via` tag for the host.
+- **No payments in the plugins.** Every MCP server definition points at `?profile=directory`, which has no wallet, top-up, spend-session or payout tools. Payment material lives in `payments/`, which no plugin loads. Don't move it into `skills/`.
+- **One server.** MCP server definitions connect only to `https://api.last-price.ai/api/mcp/rpc`, with a `via` tag for the host.
 - **Keep the versions equal.** A release bumps the version in all six manifests (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `plugin.json`, `gemini-extension.json`, `openclaw.plugin.json`, `package.json`). `check-manifests.mjs` fails if they differ.
 - **Keys stay out of files.** Never commit an API key, even in an example. Use `LP_API_KEY` or `LASTPRICE_API_KEY` from the environment.
 
