@@ -22,6 +22,12 @@ Agent skills for [Last Price](https://last-price.ai), the Pricing Compute Networ
 
 Each skill is a folder with a `SKILL.md` in the open [Agent Skills](https://agentskills.io) format: YAML frontmatter (`name`, `description` saying when to use it) and a concise body of instructions. These skills work in Cursor, Claude Code, Codex, and other agents that support Agent Skills, or as plain reference docs for any agent.
 
+## See it work
+
+<a href="https://last-price.ai/videos#agent-demo"><img src="https://res.cloudinary.com/dncuff7oj/video/upload/so_80,w_960,q_auto,f_jpg/last-price/demo-videos/agent-demo.jpg" alt="An agent prices a real job: a buyer agent checks a $2.10 quote with Last Price and settles at $0.70" width="100%"></a>
+
+**An agent prices a real job** (1:52). A seller agent signs itself up and prices its own data-cleanup job with Last Price; a buyer agent checks the quote, finds it too high and settles at $0.70. There is a [60-second cut](https://last-price.ai/videos#agent-demo-60s), and the phone app and every other video are at [last-price.ai/videos](https://last-price.ai/videos).
+
 ## Skills
 
 | Skill | Use it for |
