@@ -1,6 +1,19 @@
-# Last Price Agent Skills
+<p align="center">
+  <img src="assets/logo-512.png" alt="Last Price logo" width="120" height="120">
+</p>
 
-[![Views](https://komarev.com/ghpvc/?username=last-price-ai-skills&color=blueviolet&style=flat-square&label=Views)](https://github.com/last-price-ai/skills) [![ClawHub](https://img.shields.io/badge/ClawHub-%40last--price%2Flastprice-blueviolet?style=flat-square)](https://clawhub.ai/last-price/plugins/lastprice) [![License: MIT](https://img.shields.io/badge/license-MIT-blueviolet?style=flat-square)](LICENSE)
+<p align="center">
+  <img src="assets/banner.svg" alt="Last Price: Price computation as a service" width="100%">
+</p>
+
+<h1 align="center">Last Price Agent Skills</h1>
+
+<p align="center">
+  <a href="https://github.com/last-price-ai/skills/actions/workflows/manifests.yml"><img src="https://img.shields.io/github/actions/workflow/status/last-price-ai/skills/manifests.yml?branch=main&style=flat-square&label=build" alt="Build"></a>
+  <a href="https://clawhub.ai/last-price/plugins/lastprice"><img src="https://img.shields.io/badge/ClawHub-%40last--price%2Flastprice-10b981?style=flat-square" alt="ClawHub"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-10b981?style=flat-square" alt="License: MIT"></a>
+  <a href="https://github.com/last-price-ai/skills"><img src="https://komarev.com/ghpvc/?username=last-price-ai-skills&color=10b981&style=flat-square&label=Views" alt="Views"></a>
+</p>
 
 Agent skills for [Last Price](https://last-price.ai), the Pricing Compute Network: compute, verify, route, experiment on, and learn from prices through the Last Price API or MCP connector.
 
