@@ -1,0 +1,76 @@
+name: Agent labels
+
+# Labels issues and PRs with the agents that worked on them (agent:claude,
+# agent:codex, agent:gemini…, several when several did), and writes the same
+# list to the "Agents" field on the project board. scripts/agent-labels.mjs
+# (the same file as in last-price-ai/last-price; change it there first)
+# says how it tells the agents apart. Labels are only ever added.
+on:
+  pull_request_target:
+    types: [opened, edited, reopened]
+  issues:
+    types: [opened, edited, reopened]
+  # Sign-offs (`CLAIM: #N (Codex)`) and Claude's comments.
+  issue_comment:
+    types: [created, edited]
+  pull_request_review:
+    types: [submitted]
+  # Catches commit trailers pushed after a PR opened, and anything missed.
+  schedule:
+    - cron: '23 5 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: Label everything updated in this many days (the backfill)
+        required: false
+        default: '2'
+      items:
+        description: Or just these issue/PR numbers, space separated
+        required: false
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  label:
+    # Skipped jobs are not billed: deploy and workflow bots comment a lot and
+    # never carry an agent's signature.
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (github.event.comment.user.login != 'vercel[bot]' && github.event.comment.user.login != 'github-actions[bot]')
+    concurrency:
+      group: agent-labels-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Only the script, from the default branch: a PR's code never runs here.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: scripts/agent-labels.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Label
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROJECT_URL: ${{ vars.LAST_PRICE_PROJECT_URL || vars.PROJECT_URL }}
+          PROJECT_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT || secrets.PROJECT_PAT }}
+          DAYS: ${{ inputs.days }}
+          ITEMS: ${{ inputs.items }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ] && [ -n "$ITEMS" ]; then
+            # shellcheck disable=SC2086
+            AGENT_LABELS_BOARD_ALL=1 node scripts/agent-labels.mjs item $ITEMS
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            AGENT_LABELS_BOARD_ALL=1 node scripts/agent-labels.mjs sweep "${DAYS:-2}"
+          elif [ "$EVENT" = "schedule" ]; then
+            node scripts/agent-labels.mjs sweep 2
+          else
+            node scripts/agent-labels.mjs event
+          fi
