@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Publishes to ClawHub as `@last-price/lastprice`: `openclaw.plugin.json` gives OpenClaw the skills in `skills/` and the connector (directory tool set, tagged `via=openclaw`), `package.json` carries the scoped name, and `assets/icon.png` is the catalog icon. Keep their versions in step with `.claude-plugin/plugin.json`. Passes `clawhub package validate` with no findings.
+- `Package Publish` workflow (run by hand) packs the repo with `npm pack` and publishes it to ClawHub through ClawHub's pinned reusable workflow, using trusted publishing instead of a stored token. It previews by default.
 
 ## 0.3.0
 
