@@ -41,7 +41,7 @@ jobs:
       - run: $CLAWHUB package validate . --out "$RUNNER_TEMP/plugin-inspector"
       - name: Publish to ClawHub
         run: |
-          $CLAWHUB package publish dist/*.tgz \
+          $CLAWHUB package publish "$GITHUB_WORKSPACE"/dist/*.tgz \
             --owner last-price \
             --family bundle-plugin \
             --source-repo "$GITHUB_REPOSITORY" \
