@@ -6,6 +6,17 @@ name: spec-drift
 # last-price `release` branch, so this keeps the skills in step with prod
 # (not with last-price main). Runs every three hours, on demand, and when
 # Last Price sends a repository_dispatch "api-changed" event after a release.
+#
+# On main, drift goes to a pull request from the spec-drift branch. The
+# repository may not let Actions open pull requests ("Allow GitHub Actions to
+# create and approve pull requests" is off), so when that step is refused the
+# same report goes to an open issue instead and the run stays green: drift is
+# work to do, not a broken build.
+#
+# Run it by hand on any other branch (Actions > spec-drift > Run workflow) and
+# it commits the regenerated references and required-args.json to that branch,
+# from the live API. Use that after naming new tools in a SKILL.md, since the
+# live API cannot be reached from every machine.
 on:
   schedule:
     - cron: "17 */3 * * *"
@@ -16,6 +27,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 # Without an explicit shell, `run` steps use `bash -e` with no pipefail, so
 # `check | tee file` always succeeded and drift never opened a pull request.
@@ -43,12 +55,26 @@ jobs:
         continue-on-error: true
         run: node scripts/sync.mjs --check | tee tools.txt
       - name: Regenerate tool references
-        if: steps.tools.outcome == 'failure'
+        if: steps.tools.outcome == 'failure' && github.ref == 'refs/heads/main'
         run: node scripts/sync.mjs --keep-required || true
-      - name: Open a pull request with what drifted
+      # A branch run is someone reviewing the skills: regenerate and record the
+      # required arguments as reviewed, then commit to the branch.
+      - name: Regenerate and commit to this branch
+        if: steps.tools.outcome == 'failure' && github.ref != 'refs/heads/main'
+        run: |
+          node scripts/sync.mjs || true
+          git add skills/ required-args.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -m "chore: regenerate MCP tool references from the live API"
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
+      - name: Write the drift report
         if: steps.spec.outcome == 'failure' || steps.tools.outcome == 'failure'
         run: cat spec.txt tools.txt > drift.txt
-      - if: steps.spec.outcome == 'failure' || steps.tools.outcome == 'failure'
+      - name: Open a pull request with what drifted
+        id: pr
+        if: (steps.spec.outcome == 'failure' || steps.tools.outcome == 'failure') && github.ref == 'refs/heads/main'
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v6
         with:
           branch: spec-drift
@@ -56,3 +82,25 @@ jobs:
           body-path: drift.txt
           commit-message: "chore: regenerate MCP tool references from the live API"
           add-paths: skills/
+      - name: Report drift in an issue when the pull request is refused
+        if: steps.pr.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: "Skills drifted from the live Last Price API"
+        run: |
+          {
+            echo "The scheduled drift check found the skills out of step with the live API, and Actions may not open pull requests in this repository."
+            echo "The regenerated references are on the [spec-drift](https://github.com/${GITHUB_REPOSITORY}/compare/main...spec-drift) branch when it exists. Name every new tool in a SKILL.md, then run this workflow on that branch."
+            echo
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            echo '```'
+            cat drift.txt
+            echo '```'
+          } > issue.md
+          number=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file issue.md
+          else
+            gh issue create --title "$TITLE" --body-file issue.md
+          fi

@@ -133,3 +133,50 @@ How should traffic be split next between price variants? Send the trials and con
 | `mode` | `exact` / `monte_carlo` | Exact (the default) or Monte Carlo sampling. |
 | `draws` | integer | Monte Carlo mode only: how many samples. |
 | `seed` | integer | Monte Carlo mode only: makes the answer repeatable. |
+
+## `promote_experiment_winner`
+
+Promote an experiment's winning variant: the experiment ends and every user then gets that variant's price, from the experiment pricing API and from the Elo A/B test built-in. The results are kept. Answers 404 not_released where this is not released for your workspace. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Answers 404 not_released where this is not released for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+| `variant` **(required)** | string | The name of the variant to promote, as on get_experiment_definition. |
+
+## `list_experiment_calls`
+
+List the compute calls behind an experiment's recorded assignments, newest first: for each assignment the Elo A/B test built-in recorded, the user, the variant, the compute request id and the usage event id (as list_usage_events and get_receipt name it). Answers 404 not_released where this is not released for your workspace. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers 404 not_released where this is not released for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+| `limit` | integer | How many to return, 1 to 200 (default 50). |
+
+## `list_hosted_demos`
+
+List the demo apps Last Price runs on its own site under /demos (a SaaS plan page, an agent bank, an AI API, a storefront, a freelancer marketplace and a course platform): for each, its name, page URL, whether it is live, and the pricing experiment it runs in the Last Price demo workspace (key, name, arm names, and the visitors and conversions each arm has recorded). Open a page to see an experiment from the shopper's side before building your own. Public: needs no credential.
+
+- **Access:** no key
+- **Behaviour:** read-only
+
+_No arguments._
+
+## `get_receipt`
+
+Get the receipt for one of your workspace's priced calls, by its usage event id (the id list_usage_events returns and report_outcome takes): what was priced, by which function and agent, when, the amount, how it was paid, and the outcome if one was reported. Receipts are made only when you ask, never sent for every call. For CSV or a printable page, call GET /api/receipts/{id} with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/receipts/{id}`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `usage_event_id` **(required)** | string | The priced call's usage event id, as list_usage_events returns it. |

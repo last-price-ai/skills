@@ -114,3 +114,75 @@ Total the costs recorded in your workspace over a period, grouped by day (the de
 | `start_date` | string | The start of the period, as an ISO 8601 date and time. |
 | `end_date` | string | The end of the period, as an ISO 8601 date and time. |
 | `group_by` | `day` / `week` / `month` / `agent` / `customer` / `type` | How to group. Defaults to day. |
+
+## `list_usage_signals`
+
+List your workspace's usage signals, newest first, with counts for the same window: the total, a count per event type and the five customers with the most signals. Filter by time, agent_id, customer_id and event_type; every filter narrows the rows and the counts alike. list_usage_signal_filters names the customers and event types your signals use. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `start_date` | string | Only signals from this time on, ISO 8601. |
+| `end_date` | string | Only signals up to this time, ISO 8601. |
+| `agent_id` | string | Only this agent's signals. |
+| `customer_id` | string | Only this customer's signals. |
+| `event_type` | array | Only these event types (at most 50; a type containing a comma cannot be named). |
+| `limit` | integer | Most signal rows to return. Defaults to 100. |
+
+## `list_usage_signal_filters`
+
+List the customers (with their names) and event types your workspace's usage signals use, with how many signals each has, most first, at most 200 of each: the values list_usage_signals takes as customer_id and event_type. Each list is narrowed by the time, agent and the other list's filter, never by its own. Answers 404 (not released) until signal filters are switched on for your workspace. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers 404 (not released) until signal filters are switched on for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `start_date` | string | Only signals from this time on, ISO 8601. |
+| `end_date` | string | Only signals up to this time, ISO 8601. |
+| `agent_id` | string | Only this agent's signals. |
+| `customer_id` | string | Only this customer's signals. |
+| `event_type` | array | Only these event types (at most 50; a type containing a comma cannot be named). |
+
+## `get_instrumentation_setup`
+
+Read your workspace's saved instrumentation setup for usage signals (kind events) or costs (kind costs): the framework and language its snippets are for, the templates, and the agent, customer and API key prefix the setup provisioned (never the key), or the defaults when nothing is saved. The one click setup that creates the agent, customer and API key is not offered here: it mints a key, so it takes a person signed in to the dashboard (/event-tracking or /cost-tracing). Answers 404 until the in-app setup is switched on for your workspace. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers 404 until the in-app setup is switched on for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `kind` **(required)** | `events` / `costs` | events for usage signals (/event-tracking), costs for cost tracing (/cost-tracing). |
+
+## `save_instrumentation_setup`
+
+Save your workspace's instrumentation setup for usage signals or costs: framework (http, vercel-ai-sdk, langchain, llamaindex, openai-agents, anthropic), language (curl, node, python, go, ruby) and templates, each optional; what you leave out stays as saved. reset: true alone puts back the defaults and keeps what was provisioned. The one click setup that creates the agent, customer and API key is not offered here: it mints a key, so it takes a person signed in to the dashboard (/event-tracking or /cost-tracing). Answers 404 until the in-app setup is switched on for your workspace. Needs a key or token not limited to scopes, or a workspace owner or admin. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Answers 404 until the in-app setup is switched on for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `kind` **(required)** | `events` / `costs` | events for usage signals (/event-tracking), costs for cost tracing (/cost-tracing). |
+| `framework` | `http` / `vercel-ai-sdk` / `langchain` / `llamaindex` / `openai-agents` / `anthropic` |  |
+| `language` | `curl` / `node` / `python` / `go` / `ruby` |  |
+| `templates` | object | Saved whole: the agent (and optional customer) the setup creates, and signals (kind events) or cost_types (kind costs), at most 20. Read get_instrumentation_setup first and send every template you want to keep. |
+| `reset` | boolean | true alone puts back every default. |
+
+## `verify_instrumentation_setup`
+
+Check whether the first usage signal (kind events) or cost (kind costs) from the agent the setup provisioned has arrived since it was provisioned; the first time it has, the time is saved on the setup. Until the one click setup has run, the answer says nothing is provisioned yet. The one click setup that creates the agent, customer and API key is not offered here: it mints a key, so it takes a person signed in to the dashboard (/event-tracking or /cost-tracing). Answers 404 until the in-app setup is switched on for your workspace. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** Answers 404 until the in-app setup is switched on for your workspace.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `kind` **(required)** | `events` / `costs` | events for usage signals (/event-tracking), costs for cost tracing (/cost-tracing). |

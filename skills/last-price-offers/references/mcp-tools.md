@@ -19,7 +19,7 @@ Read a seller's negotiable terms by their public handle: which products are open
 
 ## `make_offer`
 
-Name a price for a seller's product and get the answer: accept, counter or reject, with the price and the reason. The first offer opens a negotiation and returns a buyer token, once: keep it. To make the next offer in the same negotiation, pass negotiation_id and buyer_token too. buyer_ref is an optional opaque reference for the seller and never a name or email. The seller's floor is never breached or shown. Public: needs no credential, and it is limited per address and by the rounds the seller allows.
+Name a price for a seller's product and get the answer: accept, counter or reject, with the price and the reason. The first offer opens a negotiation and returns a buyer token, once: keep it. To make the next offer in the same negotiation, pass negotiation_id and buyer_token too. buyer_ref is an optional opaque reference for the seller and never a name or email. quantity, annual_commitment and term_months describe the deal for the seller's volume and commitment terms; the answer may carry the seller's terms and a message. The seller's floor is never breached or shown. Public: needs no credential, and it is limited per address and by the rounds the seller allows.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** changes data
@@ -33,6 +33,9 @@ Name a price for a seller's product and get the answer: accept, counter or rejec
 | `negotiation_id` | string | The negotiation id from the first answer. |
 | `buyer_token` | string | The buyer token the first answer gave you, once. Keep it: it is the only way back into the negotiation. |
 | `buyer_ref` | string | An opaque reference for the seller's bookkeeping. Never a name or email. |
+| `quantity` | integer | How many you would buy, for the seller's volume terms. Read when the negotiation opens. |
+| `annual_commitment` | boolean | True to commit for a year or more, for the seller's annual commitment terms. Read when the negotiation opens. |
+| `term_months` | integer | How many months you commit to, for the seller's commitment terms. Read when the negotiation opens. |
 
 ## `get_negotiation`
 
@@ -133,6 +136,9 @@ Try an offer against one of your own products and see the answer a buyer would g
 | `offered_price` **(required)** | number | The price the pretend buyer offers. |
 | `round` | integer | Which round of the negotiation this is. Defaults to 1. |
 | `previous_counter` | number | The counter you made in the round before, if any. |
+| `quantity` | integer | How many the pretend buyer would buy, for your sales playbook's volume terms. |
+| `annual_commitment` | boolean | True when the pretend buyer commits for a year or more, for your annual commitment terms. |
+| `term_months` | integer | How many months the pretend buyer commits to. |
 
 ## `list_negotiations`
 
@@ -145,3 +151,50 @@ Your workspace's negotiations, newest first: what a buyer sees plus the floor an
 | :-- | :-- | :-- |
 | `status` | `open` / `accepted` / `rejected` / `expired` | Only negotiations in this state. |
 | `limit` | integer | How many to return. Defaults to 50. |
+
+## `get_sales_playbook`
+
+Read your workspace's sales playbook (Settings > Sales playbook) and what pricing and negotiation read from it: for each field, what was read or why it could not be, the price band it sets (the floor is the list price less the maximum discount; the ceiling is the list price less any volume or annual commitment discount the buyer is entitled to), the terms buyers see on every counter-offer, and a worked example. released says whether the sales-playbook-pricing release is on: while it is off the playbook is saved and nothing prices from it. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+_No arguments._
+
+## `update_sales_playbook`
+
+Change some fields of your workspace's sales playbook and get back what pricing and negotiation now read from it. A field you send replaces the saved text, an empty string clears it, and a field you leave out is kept. Write numbers the way a person would ("15%", "$1,200/mo", "Net 30"): the answer says, field by field, what was read and what could not be. While the sales-playbook-pricing release is on, the maximum discount becomes a floor under every price your workspace is given and counter-offers carry the terms and voice. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `industry` | string | Target industries. An empty string clears it. |
+| `companySize` | string | Employee count or revenue range of the ideal customer. An empty string clears it. |
+| `geography` | string | Target regions or markets. An empty string clears it. |
+| `painPoint1` | string | The primary pain point the product solves, with its impact. An empty string clears it. |
+| `painPoint2` | string | A secondary pain point and its business consequence. An empty string clears it. |
+| `primaryValueProp` | string | The value proposition, in your own words; counter-offer messages lead with it. An empty string clears it. |
+| `roiPromise` | string | The improvement, saving or gain a customer can expect; counter-offer messages quote it. An empty string clears it. |
+| `pricingModel` | string | Per seat, usage-based, flat fee, tiered or share of savings. An empty string clears it. |
+| `listPrice` | string | The list price with a currency, for example "$1,200/mo". Discounts are taken from the request's own current price, or from this when a request has none. An empty string clears it. |
+| `standardDiscount` | string | The discount allowed without approval, for example "10%". Below the minimum commitment only this is allowed. An empty string clears it. |
+| `maximumDiscount` | string | The most ever given, for example "25% with VP approval". Becomes the floor: list price less this. An empty string clears it. |
+| `volumeDiscounts` | string | Tiers, for example "100+ seats 10%, 500+ seats 15%". A buyer at a tier gets it in the asking price. An empty string clears it. |
+| `annualCommitment` | string | The discount for a year or longer, for example "15% off annual prepay" or "2 months free". An empty string clears it. |
+| `paymentTerms` | string | For example "Net 30", "annual prepay" or "monthly". Attached to every counter-offer. An empty string clears it. |
+| `minimumCommitment` | string | A term, amount or quantity, for example "12 months" or "10 seats". Below it only the standard discount applies. An empty string clears it. |
+
+## `negotiate_stop`
+
+Decide whether one more round of a negotiation is worth what it costs (the optimal stopping rule, POST /api/negotiate/stop). Send your role, the currency and the offers so far in context.history (two or more, or a prior in next_round.estimated_improvement); optionally best_offer, reservation, horizon, counterparty_horizon, budget_remaining, opponent_patience, disclosure, next_round (its estimated_cost, or the function_id it would run so the cost is metered) and value_model (linear with marginal_value_per_unit, or function with function_id: a registered value estimator). Answers whether to stop, the best offer so far, the expected value and the cost of one more round, the crossing (rounds still worth playing and the expected final price), the driver (whose economics force the stop) and a plain explanation, then the action (continue, accept or walk away), the reason and the metering. One metered compute call. Answers 404 until it is switched on for your workspace; until then compute_price with the lastprice/stopping-rule function gives the same decision. Needs a Last Price credential with the price:compute scope.
+
+- **Access:** key, price:compute scope
+- **Behaviour:** changes data
+- **Errors and cautions:** Answers 404 until it is switched on for your workspace; until then compute_price with the lastprice/stopping-rule function gives the same decision.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `context` **(required)** | object | The negotiation, as POST /api/negotiate/stop takes it. |
+| `options` | object | fairness_mode (default false) caps your rounds at the counterparty's smaller horizon. |

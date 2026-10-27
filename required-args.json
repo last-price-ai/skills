@@ -38,6 +38,7 @@
  "approve_commerce_proposal": [
   "proposal_id"
  ],
+ "archive_notifications": [],
  "ask_pricing_analyst": [
   "question"
  ],
@@ -75,6 +76,9 @@
  ],
  "contribute_price_data_batch": [
   "contributions"
+ ],
+ "create_child_workspace": [
+  "name"
  ],
  "create_commerce_connector": [
   "platform",
@@ -153,6 +157,10 @@
  "create_webhook": [
   "url",
   "events"
+ ],
+ "create_workspace": [
+  "name",
+  "email"
  ],
  "decide_approval": [
   "approval_id",
@@ -270,6 +278,12 @@
  "get_customer_by_external_id": [
   "external_id"
  ],
+ "get_customer_intel": [
+  "customer_id"
+ ],
+ "get_customer_overview": [
+  "customer_id"
+ ],
  "get_cut_advisor_settings": [],
  "get_dispute": [
   "dispute_id"
@@ -298,6 +312,9 @@
  "get_github_app_connection": [],
  "get_hosted_model": [
   "model_id"
+ ],
+ "get_instrumentation_setup": [
+  "kind"
  ],
  "get_invoice": [
   "invoice_id"
@@ -335,9 +352,11 @@
   "usage_event_id"
  ],
  "get_rosetta_health": [],
+ "get_routing_experiment": [],
  "get_routing_policy": [
   "policy_id"
  ],
+ "get_sales_playbook": [],
  "get_storefront": [
   "storefront_id"
  ],
@@ -365,10 +384,12 @@
  "issue_invoice_with_stripe": [
   "invoice_id"
  ],
+ "list_account_sessions": [],
  "list_aitune_backends": [],
  "list_approvals": [],
  "list_audit_events": [],
  "list_canonical_schemas": [],
+ "list_child_workspaces": [],
  "list_commerce_audit_events": [],
  "list_commerce_catalog": [],
  "list_commerce_connectors": [],
@@ -386,9 +407,14 @@
  "list_customers": [],
  "list_demo_apps": [],
  "list_disputes": [],
+ "list_experiment_calls": [
+  "experiment_key"
+ ],
  "list_experiments": [],
  "list_functions": [],
+ "list_hosted_demos": [],
  "list_hosted_models": [],
+ "list_integrations": [],
  "list_invoices": [],
  "list_jale_contributions": [],
  "list_learned_price_changes": [],
@@ -411,6 +437,7 @@
   "job_id"
  ],
  "list_scrape_jobs": [],
+ "list_security_events": [],
  "list_storefront_dns_records": [
   "storefront_id",
   "domain_id"
@@ -421,6 +448,8 @@
  "list_storefronts": [],
  "list_ucp_checkouts": [],
  "list_usage_events": [],
+ "list_usage_signal_filters": [],
+ "list_usage_signals": [],
  "list_vendor_adapters": [],
  "list_verification_strategies": [],
  "list_webhook_deliveries": [],
@@ -429,6 +458,9 @@
   "handle",
   "product_id",
   "offered_price"
+ ],
+ "negotiate_stop": [
+  "context"
  ],
  "normalize_with_rosetta": [
   "plan",
@@ -459,6 +491,10 @@
  ],
  "price_from_capture": [],
  "pricing_conversation": [],
+ "promote_experiment_winner": [
+  "experiment_key",
+  "variant"
+ ],
  "promote_hosted_model_version": [
   "model_id",
   "version"
@@ -471,6 +507,9 @@
  "quote_storefront_domain": [
   "storefront_id",
   "domain"
+ ],
+ "read_payable_invoice": [
+  "invoice"
  ],
  "read_quote_reply": [
   "text"
@@ -533,6 +572,9 @@
  "run_scrape_job": [
   "job_id"
  ],
+ "save_instrumentation_setup": [
+  "kind"
+ ],
  "search_storefront_domains": [],
  "seed_commerce_sample": [],
  "send_invoice": [
@@ -592,10 +634,12 @@
  "sync_commerce_orders": [
   "connector_id"
  ],
+ "sync_salesforce": [],
  "test_commerce_policy": [
   "policy_id",
   "item"
  ],
+ "test_datadog_keys": [],
  "test_function": [
   "function_id"
  ],
@@ -607,6 +651,9 @@
   "source_record",
   "canonical_schema",
   "vendor_contract"
+ ],
+ "unarchive_notifications": [
+  "ids"
  ],
  "update_commerce_policy": [
   "policy_id"
@@ -638,6 +685,7 @@
  "update_routing_policy": [
   "policy_id"
  ],
+ "update_sales_playbook": [],
  "update_scrape_job": [
   "job_id"
  ],
@@ -659,6 +707,9 @@
   "api_key"
  ],
  "verify_agent_protocol": [],
+ "verify_instrumentation_setup": [
+  "kind"
+ ],
  "verify_price": [
   "proposed_price"
  ],

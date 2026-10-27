@@ -4,6 +4,41 @@
 
 Index: [mcp-tools.md](mcp-tools.md).
 
+## `get_public_leaderboard`
+
+Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating. Pass window as 7d, 30d, 90d or all (default all). Public: needs no credential, limited per address.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **Errors and cautions:** Public: needs no credential, limited per address.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `window` | `7d` / `30d` / `90d` / `all` | How far back to rank. Defaults to all. |
+
+## `get_marketplace_earnings`
+
+Read the payout ledger for the functions you own on the marketplace: what each call earned, its commission and its payout status. Filter by payout_status and page with limit and offset. Read-only. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `payout_status` | string | Only entries with this payout status. |
+| `limit` | integer | How many to return. Defaults to 50. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `list_webhooks`
+
+List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret (whsec_...; the secret is how you verify the x-lastprice-signature header on what it receives). Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/webhooks`
+
+_No arguments._
+
 ## `create_webhook`
 
 Add an outbound webhook endpoint: Last Price sends a signed POST to the https url for each event you list. The answer carries the signing secret (whsec_...); keep it to verify deliveries. Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused. Send ping_webhook afterwards to check the endpoint answers. Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
@@ -407,6 +442,9 @@ Try an offer against one of your own products and see the answer a buyer would g
 | `offered_price` **(required)** | number | The price the pretend buyer offers. |
 | `round` | integer | Which round of the negotiation this is. Defaults to 1. |
 | `previous_counter` | number | The counter you made in the round before, if any. |
+| `quantity` | integer | How many the pretend buyer would buy, for your sales playbook's volume terms. |
+| `annual_commitment` | boolean | True when the pretend buyer commits for a year or more, for your annual commitment terms. |
+| `term_months` | integer | How many months the pretend buyer commits to. |
 
 ## `list_negotiations`
 
@@ -434,7 +472,7 @@ Read a seller's negotiable terms by their public handle: which products are open
 
 ## `make_offer`
 
-Name a price for a seller's product and get the answer: accept, counter or reject, with the price and the reason. The first offer opens a negotiation and returns a buyer token, once: keep it. To make the next offer in the same negotiation, pass negotiation_id and buyer_token too. buyer_ref is an optional opaque reference for the seller and never a name or email. The seller's floor is never breached or shown. Public: needs no credential, and it is limited per address and by the rounds the seller allows.
+Name a price for a seller's product and get the answer: accept, counter or reject, with the price and the reason. The first offer opens a negotiation and returns a buyer token, once: keep it. To make the next offer in the same negotiation, pass negotiation_id and buyer_token too. buyer_ref is an optional opaque reference for the seller and never a name or email. quantity, annual_commitment and term_months describe the deal for the seller's volume and commitment terms; the answer may carry the seller's terms and a message. The seller's floor is never breached or shown. Public: needs no credential, and it is limited per address and by the rounds the seller allows.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** changes data
@@ -448,6 +486,9 @@ Name a price for a seller's product and get the answer: accept, counter or rejec
 | `negotiation_id` | string | The negotiation id from the first answer. |
 | `buyer_token` | string | The buyer token the first answer gave you, once. Keep it: it is the only way back into the negotiation. |
 | `buyer_ref` | string | An opaque reference for the seller's bookkeeping. Never a name or email. |
+| `quantity` | integer | How many you would buy, for the seller's volume terms. Read when the negotiation opens. |
+| `annual_commitment` | boolean | True to commit for a year or more, for the seller's annual commitment terms. Read when the negotiation opens. |
+| `term_months` | integer | How many months you commit to, for the seller's commitment terms. Read when the negotiation opens. |
 
 ## `get_negotiation`
 

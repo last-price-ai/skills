@@ -58,7 +58,7 @@ Add a routing policy: how a price request picks a pricing function. The strategy
 | :-- | :-- | :-- |
 | `name` **(required)** | string | A name for the policy. |
 | `strategy` **(required)** | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How a function is picked. |
-| `config` | object | What the strategy needs. weights gives each function id a share (weighted). rules each send requests whose field matches to a function (policy). fallback_chain lists function ids to try in order when the strategy picks none. |
+| `config` | object | What the strategy needs. weights gives each function id a share (weighted). rules each send requests whose field matches to a function (policy). fallback_chain lists function ids to try in order when the strategy picks none. experiment runs an A/B test inside the policy, one function per arm. |
 | `fallback_function_id` | string / null | A function to use when the strategy picks none. |
 | `is_default` | boolean | Make this the workspace default. Defaults to false. |
 
@@ -82,7 +82,7 @@ Run a pricing chain: stages one after another, each stage's price feeding the ne
 Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (fair, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as fair. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/price-router/verify`, `/api/public/price-router/verify`
 
 | Argument | Type | Meaning |
@@ -118,3 +118,15 @@ Save the price guardrails for your workspace. max_change_pct, min_margin_pct and
 | `max_change_pct` | number / null | Most a final price may move from the current price, up or down, in percent. Null (the default) for no limit. |
 | `min_margin_pct` | number / null | Least margin over the unit cost a call sends, in percent of the price. Null (the default) for no minimum. |
 | `never_below_cost` | boolean | Never price below the unit cost a call sends. Defaults to true. |
+
+## `get_routing_experiment`
+
+Read the experiment one of your routing policies runs and how far it has got: each arm with the function it runs and the calls it recorded, the experiment's status, the promoted winner (every call the policy routes then runs its function), and any arm of the stored experiment the policy gives no function. status says where it stands: not released for your workspace yet, not configured, waiting for the first routed call, running or promoted. Only the default policy routes calls. Read only. Leave policy_id out for your default policy. Needs a Last Price credential with routing read scope.
+
+- **Access:** key, routing read scope
+- **Behaviour:** read-only
+- **Errors and cautions:** status says where it stands: not released for your workspace yet, not configured, waiting for the first routed call, running or promoted.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `policy_id` | string | The routing policy UUID. Leave it out to read your workspace's default policy. |
