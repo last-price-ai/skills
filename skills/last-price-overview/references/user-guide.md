@@ -4,7 +4,6 @@ Use the role that matches the person or business the agent represents.
 
 | You want to… | Start with |
 |---|---|
-| Pay for a price computation with a wallet, without an account | [Pay per call](../../last-price-x402/SKILL.md) |
 | Add pricing to an application or service | [Compute](../../last-price-compute/SKILL.md), then [authentication](../../last-price-auth/SKILL.md) for workspace access |
 | Connect an assistant through MCP | [MCP connector](../../last-price-mcp/SKILL.md) |
 | Build or route a pricing function | [Functions and routing](../../last-price-functions-and-routing/SKILL.md) |
