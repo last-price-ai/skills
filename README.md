@@ -30,6 +30,8 @@ Each skill is a folder with a `SKILL.md` in the open [Agent Skills](https://agen
 
 ## Skills
 
+Choose a starting point in the [user guide](skills/last-price-overview/references/user-guide.md).
+
 | Skill | Use it for |
 |---|---|
 | [`last-price-overview`](skills/last-price-overview/SKILL.md) | Start here: what Last Price is, MCP vs HTTP, which skill does what |

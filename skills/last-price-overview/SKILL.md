@@ -29,6 +29,8 @@ HTTP: `x-api-key: $LP_API_KEY`. MCP connector: `LASTPRICE_API_KEY`. Never paste 
 
 ## Which skill
 
+For a starting point by user goal or workspace role, read the [user guide](references/user-guide.md).
+
 | Job | Skill |
 |---|---|
 | Get or verify a key, headers, self-register an agent | `last-price-auth` |
