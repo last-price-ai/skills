@@ -3,7 +3,7 @@
   "name": "Last Price",
   "description": "Price computation as a service: price anything, check a price, and run your Last Price workspace from OpenClaw.",
   "categories": [
-    "data-analytics"
+    "finance-payments"
   ],
   "version": "0.3.0",
   "configSchema": {
