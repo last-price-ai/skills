@@ -1,0 +1,51 @@
+name: Package Publish
+
+# Publishes @last-price/lastprice to ClawHub (OpenClaw's registry) through
+# ClawHub's reusable workflow. The package is `npm pack` of this repo, so
+# only what package.json `files` lists ships (never payments/). ClawHub
+# trusts this workflow by file name (trusted publishing), so no ClawHub
+# token is stored here. Bump the version in every manifest before a real
+# publish; ClawHub refuses a version it already has.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Preview only. Untick to publish.
+        type: boolean
+        default: true
+
+permissions: {}
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/check-manifests.mjs
+      - run: mkdir dist && npm pack --pack-destination dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clawhub-package
+          path: dist/*.tgz
+          if-no-files-found: error
+
+  publish:
+    needs: pack
+    # Real publishes only from main; any branch can preview.
+    if: github.ref == 'refs/heads/main' || inputs.dry_run
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    # Pinned to a reviewed commit of openclaw/clawhub main.
+    uses: openclaw/clawhub/.github/workflows/package-publish.yml@f02574f2024918e3f75aa38868ae589a422da639
+    with:
+      package_artifact_name: clawhub-package
+      owner: last-price
+      family: bundle-plugin
+      dry_run: ${{ inputs.dry_run }}
