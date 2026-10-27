@@ -59,6 +59,7 @@ Covers the admin surface behind `https://app.last-price.ai`. Re-check OpenAPI (t
 
 - `GET /api/workspaces/{id}/notifications?limit=&cursor=`: approvals, failed webhook deliveries, agent-inbox mail, disputes, commerce proposals; `unread_count`.
 - `POST /api/workspaces/{id}/notifications/read` `{read_through?}` moves the caller's own read mark forward only. Pass the `created_at` of the newest item actually handled.
+- Archive for this reader only: `POST /api/workspaces/{id}/notifications/archive` (`archive_notifications`, `ids` up to 100 or `all`) and `POST .../unarchive` (`unarchive_notifications`). Early access.
 - `GET|PATCH /api/workspaces/{id}/alert-preferences` changes only the caller's own settings.
 - Unsubscribe links (`/api/alerts/unsubscribe`): `GET` only redirects to a confirm page and changes nothing; the RFC 8058 one-click `POST` turns alerts off. Turning them back on goes through alert preferences.
 
@@ -66,7 +67,16 @@ Covers the admin surface behind `https://app.last-price.ai`. Re-check OpenAPI (t
 
 - `POST /api/workspaces` (session) creates a production workspace plus a paired sandbox.
 - `GET /api/workspaces/{id}`; `PATCH` `{name?, slug?}` (owner/admin); `DELETE` (owner only) removes the workspace **and** its sandbox: irreversible.
+- By key: `create_workspace` (`name`, `email`) creates a free workspace and sandbox owned by the key's creator; it needs an `x-api-key` with `workspace:admin` and is early access. Agents: `create_child_workspace` (`POST /api/agents/workspaces`) makes an unclaimed child sandbox with its own key (shown once) and claim link, at most 10 by default; `list_child_workspaces` (`GET /api/agents/workspaces`) lists them.
 - `GET|PATCH /api/workspaces/{id}/settings` (company, address, tax, invoice fields); `POST /settings/enrich` fills company info from a domain.
+
+## Account security
+
+A person's own account, not a workspace, and only with their sign-in token (keys and agent tokens are refused): `list_account_sessions` shows the devices signed in, and `list_security_events` (`GET /api/user/security-events`) the security log (sign-ins, password and email changes, keys created or revoked). Both are being rolled out.
+
+## Integrations
+
+`list_integrations` (`GET /api/integrations`, `integrations:read`) says whether Salesforce and Datadog are offered and their state, never a key. With `integrations:write`: `sync_salesforce` (`POST /api/integrations/salesforce/sync`, `direction` pull, push or both; idempotent) once a person has connected Salesforce in the dashboard, and `test_datadog_keys` (`POST /api/integrations/datadog/validate`) to check a key pair without saving it, or a saved pair by `key_id`. The user supplies Datadog keys; never echo them.
 
 ## Rules
 

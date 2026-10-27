@@ -55,6 +55,7 @@ Resolution inside a policy: `config.rules` (first match wins), then the `strateg
 - `weighted` needs at least one positive weight in `config.weights` (`function_id` to weight); `policy` needs `config.rules`. Missing config is 400.
 - `config.max_cost_per_unit` and `config.max_latency_ms` are ceilings for stored `cheapest`/`fastest`/`round_robin`; if nothing qualifies it defers to `fallback_chain`.
 - The rule object shape is not fully documented: GET existing policies and copy a shape the API stored, or create a minimal rule and read it back. Rules read `context.metadata` keys.
+- A policy can run an experiment across functions: `GET /api/routing-policies/{id}/experiment` (`get_routing_experiment`, read only; leave `policy_id` out for the default policy) shows each arm's function and recorded calls, the status (not released, not configured, waiting, running or promoted) and the promoted winner. Only the default policy routes calls.
 - Request overrides: `function_id` or `explicit` pins one function; `cheapest`, `fastest`, `round_robin` override the policy and ignore its ceilings; `weighted` still reads the default policy's weights.
 
 ## The router call

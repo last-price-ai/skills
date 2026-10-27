@@ -16,6 +16,8 @@ All ids are UUIDs. PATCH is partial (only sent fields change; an empty body is 4
 | Get / update / delete | `GET` / `PATCH` / `DELETE /api/customers/{customerId}` |
 | By your id | `GET /api/customers/external/{externalId}` |
 
+A customer's summary and buying history: `GET /api/customers/{customerId}/overview` (`get_customer_overview`: revenue, open and overdue invoices, margin, usage trend, health with reasons) and `GET /api/customers/{customerId}/intel` (`get_customer_intel`: price sensitivity, negotiations, buyer agents, experiments, price changes, notes). Both need `billing:read` and answer 404 until released for the workspace.
+
 Create: `name` required; optional `phone`, `website`, `employeeCount`, `annualRevenue`, `taxExemptStatus` (`none|exempt|reverse`), `creationSource`, `externalId`, `billingAddress`. PATCH accepts `name`, `email` (null or `""` clears), `metadata`.
 
 ## Contacts
@@ -69,6 +71,10 @@ Record: `customerId`, `amount` required; optional `invoiceId`, `currency`, `stat
 Create: `paymentId` and `amount` (> 0) required; optional `customerId`, `currency`, `reason`, `status`, `metadata`. PATCH `status`, `reason`, `metadata`. No delete. Opening a dispute alerts owners/admins.
 
 Webhooks: `order.created`, `payment.received`, `dispute.opened`, `invoice.generated` (see `last-price-webhooks`).
+
+## Invoices sent to you
+
+`read_payable_invoice` (`GET /api/public/invoices/{token}`, no credential) reads an invoice from its Last Price pay link: pass the link or its 43-character token. Reading never pays. Paying is a separate step that needs the person you work for to approve it first.
 
 ## Guardrails
 

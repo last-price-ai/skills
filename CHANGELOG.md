@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Caught up with production again: the skills name the 25 tools prod gained (experiment promotion and calls, hosted demos, routing experiments, the sales playbook and the stopping rule, customer overview and intel, payable invoices, child and admin workspaces, account sessions and the security log, notification archive, Salesforce and Datadog, usage signal filters, instrumentation setup), and the OpenAPI snapshot has the 53 new operations.
+- The drift check no longer fails when the repository will not let Actions open pull requests: it writes the report to an open issue instead. Run by hand on a branch, it commits the references regenerated from the live API to that branch.
 - README: a "See it work" section with the agent demo video, linking to all demo videos at last-price.ai/videos.
 - Publishes to ClawHub as `@last-price/lastprice`: `openclaw.plugin.json` gives OpenClaw the skills in `skills/` and the connector (directory tool set, tagged `via=openclaw`), `package.json` carries the scoped name, and `assets/icon.png` is the catalog icon. Keep their versions in step with `.claude-plugin/plugin.json`. Passes `clawhub package validate` with no findings.
 - `Package Publish` workflow (run by hand) packs the repo with `npm pack` and publishes it to ClawHub with the `clawhub` CLI, using trusted publishing instead of a stored token. It previews by default.
