@@ -95,12 +95,12 @@ Ask whether a price makes sense for its context, rather than what the price shou
 | `customer_segment` | string | Optional segment, e.g. enterprise. |
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
-| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
-| `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
+| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `min_price` | number | Optional hard floor. Binding: a verdict will never relax it. |
 | `max_price` | number | Optional hard ceiling. Binding: a verdict will never relax it. |
 | `metadata` | object | Optional free-form context. |
-| `outcome_terms` | object | Optional, for a price charged per outcome. When the outcome counts as failed and what is owed then. Where outcome terms are switched on for the workspace, the result carries outcome_terms: these terms normalised, the deadline as a time, the amount owed on timeout, and which terms are missing (complete is false without success_definition, resolve_by and on_timeout). Sending it marks the price as an outcome price; so does metadata.unit "outcome". |
+| `outcome_terms` | object | Optional, for a price charged per outcome: when the outcome counts as failed and what is owed then. The result echoes the terms normalised, with complete false until success_definition, resolve_by and on_timeout are all set. |
 | `quote_valid_until` | string | Optional. The valid_until of the compute_price result this price came from (RFC 3339). Where quote expiry is switched on, a time already past is answered with quote_expired: true. |
 
 ## `set_price_guardrails`

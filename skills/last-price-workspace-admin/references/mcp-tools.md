@@ -71,13 +71,15 @@ List the agent workspaces under yours, newest first: the children your agents cr
 
 ## `list_account_sessions`
 
-Read the devices where you are signed in to Last Price, most recently active first: device, browser, system, approximate location, masked address, how and when each signed in, and when it was last active. Your own account, not a workspace: needs a person's sign-in token (LASTPRICE_JWT from POST /api/auth/native-token); an API key or an agent's token is refused. Answers only while recorded sessions are switched on for your account (being rolled out).
+Read the devices where you are signed in to Last Price, most recently active first: device, browser, system, approximate location, masked address, how and when each signed in, and when it was last active. Your own account, not a workspace: needs a person's sign-in token (LASTPRICE_JWT from POST /api/auth/native-token); an API key or an agent's token is refused. Answers only while recorded sessions are switched on for your account (being rolled out). Optionally pass workspace_id to include up to 100 key roots you created there and their descendants, without secrets; you must still have workspace access. This supplement is not a complete key history.
 
 - **Access:** key
 - **Behaviour:** read-only
 - **Errors and cautions:** Your own account, not a workspace: needs a person's sign-in token (LASTPRICE_JWT from POST /api/auth/native-token); an API key or an agent's token is refused.
 
-_No arguments._
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `workspace_id` | string |  |
 
 ## `list_security_events`
 

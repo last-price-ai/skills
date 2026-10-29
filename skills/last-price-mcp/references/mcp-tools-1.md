@@ -14,17 +14,17 @@ Ask Last Price what pricing inputs are missing. Start with request: {}, return i
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `action` | `prepare` / `compute` |  |
+| `action` | `prepare` / `compute` | prepare (free) returns the questions still open; compute prices once nothing is missing. |
 | `request` | object | Partial REST PricingComputeRequest, including nested context, constraints, an explicit function selection and options. Reuse continuation.request on subsequent calls. |
-| `answers` | object |  |
+| `answers` | object | Answers to the questions the last call asked, by field, e.g. {"currency":"USD","unit_cost":4}. |
 
 ## `compute_price`
 
-Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after. Pass intent (the limit the buyer approved) to learn whether the price fits it.
+Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Missing business inputs return an error naming them.
+- **Errors and cautions:** Missing inputs return an error naming them.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -33,25 +33,25 @@ Compute a price for a product/context via the Last Price Pricing Compute Network
 | `current_price` | number | The current or reference price. Optional: functions that price relative to an incumbent need it, but lastprice/cost-plus prices from unit_cost instead. |
 | `unit_cost` | number | What the work costs you. It lets lastprice/cost-plus price with no current_price, which is the usual case when pricing a task you are about to run. Routing picks a function that can use it; to require cost-plus, pass its UUID from list_functions as function_id. |
 | `target_margin_pct` | number | Margin on price for cost-plus, not markup on cost: price = unit_cost / (1 - margin). Defaults to 30. |
-| `outcome_terms` | object | Optional, for a price charged per outcome. When the outcome counts as failed and what is owed then. Where outcome terms are switched on for the workspace, the result carries outcome_terms: these terms normalised, the deadline as a time, the amount owed on timeout, and which terms are missing (complete is false without success_definition, resolve_by and on_timeout). Sending it marks the price as an outcome price; so does metadata.unit "outcome". |
+| `outcome_terms` | object | Optional, for a price charged per outcome: when the outcome counts as failed and what is owed then. The result echoes the terms normalised, with complete false until success_definition, resolve_by and on_timeout are all set. |
 | `min_price` | number | Optional minimum acceptable price. A competitive offer needs this or a declared unit_cost and target_margin_pct. |
 | `max_price` | number | Optional maximum acceptable price. |
 | `currency` **(required)** | string | Three-letter ISO currency code, e.g. USD. |
 | `customer_segment` | string | Optional segment, e.g. enterprise. |
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
-| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
-| `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
+| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `routing_preference` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How to route across pricing functions. Defaults to "default". |
-| `routing` | object | Optional. Which functions may answer this one call, by UUID from list_functions. A call these leave with no function is refused, naming why, before anything runs or is charged. Where routing preferences are not yet on for your workspace they are ignored. |
-| `learned_routing` | boolean | Optional. With routing_preference cheapest, fastest, round robin or weighted, let the router learn which of the functions that strategy chooses from serves your workspace best (from your own routed calls), falling back to the strategy while there is too little data. Ignored for any other preference or a function_id, and until learned routing is released for your workspace. get_learned_routing with strategy shows what it learned. |
+| `routing` | object | Optional. Which functions may answer this call, by UUID from list_functions. If none qualifies, the call is refused before any charge. |
+| `learned_routing` | boolean | Optional. With routing_preference cheapest, fastest, round_robin or weighted, let the router learn from your own calls which function serves you best (see get_learned_routing). Ignored with a function_id. |
 | `function_id` | string | Optional explicit pricing function UUID to use. |
 | `include_explanation` | boolean | If true, ask for an explanation and confidence with the price. |
 | `no_explore` | boolean | If true, give this price exactly as computed, without the small per-call variation a workspace may run so learned pricing can learn what buyers will pay (see get_price_exploration). |
-| `include_buyer_envelope` | boolean | If true, and metadata.category names a category, the result carries buyer_envelope: what buyers' own spend checks allowed in that category (p25 to p75, the median, and how often checks were refused over a limit, pooled over 5 or more buyer workspaces; no numbers below 5) and where this price sits. A limit, not a valuation: it never changes the price. Where it is not switched on for the workspace it is ignored. |
-| `metadata` | object | Optional context. For competitive pricing: competitor_price, competitor_currency and competitive_action (match or undercut); undercut requires undercut_pct. Confirm product comparability before calling. Or send market_query (the job, in plain words) instead of competitor_price: where market prices are switched on, the market is looked up first and the answer carries market_prices (low, median, high and the pages); with competitive_action and no competitor_price, the lowest market price is used to undercut and the median to match (market_reference: low, median or high chooses). |
+| `include_buyer_envelope` | boolean | If true, with metadata.category set, the result adds buyer_envelope: what buyers' spend limits allowed in that category (pooled over 5 or more buyers) and where this price sits. It never changes the price. |
+| `metadata` | object | Optional context. Competitive pricing: competitor_price, competitor_currency and competitive_action (match, or undercut with undercut_pct); confirm the products are comparable. Or market_query (the job in plain words) to look up market prices instead. |
 | `idempotency_key` | string | Optional. A new value (e.g. a UUID) for each call you mean to make; send the SAME value if you retry after a timeout or error you cannot interpret, and the call is computed and charged once. Ignored without a credential. |
-| `intent` | object | Optional. The spending limit the buyer approved, such as a card network or payment rail mandate. Where this is switched on for the workspace, the result says whether the price fits it, with the reasons when not, and a signed quote binds the same so an issuer or buyer can check it. |
+| `intent` | object | Optional. The spending limit the buyer approved, e.g. a card network mandate. The result says whether the price fits it. |
 
 ## `compute_prices_batch`
 
@@ -85,12 +85,12 @@ Ask whether a price makes sense for its context, rather than what the price shou
 | `customer_segment` | string | Optional segment, e.g. enterprise. |
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
-| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
-| `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
+| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `min_price` | number | Optional hard floor. Binding: a verdict will never relax it. |
 | `max_price` | number | Optional hard ceiling. Binding: a verdict will never relax it. |
 | `metadata` | object | Optional free-form context. |
-| `outcome_terms` | object | Optional, for a price charged per outcome. When the outcome counts as failed and what is owed then. Where outcome terms are switched on for the workspace, the result carries outcome_terms: these terms normalised, the deadline as a time, the amount owed on timeout, and which terms are missing (complete is false without success_definition, resolve_by and on_timeout). Sending it marks the price as an outcome price; so does metadata.unit "outcome". |
+| `outcome_terms` | object | Optional, for a price charged per outcome: when the outcome counts as failed and what is owed then. The result echoes the terms normalised, with complete false until success_definition, resolve_by and on_timeout are all set. |
 | `quote_valid_until` | string | Optional. The valid_until of the compute_price result this price came from (RFC 3339). Where quote expiry is switched on, a time already past is answered with quote_expired: true. |
 
 ## `list_verification_strategies`
@@ -1031,7 +1031,7 @@ Make the version of a hosted model that was active before the current one active
 
 ## `get_forge_status`
 
-Read Forge for your workspace: the pricing models the nightly job trained on your own reported quotes (for the workspace and its busiest products, the model and data window it chose and how often the market drifted), each with the rung it reached on the promotion ladder (bench, then replay on your logged quotes) and every gate's evidence; the recent runs; and the pricing experts the self-recoding coder wrote and tested on the test bench, without their source. Nothing here changes a price. Not available until Forge is switched on for your workspace. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read Forge for your workspace: the pricing models the nightly job trained on your own reported quotes (for the workspace and its busiest products, the model and data window it chose and how often the market drifted), each with the rung it reached on the promotion ladder (bench, replay on your logged quotes, then shadow pricing on new live quotes) and every gate's evidence. A model in shadow shows how many live quotes it has priced and when it will be judged; a promoted one, the quotes it has priced and its current watch window; promotable marks the one promote_forge_candidate takes. Also the recent runs, and the pricing experts the self-recoding coder wrote and tested on the test bench, without their source. Reading changes nothing. Not available until Forge is switched on for your workspace. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
@@ -1305,7 +1305,7 @@ Approve or reject one mapping Rosetta held back, by id from list_rosetta_review.
 
 ## `list_commerce_connectors`
 
-List the store connectors linked to your workspace (credentials are never shown) and the platforms you can connect. Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the store connectors linked to your workspace (credentials are never shown), the platforms you can connect (available_platforms), and the ones whose sales sync_commerce_orders can pull (orders_platforms). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
@@ -1315,7 +1315,7 @@ _No arguments._
 
 ## `create_commerce_connector`
 
-Link a store to the commerce pipeline: platform is one of the platforms list_commerce_connectors offers. Store credentials go in credentials; they are kept encrypted and never returned, but they do pass through this conversation, so use a key made for the purpose. The metadata also sets where competitor prices come from. Needs the owner or admin role and a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Link a store to the commerce pipeline: platform is one of the platforms list_commerce_connectors offers. Store credentials go in credentials; they are kept encrypted and never returned, but they do pass through this conversation, so use a key made for the purpose. Two links need no store secret here: a site you or an AI site builder made (platform ucp-http, credentials { base_url, api_key } where api_key is a random key the site itself checks; the site answers the requests described at last-price.ai/documentation#commerce-connectors-site), and Stripe through the account the workspace connected on the Monetization page (platform stripe, credentials { connection: "workspace" }). The metadata also sets where competitor prices come from. Needs the owner or admin role and a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
@@ -1325,7 +1325,7 @@ Link a store to the commerce pipeline: platform is one of the platforms list_com
 | :-- | :-- | :-- |
 | `platform` **(required)** | string | The store platform, e.g. memory for a demo store. |
 | `display_name` **(required)** | string | A name for the connector. |
-| `credentials` | object | The platform credentials. Write-only. |
+| `credentials` | object | The platform credentials. Write-only. Other platforms take their own keys (see the documentation). |
 | `metadata` | object | Platform settings, including where competitor prices come from. |
 
 ## `set_commerce_connector_active`
@@ -1353,11 +1353,10 @@ Pull the catalog from one linked store now. connector_id is the id from list_com
 
 ## `sync_commerce_orders`
 
-Pull recent orders from one linked store, for the store sales view. since limits it to orders after that time; the default is since the last sync, or 60 days on the first. Platforms that cannot read orders answer an error. Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Pull recent orders from one linked store, for the store sales view. since limits it to orders after that time; the default is since the last sync, or 60 days on the first. Only platforms in orders_platforms from list_commerce_connectors can; others answer orders_not_supported. Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Platforms that cannot read orders answer an error.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -2156,17 +2155,19 @@ Delete an invoice: pass invoice_id. It cannot be undone by another tool. Needs a
 
 ## `send_invoice`
 
-Email an invoice to the customer and mark it sent: pass invoice_id, and optionally to (an email address; the customer's own is used otherwise). This sends a real email and answers 404 once the invoice is already sent, so check it with get_invoice first. Needs a claimed Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Issue a draft invoice: pass invoice_id and optionally to. By default this sends a real email. Set post:true to follow the workspace auto-send preference instead; if off, it issues without email. Explicit issueWithoutEmail:true always prevents email. Already sent invoices answer 404; check get_invoice first. Needs a claimed Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/invoices/{invoiceId}/send`
-- **Errors and cautions:** This sends a real email and answers 404 once the invoice is already sent, so check it with get_invoice first. Needs a claimed Last Price credential with billing write scope.
+- **Errors and cautions:** Already sent invoices answer 404; check get_invoice first. Needs a claimed Last Price credential with billing write scope.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `invoice_id` **(required)** | string | The invoice: its id, as list_invoices shows it. |
 | `to` | string | The address to send it to. Defaults to the customer's own. |
+| `post` | boolean | Follow the saved workspace auto-send preference. Does not create a draft. |
+| `issueWithoutEmail` | boolean | Issue without email, overriding both the recipient and auto-send preference. |
 
 ## `list_credits`
 
@@ -2298,15 +2299,15 @@ Create a credit bundle to sell: a name, price, billing frequency and credits (nu
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `name` **(required)** | string |  |
-| `description` | string |  |
+| `name` **(required)** | string | What buyers see, e.g. "Starter 1,000 credits". |
+| `description` | string | Optional longer text shown with the bundle. |
 | `code` | string | Unique in the workspace; cannot change later. |
 | `currency` **(required)** | string | ISO 4217 code in upper case; cannot change later. |
-| `price` **(required)** | number |  |
-| `billing_frequency` **(required)** | `monthly` / `quarterly` / `annually` / `one_time` |  |
+| `price` **(required)** | number | Price per billing period in currency, e.g. 49. |
+| `billing_frequency` **(required)** | `monthly` / `quarterly` / `annually` / `one_time` | How often the price is charged; one_time for a single purchase. |
 | `credits` **(required)** | number / null | Credits per period; null for unlimited. |
 | `rollover_credits` | number / null | Most credits that roll over; 0 for none, null for unlimited. |
-| `status` | `active` / `inactive` |  |
+| `status` | `active` / `inactive` | active puts it on sale now; inactive (the default) saves it for later. |
 
 ## `update_credit_bundle_plan`
 
@@ -2318,12 +2319,12 @@ Change a credit bundle: activate it (status active), take it off sale (inactive)
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `plan_id` **(required)** | string | The bundle id from list_credit_bundle_plans. |
-| `name` | string |  |
-| `description` | string |  |
-| `price` | number |  |
-| `credits` | number / null |  |
-| `rollover_credits` | number / null |  |
-| `status` | `active` / `inactive` / `archived` |  |
+| `name` | string | New name buyers see. |
+| `description` | string | New longer text shown with the bundle. |
+| `price` | number | New price per billing period, in the bundle currency. |
+| `credits` | number / null | Credits per period; null for unlimited. |
+| `rollover_credits` | number / null | Most credits that roll over; 0 for none, null for unlimited. |
+| `status` | `active` / `inactive` / `archived` | active puts it on sale, inactive takes it off sale, archived retires it. |
 
 ## `grant_credit_bundle_plan`
 
@@ -2334,7 +2335,7 @@ Give a customer an active credit bundle: its credits are added to their balance 
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `plan_id` **(required)** | string |  |
+| `plan_id` **(required)** | string | An active bundle id from list_credit_bundle_plans. |
 | `customer_id` **(required)** | string | One of your customers. |
 | `create_invoice` | boolean | Also create a draft invoice for the price (default true). |
 
@@ -2411,7 +2412,7 @@ Write the Last Price integration code for an app (Next.js, Express or FastAPI): 
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` |  |
+| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` | The app framework the code is written for. |
 | `agent_id` | string | One of your agents, filled into the code. |
 | `event_name` | string | The billable event the example records, like chat.completed. |
 | `customers` | boolean | Include creating customers at sign-up (default true). |
@@ -2437,7 +2438,7 @@ Open the Last Price integration code (the files generate_monetization_code write
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `repository` **(required)** | string | owner/name, like acme/agent-app; must be a repository the installation can use. |
-| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` |  |
+| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` | The app framework the code is written for. |
 | `agent_id` | string | One of your agents, filled into the code. |
 | `event_name` | string | The billable event the example records, like chat.completed. |
 | `customers` | boolean | Include creating customers at sign-up (default true). |

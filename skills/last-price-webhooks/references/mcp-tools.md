@@ -7,9 +7,9 @@ A tool missing from your own `tools/list` is not switched on for your connection
 
 ## `list_webhooks`
 
-List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret (whsec_...; the secret is how you verify the x-lastprice-signature header on what it receives). Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret, masked to whsec_ and its last four characters; the full secret comes once from create_webhook, or from rotate_webhook_secret, which makes a new one. Needs a Last Price credential with the webhooks:read scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Access:** key, webhooks:read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/webhooks`
 
@@ -17,9 +17,9 @@ _No arguments._
 
 ## `create_webhook`
 
-Add an outbound webhook endpoint: Last Price sends a signed POST to the https url for each event you list. The answer carries the signing secret (whsec_...); keep it to verify deliveries. Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused. Send ping_webhook afterwards to check the endpoint answers. Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Add an outbound webhook endpoint: Last Price sends a signed POST to the https url for each event you list. The answer carries the signing secret (whsec_...); keep it to verify deliveries. Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused. Send ping_webhook afterwards to check the endpoint answers. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/webhooks`
 - **Errors and cautions:** Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused.
@@ -32,9 +32,9 @@ Add an outbound webhook endpoint: Last Price sends a signed POST to the https ur
 
 ## `update_webhook`
 
-Change a webhook endpoint: its url, the events it gets, or switch it off and on with status. Only the fields you send change; events replaces the whole list. Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Change a webhook endpoint: its url, the events it gets, or switch it off and on with status. Only the fields you send change; events replaces the whole list. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
@@ -46,9 +46,9 @@ Change a webhook endpoint: its url, the events it gets, or switch it off and on 
 
 ## `delete_webhook`
 
-Delete a webhook endpoint and its delivery history. This cannot be undone: update_webhook with status inactive pauses it instead. Needs the owner or admin role, and a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Delete a webhook endpoint and its delivery history. This cannot be undone: update_webhook with status inactive pauses it instead. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **Errors and cautions:** This cannot be undone: update_webhook with status inactive pauses it instead.
 
@@ -58,9 +58,9 @@ Delete a webhook endpoint and its delivery history. This cannot be undone: updat
 
 ## `ping_webhook`
 
-Send one signed webhook.test event to an active endpoint now and record the result as a delivery, so you can check it receives and verifies events. Read the outcome with list_webhook_deliveries. Needs a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Send one signed webhook.test event to an active endpoint now and record the result as a delivery, so you can check it receives and verifies events. Read the outcome with list_webhook_deliveries. Needs a Last Price credential with the webhooks:write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 
 | Argument | Type | Meaning |
@@ -69,9 +69,9 @@ Send one signed webhook.test event to an active endpoint now and record the resu
 
 ## `list_webhook_deliveries`
 
-List recent delivery attempts across your workspace's webhook endpoints, newest first: the event, the status your endpoint answered with and when. Use it to find an endpoint that is failing. Needs a key with no scope limits or a person's sign-in. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List recent delivery attempts across your workspace's webhook endpoints, newest first: the event, the status your endpoint answered with and when. Use it to find an endpoint that is failing. Needs a Last Price credential with the webhooks:read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Access:** key, webhooks:read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
