@@ -26,6 +26,7 @@ Every op needs a credential and a claimed workspace; each op names its scope in 
 - `GET /api/commerce/connectors` -> `{accounts[], available_platforms[]}` (e.g. `memory`, `shopify`, `amazon-sp`). Credentials come back masked.
 - `POST /api/commerce/connectors` `{platform, display_name, credentials?, metadata?}` -> 201. Credentials are encrypted and never readable again. `metadata.observation_sources[]` names competitor price sources the cycle pulls (source-specific `query`; source API keys go in `credentials`, never in metadata).
 - `PATCH /api/commerce/connectors/{id}` `{active: boolean}`: pause/resume (prefer over deleting).
+- `POST /api/commerce/connectors/{id}/check` (`check_commerce_connector`): try a linked store without changing anything; reports reach, catalog and (where sales can be pulled) orders, each ok or the store's own error. Run it after linking a site an AI site builder made, before the first sync.
 - `POST /api/commerce/connectors/{id}/sync` -> `{items_synced, pages, duration_ms}`.
 - `POST /api/commerce/connectors/{id}/orders/sync` `{since?}`: pull store orders into the workspace (feeds learned elasticity).
 
@@ -57,7 +58,7 @@ Every op needs a credential and a claimed workspace; each op names its scope in 
 
 **Safe end-to-end smoke (no real store):** seed-sample -> catalog + observations -> evaluate the seeded policy on one item -> cycle `{}` -> approve one proposal and reject another with reasons -> execution (safe: in-memory platform) -> audit for the proposal.
 
-**Onboarding a real store:** connector (owner/admin) -> sync -> observation sources -> policy in `shadow` -> evaluate several items -> cycle -> review proposals -> switch to `manual`, later `auto` with a tight delta.
+**Onboarding a real store:** connector (owner/admin) -> check -> sync -> observation sources -> policy in `shadow` -> evaluate several items -> cycle -> review proposals -> switch to `manual`, later `auto` with a tight delta.
 
 ## Guardrails
 

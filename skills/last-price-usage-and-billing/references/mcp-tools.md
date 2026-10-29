@@ -170,8 +170,8 @@ Save your workspace's instrumentation setup for usage signals or costs: framewor
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `kind` **(required)** | `events` / `costs` | events for usage signals (/event-tracking), costs for cost tracing (/cost-tracing). |
-| `framework` | `http` / `vercel-ai-sdk` / `langchain` / `llamaindex` / `openai-agents` / `anthropic` |  |
-| `language` | `curl` / `node` / `python` / `go` / `ruby` |  |
+| `framework` | `http` / `vercel-ai-sdk` / `langchain` / `llamaindex` / `openai-agents` / `anthropic` | The agent framework the saved setup shows, e.g. langchain. |
+| `language` | `curl` / `node` / `python` / `go` / `ruby` | The language of the code it shows, e.g. python. |
 | `templates` | object | Saved whole: the agent (and optional customer) the setup creates, and signals (kind events) or cost_types (kind costs), at most 20. Read get_instrumentation_setup first and send every template you want to keep. |
 | `reset` | boolean | true alone puts back every default. |
 

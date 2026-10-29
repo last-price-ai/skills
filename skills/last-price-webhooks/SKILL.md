@@ -4,7 +4,7 @@ description: Use when subscribing to last-price.ai events with outbound webhooks
 ---
 # Last Price: outbound webhooks and signature verification
 
-MCP equivalents: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `ping_webhook`, `list_webhook_deliveries`, `verify_webhook_signature`. Re-check OpenAPI when the event list matters; it grows.
+MCP equivalents: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `ping_webhook`, `list_webhook_deliveries`, `verify_webhook_signature`, `rotate_webhook_secret`. Re-check OpenAPI when the event list matters; it grows.
 
 ## Who can call what
 
@@ -13,7 +13,7 @@ MCP equivalents: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_we
 | List endpoints | `GET /api/webhooks` | owner/admin. Full secret only to a dashboard session; keys see it masked (`secret_masked: true`). |
 | Create | `POST /api/webhooks` | owner/admin; `webhooks:write` |
 | Update / pause | `PATCH /api/webhooks/{webhookId}` | owner/admin; `webhooks:write` |
-| Rotate secret | `POST /api/webhooks/{webhookId}/rotate-secret` | owner/admin; returns the new secret once |
+| Rotate secret | `POST /api/webhooks/{webhookId}/rotate-secret` | `webhooks:write`, owner/admin; returns the new secret once |
 | Delete (also wipes delivery history) | `DELETE /api/webhooks/{webhookId}` | destructive, confirm first |
 | Test event | `POST /api/webhooks/{webhookId}/ping` | no body |
 | Delivery log | `GET /api/webhooks/deliveries?limit=1..200` | newest first, includes pings |

@@ -95,12 +95,12 @@ Ask whether a price makes sense for its context, rather than what the price shou
 | `customer_segment` | string | Optional segment, e.g. enterprise. |
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
-| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
-| `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
+| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `min_price` | number | Optional hard floor. Binding: a verdict will never relax it. |
 | `max_price` | number | Optional hard ceiling. Binding: a verdict will never relax it. |
 | `metadata` | object | Optional free-form context. |
-| `outcome_terms` | object | Optional, for a price charged per outcome. When the outcome counts as failed and what is owed then. Where outcome terms are switched on for the workspace, the result carries outcome_terms: these terms normalised, the deadline as a time, the amount owed on timeout, and which terms are missing (complete is false without success_definition, resolve_by and on_timeout). Sending it marks the price as an outcome price; so does metadata.unit "outcome". |
+| `outcome_terms` | object | Optional, for a price charged per outcome: when the outcome counts as failed and what is owed then. The result echoes the terms normalised, with complete false until success_definition, resolve_by and on_timeout are all set. |
 | `quote_valid_until` | string | Optional. The valid_until of the compute_price result this price came from (RFC 3339). Where quote expiry is switched on, a time already past is answered with quote_expired: true. |
 
 ## `set_price_guardrails`
@@ -118,6 +118,25 @@ Save the price guardrails for your workspace. max_change_pct, min_margin_pct and
 | `max_change_pct` | number / null | Most a final price may move from the current price, up or down, in percent. Null (the default) for no limit. |
 | `min_margin_pct` | number / null | Least margin over the unit cost a call sends, in percent of the price. Null (the default) for no minimum. |
 | `never_below_cost` | boolean | Never price below the unit cost a call sends. Defaults to true. |
+
+## `preview_price_change`
+
+Preview a price change on your own past calls: replay a proposed price for the pricing functions your workspace owns over the calls they served in a window, with the metering formula that charged them, once at today's price and once at the proposed one. Send change_pct (one function, or every function you own when function_id is left out), or a new cost_per_unit and/or cost_multiplier for one function_id. Returns totals, the change per function, how many customers would pay more, less or the same, the biggest movers (lettered, never named), threshold crossings and a confidence note. Read only: nothing is saved, billed or changed; to use a price, save it on the function. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/pricing/preview`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` | string | One of your functions. Leave it out to move every function you own by change_pct. |
+| `change_pct` | number | Move the price by this percent. Send this, or cost_per_unit and/or cost_multiplier. |
+| `cost_per_unit` | number | A new cost per unit for function_id. |
+| `cost_multiplier` | number | A new cost multiplier for function_id. |
+| `from` | string | Start of the window, an ISO 8601 date or date-time. Defaults to 30 days before to. |
+| `to` | string | End of the window, inclusive. Defaults to now; at most 366 days after from. |
+| `threshold_usd` | number | Count the customers whose spend in the window would cross this amount, up or down. |
+| `movers` | integer | How many of the biggest movers to list. Defaults to 10. |
 
 ## `get_routing_experiment`
 

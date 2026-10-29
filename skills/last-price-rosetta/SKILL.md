@@ -4,7 +4,7 @@ description: Use when translating merchant or vendor payloads with last-price.ai
 ---
 # Last Price: Rosetta (schema translation)
 
-Rosetta maps merchant or vendor payloads onto Last Price canonical records. A planner (heuristics plus a model) proposes field mappings with confidence, a deterministic compiler applies them, validation runs before anything is trusted, and people decide uncertain cases. MCP equivalents: `ingest_with_rosetta`, `plan_rosetta_mapping`, `translate_with_rosetta`, `freeze_rosetta_adapter`, `normalize_with_rosetta`, `list_rosetta_review`, `decide_rosetta_review`, `list_canonical_schemas`.
+Rosetta maps merchant or vendor payloads onto Last Price canonical records. A planner (heuristics plus a model) proposes field mappings with confidence, a deterministic compiler applies them, validation runs before anything is trusted, and people decide uncertain cases. MCP equivalents: `ingest_with_rosetta`, `plan_rosetta_mapping`, `translate_with_rosetta`, `freeze_rosetta_adapter`, `normalize_with_rosetta`, `list_rosetta_review`, `decide_rosetta_review`, `list_canonical_schemas`, `list_rosetta_adapters`, `revoke_rosetta_adapter`.
 
 ## Access
 
@@ -34,8 +34,8 @@ Wherever a target is taken you can pass the key or a full schema `{id, fields:[{
 | POST | `/api/rosetta/normalize` | **`plan`** (camelCase), **`vendor_response`** | `canonical`, `missing[]`, `lossy[]`, `passthrough` |
 | GET | `/api/rosetta/review?status=pending|approved|rejected` | | `items[]`, newest first |
 | POST | `/api/rosetta/review` | **`id`**, **`action`** `approve|reject`, `reviewer` | `item`; 404 other workspace, 409 already decided |
-| GET | `/api/rosetta/adapters` | | Frozen adapters (early access; 404 `not_released` until enabled) |
-| DELETE | `/api/rosetta/adapters/{id}` | | Retire an adapter; the next payload of that shape re-plans |
+| GET | `/api/rosetta/adapters` | | Frozen adapters, `list_rosetta_adapters` (early access; 404 `not_released` until enabled) |
+| DELETE | `/api/rosetta/adapters/{id}` | | Retire an adapter, `revoke_rosetta_adapter` (cannot be undone; early access, 404 `not_released` until enabled; 409 if already revoked, 404 if unknown); the next payload of that shape re-plans |
 
 ## Ingest statuses
 

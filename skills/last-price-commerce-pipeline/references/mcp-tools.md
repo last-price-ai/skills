@@ -54,3 +54,15 @@ Push every approved price proposal to its connected store now. This changes live
 - **Errors and cautions:** This changes live prices on the store and cannot be undone from here.
 
 _No arguments._
+
+## `check_commerce_connector`
+
+Try one linked store without changing anything, and see which part answers: reach (the store or site responds to its key), catalog (the first few products) and, where the workspace can pull sales, orders (the last day's). Each step reports ok, the time it took (at most 8 seconds each) and the store's own error; steps after a timeout are skipped. Use it after linking a site an AI site builder made, before the first sync. Nothing is stored and no price is written. Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only, reaches outside Last Price
+- **REST:** `/api/commerce/connectors/{id}/check`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `connector_id` **(required)** | string | The connector id, as list_commerce_connectors gives it. |

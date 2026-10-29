@@ -14,17 +14,17 @@ Ask Last Price what pricing inputs are missing. Start with request: {}, return i
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `action` | `prepare` / `compute` |  |
+| `action` | `prepare` / `compute` | prepare (free) returns the questions still open; compute prices once nothing is missing. |
 | `request` | object | Partial REST PricingComputeRequest, including nested context, constraints, an explicit function selection and options. Reuse continuation.request on subsequent calls. |
-| `answers` | object |  |
+| `answers` | object | Answers to the questions the last call asked, by field, e.g. {"currency":"USD","unit_cost":4}. |
 
 ## `compute_price`
 
-Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after. Pass intent (the limit the buyer approved) to learn whether the price fits it.
+Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Missing business inputs return an error naming them.
+- **Errors and cautions:** Missing inputs return an error naming them.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -33,25 +33,25 @@ Compute a price for a product/context via the Last Price Pricing Compute Network
 | `current_price` | number | The current or reference price. Optional: functions that price relative to an incumbent need it, but lastprice/cost-plus prices from unit_cost instead. |
 | `unit_cost` | number | What the work costs you. It lets lastprice/cost-plus price with no current_price, which is the usual case when pricing a task you are about to run. Routing picks a function that can use it; to require cost-plus, pass its UUID from list_functions as function_id. |
 | `target_margin_pct` | number | Margin on price for cost-plus, not markup on cost: price = unit_cost / (1 - margin). Defaults to 30. |
-| `outcome_terms` | object | Optional, for a price charged per outcome. When the outcome counts as failed and what is owed then. Where outcome terms are switched on for the workspace, the result carries outcome_terms: these terms normalised, the deadline as a time, the amount owed on timeout, and which terms are missing (complete is false without success_definition, resolve_by and on_timeout). Sending it marks the price as an outcome price; so does metadata.unit "outcome". |
+| `outcome_terms` | object | Optional, for a price charged per outcome: when the outcome counts as failed and what is owed then. The result echoes the terms normalised, with complete false until success_definition, resolve_by and on_timeout are all set. |
 | `min_price` | number | Optional minimum acceptable price. A competitive offer needs this or a declared unit_cost and target_margin_pct. |
 | `max_price` | number | Optional maximum acceptable price. |
 | `currency` **(required)** | string | Three-letter ISO currency code, e.g. USD. |
 | `customer_segment` | string | Optional segment, e.g. enterprise. |
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
-| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
-| `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
+| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `routing_preference` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How to route across pricing functions. Defaults to "default". |
-| `routing` | object | Optional. Which functions may answer this one call, by UUID from list_functions. A call these leave with no function is refused, naming why, before anything runs or is charged. Where routing preferences are not yet on for your workspace they are ignored. |
-| `learned_routing` | boolean | Optional. With routing_preference cheapest, fastest, round robin or weighted, let the router learn which of the functions that strategy chooses from serves your workspace best (from your own routed calls), falling back to the strategy while there is too little data. Ignored for any other preference or a function_id, and until learned routing is released for your workspace. get_learned_routing with strategy shows what it learned. |
+| `routing` | object | Optional. Which functions may answer this call, by UUID from list_functions. If none qualifies, the call is refused before any charge. |
+| `learned_routing` | boolean | Optional. With routing_preference cheapest, fastest, round_robin or weighted, let the router learn from your own calls which function serves you best (see get_learned_routing). Ignored with a function_id. |
 | `function_id` | string | Optional explicit pricing function UUID to use. |
 | `include_explanation` | boolean | If true, ask for an explanation and confidence with the price. |
 | `no_explore` | boolean | If true, give this price exactly as computed, without the small per-call variation a workspace may run so learned pricing can learn what buyers will pay (see get_price_exploration). |
-| `include_buyer_envelope` | boolean | If true, and metadata.category names a category, the result carries buyer_envelope: what buyers' own spend checks allowed in that category (p25 to p75, the median, and how often checks were refused over a limit, pooled over 5 or more buyer workspaces; no numbers below 5) and where this price sits. A limit, not a valuation: it never changes the price. Where it is not switched on for the workspace it is ignored. |
-| `metadata` | object | Optional context. For competitive pricing: competitor_price, competitor_currency and competitive_action (match or undercut); undercut requires undercut_pct. Confirm product comparability before calling. Or send market_query (the job, in plain words) instead of competitor_price: where market prices are switched on, the market is looked up first and the answer carries market_prices (low, median, high and the pages); with competitive_action and no competitor_price, the lowest market price is used to undercut and the median to match (market_reference: low, median or high chooses). |
+| `include_buyer_envelope` | boolean | If true, with metadata.category set, the result adds buyer_envelope: what buyers' spend limits allowed in that category (pooled over 5 or more buyers) and where this price sits. It never changes the price. |
+| `metadata` | object | Optional context. Competitive pricing: competitor_price, competitor_currency and competitive_action (match, or undercut with undercut_pct); confirm the products are comparable. Or market_query (the job in plain words) to look up market prices instead. |
 | `idempotency_key` | string | Optional. A new value (e.g. a UUID) for each call you mean to make; send the SAME value if you retry after a timeout or error you cannot interpret, and the call is computed and charged once. Ignored without a credential. |
-| `intent` | object | Optional. The spending limit the buyer approved, such as a card network or payment rail mandate. Where this is switched on for the workspace, the result says whether the price fits it, with the reasons when not, and a signed quote binds the same so an issuer or buyer can check it. |
+| `intent` | object | Optional. The spending limit the buyer approved, e.g. a card network mandate. The result says whether the price fits it. |
 
 ## `compute_prices_batch`
 
@@ -85,12 +85,12 @@ Ask whether a price makes sense for its context, rather than what the price shou
 | `customer_segment` | string | Optional segment, e.g. enterprise. |
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
-| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
-| `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
+| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `min_price` | number | Optional hard floor. Binding: a verdict will never relax it. |
 | `max_price` | number | Optional hard ceiling. Binding: a verdict will never relax it. |
 | `metadata` | object | Optional free-form context. |
-| `outcome_terms` | object | Optional, for a price charged per outcome. When the outcome counts as failed and what is owed then. Where outcome terms are switched on for the workspace, the result carries outcome_terms: these terms normalised, the deadline as a time, the amount owed on timeout, and which terms are missing (complete is false without success_definition, resolve_by and on_timeout). Sending it marks the price as an outcome price; so does metadata.unit "outcome". |
+| `outcome_terms` | object | Optional, for a price charged per outcome: when the outcome counts as failed and what is owed then. The result echoes the terms normalised, with complete false until success_definition, resolve_by and on_timeout are all set. |
 | `quote_valid_until` | string | Optional. The valid_until of the compute_price result this price came from (RFC 3339). Where quote expiry is switched on, a time already past is answered with quote_expired: true. |
 
 ## `list_verification_strategies`
@@ -486,6 +486,25 @@ See which outside pricing engines (vendor adapters, such as Pricefx and Prisync)
 
 _No arguments._
 
+## `preview_price_change`
+
+Preview a price change on your own past calls: replay a proposed price for the pricing functions your workspace owns over the calls they served in a window, with the metering formula that charged them, once at today's price and once at the proposed one. Send change_pct (one function, or every function you own when function_id is left out), or a new cost_per_unit and/or cost_multiplier for one function_id. Returns totals, the change per function, how many customers would pay more, less or the same, the biggest movers (lettered, never named), threshold crossings and a confidence note. Read only: nothing is saved, billed or changed; to use a price, save it on the function. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/pricing/preview`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` | string | One of your functions. Leave it out to move every function you own by change_pct. |
+| `change_pct` | number | Move the price by this percent. Send this, or cost_per_unit and/or cost_multiplier. |
+| `cost_per_unit` | number | A new cost per unit for function_id. |
+| `cost_multiplier` | number | A new cost multiplier for function_id. |
+| `from` | string | Start of the window, an ISO 8601 date or date-time. Defaults to 30 days before to. |
+| `to` | string | End of the window, inclusive. Defaults to now; at most 366 days after from. |
+| `threshold_usd` | number | Count the customers whose spend in the window would cross this amount, up or down. |
+| `movers` | integer | How many of the biggest movers to list. Defaults to 10. |
+
 ## `get_price_guardrails`
 
 Read the price guardrails saved for your workspace, and the defaults set_price_guardrails fills in for an omitted field. saved is false when none are saved, and then no workspace limit applies. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
@@ -688,6 +707,48 @@ Ask Jale for the price to run next in one of your experiments: it simulates each
 | `objective` | `revenue` / `conversion` / `profit` / `market_share` | What to optimise for. Defaults to revenue. |
 | `candidates` | array | The prices to compare. Otherwise a grid is chosen. |
 | `lookback_days` | integer | How many days of results to learn from. |
+
+## `set_experiment_status`
+
+Start, pause, resume or complete one of your experiments: pass experiment_key and status. active starts or resumes it; paused stops it for now, so every buyer sees the control price and nothing is recorded; completed ends it for good and keeps its results. A completed experiment cannot change again. Read the outcome with get_experiment_definition. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}`
+- **Errors and cautions:** Needs a claimed Last Price credential for the workspace that owns the experiment.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+| `status` **(required)** | `active` / `paused` / `completed` | active starts or resumes it, paused stops it for now, completed ends it for good. |
+
+## `delete_experiment`
+
+Delete one of your experiments with every assignment, view and conversion recorded for it: pass experiment_key. To stop one and keep its results, use set_experiment_status with completed instead. Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}`
+- **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+
+## `remove_experiment_conversions`
+
+Take wrong or abusive conversions out of an experiment's results: pass experiment_key and exactly one of user_id (every conversion that buyer made) or variant (every conversion in that arm). Views and assignments stay, so the buyer keeps their price and can convert again. Returns how many conversions were removed and the revenue they carried, and the removal is written to the audit log. Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}/conversions`
+- **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+| `user_id` | string | The buyer whose conversions to remove: the user id your site sent with them. Give this or variant. |
+| `variant` | string | The arm whose conversions to remove, such as control or variant_1. Give this or user_id. |
 
 ## `get_pricing_analysis`
 
@@ -1031,7 +1092,7 @@ Make the version of a hosted model that was active before the current one active
 
 ## `get_forge_status`
 
-Read Forge for your workspace: the pricing models the nightly job trained on your own reported quotes (for the workspace and its busiest products, the model and data window it chose and how often the market drifted), each with the rung it reached on the promotion ladder (bench, then replay on your logged quotes) and every gate's evidence; the recent runs; and the pricing experts the self-recoding coder wrote and tested on the test bench, without their source. Nothing here changes a price. Not available until Forge is switched on for your workspace. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read Forge for your workspace: the pricing models the nightly job trained on your own reported quotes (for the workspace and its busiest products, the model and data window it chose and how often the market drifted), each with the rung it reached on the promotion ladder (bench, replay on your logged quotes, then shadow pricing on new live quotes) and every gate's evidence. A model in shadow shows how many live quotes it has priced and when it will be judged; a promoted one, the quotes it has priced and its current watch window; promotable marks the one promote_forge_candidate takes. Also the recent runs, and the pricing experts the self-recoding coder wrote and tested on the test bench, without their source. Reading changes nothing. Not available until Forge is switched on for your workspace. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
@@ -1054,6 +1115,44 @@ Reject one of your workspace's Forge candidates: it stops climbing the promotion
 | :-- | :-- | :-- |
 | `candidate_id` **(required)** | string | The candidate id, as get_forge_status gives it. |
 | `reason` | string | Why, kept with its evidence; not blank. |
+
+## `promote_forge_candidate`
+
+Put one of your workspace's Forge models on live prices: the newest model that passed shadow pricing for its product (promotable in get_forge_status) prices that product's live quotes from now on (a workspace-wide model: every product without its own), and the model it replaces stops. It prices only learned and optimizer prices, never a price you fixed, a channel price or a pricing chain stage; it stays inside the range your quotes were charged at widened by 10% and never below unit cost, then your limits and guardrails apply. It retrains each night, and a watch retires it if your learned price would clearly have earned more. Any other candidate is refused. Not available until Forge promotion is switched on for your workspace. Needs a Last Price credential with routing write scope; from the dashboard, an owner or admin. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/forge/candidates/{id}/promote`
+- **Errors and cautions:** Any other candidate is refused.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `candidate_id` **(required)** | string | The candidate id, as get_forge_status gives it. |
+
+## `retire_forge_candidate`
+
+Stop one of your workspace's promoted Forge models pricing live quotes: your learned price prices them again, and the model keeps its evidence, with your reason added. candidate_id is a promoted model from get_forge_status; any other is refused. Works even while Forge promotion is off, so a promoted model can always be stopped. Needs a Last Price credential with routing write scope; from the dashboard, an owner or admin. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/forge/candidates/{id}/retire`
+- **Errors and cautions:** candidate_id is a promoted model from get_forge_status; any other is refused.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `candidate_id` **(required)** | string | The candidate id, as get_forge_status gives it. |
+| `reason` | string | Why, kept with its evidence; not blank. |
+
+## `get_price_foundation_report`
+
+Read what the shadow ML pricing mix learned last night from your workspace's outcomes. On every learned quote it logs the price it would have set and each expert's chance of a sale, and never changes the price. Shows the outcomes it learned from, the groups it added to its vocabulary (a category, way of charging or kind of buyer it had no name for) with the replay evidence that kept each, proposals it turned down, and how its logged answers scored against what buyers did (log loss per expert and for the mix, lower is better). Answers released: false while it is not switched on for your workspace. Read only. Needs a Last Price credential with routing read scope.
+
+- **Access:** key, routing read scope
+- **Behaviour:** read-only
+- **REST:** `/api/price-foundation`
+- **Errors and cautions:** Answers released: false while it is not switched on for your workspace.
+
+_No arguments._
 
 ## `get_frontier_model`
 
@@ -1303,9 +1402,38 @@ Approve or reject one mapping Rosetta held back, by id from list_rosetta_review.
 | `action` **(required)** | `approve` / `reject` | Approve the mapping or reject it. |
 | `reviewer` | string | Who decided. Defaults to the workspace. |
 
+## `list_rosetta_adapters`
+
+List the workspace's Rosetta adapters, newest first: each one's id, status (active, superseded or revoked), canonical target, shape fingerprint, mappings, confidence, merchant_id and when it was frozen or replaced. An active adapter is what ingest_with_rosetta answers from for that merchant and payload shape. Pass status, canonical_target, merchant_id or limit (1 to 500, default 100) to narrow it. Read-only. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/rosetta/adapters`
+- **Errors and cautions:** Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `active` / `superseded` / `revoked` | Only adapters with this status. |
+| `canonical_target` | string | Only adapters for this canonical schema, e.g. canonical-offer. |
+| `merchant_id` | string | Only adapters for this merchant_id, as ingest_with_rosetta was given it. |
+| `limit` | integer | How many to return. Defaults to 100. |
+
+## `revoke_rosetta_adapter`
+
+Revoke one Rosetta adapter by adapter_id from list_rosetta_adapters, so ingest_with_rosetta stops answering from it: the next payload of that shape plans a new mapping, which may be queued for review. Revoking cannot be undone; an adapter already revoked answers 409 and an unknown id 404. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/rosetta/adapters/{id}`
+- **Errors and cautions:** Revoking cannot be undone; an adapter already revoked answers 409 and an unknown id 404. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `adapter_id` **(required)** | string | The adapter id, as list_rosetta_adapters gives it. |
+
 ## `list_commerce_connectors`
 
-List the store connectors linked to your workspace (credentials are never shown) and the platforms you can connect. Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the store connectors linked to your workspace (credentials are never shown), the platforms you can connect (available_platforms), and the ones whose sales sync_commerce_orders can pull (orders_platforms). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
@@ -1315,7 +1443,7 @@ _No arguments._
 
 ## `create_commerce_connector`
 
-Link a store to the commerce pipeline: platform is one of the platforms list_commerce_connectors offers. Store credentials go in credentials; they are kept encrypted and never returned, but they do pass through this conversation, so use a key made for the purpose. The metadata also sets where competitor prices come from. Needs the owner or admin role and a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Link a store to the commerce pipeline: platform is one of the platforms list_commerce_connectors offers. Store credentials go in credentials; they are kept encrypted and never returned, but they do pass through this conversation, so use a key made for the purpose. Two links need no store secret here: a site you or an AI site builder made (platform ucp-http, credentials { base_url, api_key } where api_key is a random key the site itself checks; the site answers the requests described at last-price.ai/documentation#commerce-connectors-site), and Stripe through the account the workspace connected on the Monetization page (platform stripe, credentials { connection: "workspace" }). The metadata also sets where competitor prices come from. Needs the owner or admin role and a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
@@ -1325,8 +1453,20 @@ Link a store to the commerce pipeline: platform is one of the platforms list_com
 | :-- | :-- | :-- |
 | `platform` **(required)** | string | The store platform, e.g. memory for a demo store. |
 | `display_name` **(required)** | string | A name for the connector. |
-| `credentials` | object | The platform credentials. Write-only. |
+| `credentials` | object | The platform credentials. Write-only. Other platforms take their own keys (see the documentation). |
 | `metadata` | object | Platform settings, including where competitor prices come from. |
+
+## `check_commerce_connector`
+
+Try one linked store without changing anything, and see which part answers: reach (the store or site responds to its key), catalog (the first few products) and, where the workspace can pull sales, orders (the last day's). Each step reports ok, the time it took (at most 8 seconds each) and the store's own error; steps after a timeout are skipped. Use it after linking a site an AI site builder made, before the first sync. Nothing is stored and no price is written. Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only, reaches outside Last Price
+- **REST:** `/api/commerce/connectors/{id}/check`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `connector_id` **(required)** | string | The connector id, as list_commerce_connectors gives it. |
 
 ## `set_commerce_connector_active`
 
@@ -1353,11 +1493,10 @@ Pull the catalog from one linked store now. connector_id is the id from list_com
 
 ## `sync_commerce_orders`
 
-Pull recent orders from one linked store, for the store sales view. since limits it to orders after that time; the default is since the last sync, or 60 days on the first. Platforms that cannot read orders answer an error. Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Pull recent orders from one linked store, for the store sales view. since limits it to orders after that time; the default is since the last sync, or 60 days on the first. Only platforms in orders_platforms from list_commerce_connectors can; others answer orders_not_supported. Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Platforms that cannot read orders answer an error.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -2156,17 +2295,19 @@ Delete an invoice: pass invoice_id. It cannot be undone by another tool. Needs a
 
 ## `send_invoice`
 
-Email an invoice to the customer and mark it sent: pass invoice_id, and optionally to (an email address; the customer's own is used otherwise). This sends a real email and answers 404 once the invoice is already sent, so check it with get_invoice first. Needs a claimed Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Issue a draft invoice: pass invoice_id and optionally to. By default this sends a real email. Set post:true to follow the workspace auto-send preference instead; if off, it issues without email. Explicit issueWithoutEmail:true always prevents email. Already sent invoices answer 404; check get_invoice first. Needs a claimed Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/invoices/{invoiceId}/send`
-- **Errors and cautions:** This sends a real email and answers 404 once the invoice is already sent, so check it with get_invoice first. Needs a claimed Last Price credential with billing write scope.
+- **Errors and cautions:** Already sent invoices answer 404; check get_invoice first. Needs a claimed Last Price credential with billing write scope.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `invoice_id` **(required)** | string | The invoice: its id, as list_invoices shows it. |
 | `to` | string | The address to send it to. Defaults to the customer's own. |
+| `post` | boolean | Follow the saved workspace auto-send preference. Does not create a draft. |
+| `issueWithoutEmail` | boolean | Issue without email, overriding both the recipient and auto-send preference. |
 
 ## `list_credits`
 
@@ -2298,15 +2439,15 @@ Create a credit bundle to sell: a name, price, billing frequency and credits (nu
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `name` **(required)** | string |  |
-| `description` | string |  |
+| `name` **(required)** | string | What buyers see, e.g. "Starter 1,000 credits". |
+| `description` | string | Optional longer text shown with the bundle. |
 | `code` | string | Unique in the workspace; cannot change later. |
 | `currency` **(required)** | string | ISO 4217 code in upper case; cannot change later. |
-| `price` **(required)** | number |  |
-| `billing_frequency` **(required)** | `monthly` / `quarterly` / `annually` / `one_time` |  |
+| `price` **(required)** | number | Price per billing period in currency, e.g. 49. |
+| `billing_frequency` **(required)** | `monthly` / `quarterly` / `annually` / `one_time` | How often the price is charged; one_time for a single purchase. |
 | `credits` **(required)** | number / null | Credits per period; null for unlimited. |
 | `rollover_credits` | number / null | Most credits that roll over; 0 for none, null for unlimited. |
-| `status` | `active` / `inactive` |  |
+| `status` | `active` / `inactive` | active puts it on sale now; inactive (the default) saves it for later. |
 
 ## `update_credit_bundle_plan`
 
@@ -2318,12 +2459,12 @@ Change a credit bundle: activate it (status active), take it off sale (inactive)
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `plan_id` **(required)** | string | The bundle id from list_credit_bundle_plans. |
-| `name` | string |  |
-| `description` | string |  |
-| `price` | number |  |
-| `credits` | number / null |  |
-| `rollover_credits` | number / null |  |
-| `status` | `active` / `inactive` / `archived` |  |
+| `name` | string | New name buyers see. |
+| `description` | string | New longer text shown with the bundle. |
+| `price` | number | New price per billing period, in the bundle currency. |
+| `credits` | number / null | Credits per period; null for unlimited. |
+| `rollover_credits` | number / null | Most credits that roll over; 0 for none, null for unlimited. |
+| `status` | `active` / `inactive` / `archived` | active puts it on sale, inactive takes it off sale, archived retires it. |
 
 ## `grant_credit_bundle_plan`
 
@@ -2334,7 +2475,7 @@ Give a customer an active credit bundle: its credits are added to their balance 
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `plan_id` **(required)** | string |  |
+| `plan_id` **(required)** | string | An active bundle id from list_credit_bundle_plans. |
 | `customer_id` **(required)** | string | One of your customers. |
 | `create_invoice` | boolean | Also create a draft invoice for the price (default true). |
 
@@ -2411,7 +2552,7 @@ Write the Last Price integration code for an app (Next.js, Express or FastAPI): 
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` |  |
+| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` | The app framework the code is written for. |
 | `agent_id` | string | One of your agents, filled into the code. |
 | `event_name` | string | The billable event the example records, like chat.completed. |
 | `customers` | boolean | Include creating customers at sign-up (default true). |
@@ -2437,7 +2578,7 @@ Open the Last Price integration code (the files generate_monetization_code write
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `repository` **(required)** | string | owner/name, like acme/agent-app; must be a repository the installation can use. |
-| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` |  |
+| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` | The app framework the code is written for. |
 | `agent_id` | string | One of your agents, filled into the code. |
 | `event_name` | string | The billable event the example records, like chat.completed. |
 | `customers` | boolean | Include creating customers at sign-up (default true). |
@@ -2457,191 +2598,3 @@ Total your workspace's priced calls over a period, this calendar month by defaul
 | :-- | :-- | :-- |
 | `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month. |
 | `end_date` | string | End of the period, ISO 8601. Defaults to now. |
-
-## `get_usage_breakdown`
-
-See your usage grouped by pricing function: calls, spend and outcomes for each function over a period. Pass start_date and end_date to choose the period, and group_by function, the only grouping there is. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
-| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
-| `group_by` | `function` | How to group. Only function is available. |
-
-## `list_usage_events`
-
-List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `function_id` | string | Only calls priced by this function. |
-| `start_date` | string | Only calls from this time on, ISO 8601. |
-| `end_date` | string | Only calls up to this time, ISO 8601. |
-| `limit` | integer | Page size. Defaults to 50. |
-| `offset` | integer | Calls to skip. Defaults to 0, at most 1000000. |
-| `buyer_agent` | `all` / `verified` | verified: only calls whose buying agent proved who it was with an AgentID token. Defaults to all. |
-
-## `get_llm_usage`
-
-See what model calls cost your workspace over a period (this month so far by default): totals, how much ran on your own provider key and how much on the platform's, and a daily series. Pass start_date and end_date to choose the period. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
-| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
-
-## `list_llm_usage_events`
-
-List the individual model calls behind get_llm_usage, newest first: what each was for, its provider and model, tokens and cost. Filter by operation and by start_date and end_date, and page with limit and offset. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `operation` | string | Only calls made for this operation. |
-| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
-| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
-| `limit` | integer | How many to return. Defaults to 50. |
-| `offset` | integer | How many to skip, for the next page. |
-
-## `get_receipt`
-
-Get the receipt for one of your workspace's priced calls, by its usage event id (the id list_usage_events returns and report_outcome takes): what was priced, by which function and agent, when, the amount, how it was paid, and the outcome if one was reported. Receipts are made only when you ask, never sent for every call. For CSV or a printable page, call GET /api/receipts/{id} with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-- **REST:** `/api/receipts/{id}`
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `usage_event_id` **(required)** | string | The priced call's usage event id, as list_usage_events returns it. |
-
-## `list_receipts`
-
-Get receipts for many of your workspace's priced calls at once, as one statement with totals: name up to 50 usage event ids, or a period (this calendar month by default, at most 366 days), optionally for one function or agent. A period statement also counts, for each agent, the value signals set up in Settings, Value receipts. Receipts are made only when you ask. For CSV or a printable page, call GET /api/receipts with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `ids` | string | Up to 50 usage event ids, comma separated. Send ids or a period, not both. |
-| `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month (UTC). |
-| `end_date` | string | End of the period, ISO 8601. Defaults to now. |
-| `function_id` | string | Only calls priced by this function. |
-| `agent_id` | string | Only calls made by this agent. A key bound to an agent always gets only its own calls. |
-| `limit` | integer | Receipts per page for a period. Defaults to 100. |
-| `offset` | integer | Receipts to skip for a period. Defaults to 0, at most 1000000. |
-
-## `browse_catalog`
-
-Browse the public marketplace catalog of pricing functions.
-
-- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** read-only
-- **REST:** `/api/functions/catalog`
-
-_No arguments._
-
-## `list_marketplace_listings`
-
-Browse the public marketplace: the pricing functions their owners listed for anyone to use, each cut to its public fields, with usage and rating. Page with limit and offset. Public: needs no credential, limited per address.
-
-- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** read-only
-- **Errors and cautions:** Public: needs no credential, limited per address.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `limit` | integer | How many to return. |
-| `offset` | integer | How many to skip, for the next page. |
-
-## `list_my_marketplace_listings`
-
-List your own marketplace listings, public or not. Page with limit and offset. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `limit` | integer | How many to return. |
-| `offset` | integer | How many to skip, for the next page. |
-
-## `create_marketplace_listing`
-
-List one of your functions on the marketplace: pass function_id, and optionally is_public (default false), commission_rate (default 0.30), min_payout_threshold (default 50) and payout_currency (default USD). A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Where payouts go is set by a person, not by this tool. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
-- **REST:** `/api/marketplace/listings`
-- **Errors and cautions:** A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Needs a claimed Last Price credential.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
-| `is_public` | boolean | List it publicly. Defaults to false. |
-| `commission_rate` | number | The share of each sale the marketplace keeps. Defaults to 0.30. |
-| `min_payout_threshold` | number | The least balance that is paid out. Defaults to 50. |
-| `payout_currency` | string | The currency payouts are made in. Defaults to USD. |
-
-## `update_marketplace_listing`
-
-Change one of your marketplace listings: pass listing_id and at least one of is_public, commission_rate and min_payout_threshold. Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** **destructive**
-- **REST:** `/api/marketplace/listings/{listingId}`
-- **Errors and cautions:** Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
-| `is_public` | boolean | Whether the listing is public. |
-| `commission_rate` | number | The share of each sale the marketplace keeps. |
-| `min_payout_threshold` | number | The least balance that is paid out. |
-
-## `delete_marketplace_listing`
-
-Remove one of your marketplace listings: pass listing_id. The function stays; it is no longer listed. Only the owner can remove a listing. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** **destructive**
-- **Errors and cautions:** Needs a claimed Last Price credential.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
-
-## `get_function_review`
-
-Read the latest marketplace review of one of your functions, from its listing: the report, whether the listing is public and the listing id. The review is null when the function has no listing or was never reviewed. Pass function_id. Only the owner can read it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
-
-## `run_function_review`
-
-Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the listing is public. Pass function_id. The sample call spends your endpoint or provider key. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Needs a claimed Last Price credential.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |

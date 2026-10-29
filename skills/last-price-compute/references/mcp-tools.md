@@ -7,11 +7,11 @@ A tool missing from your own `tools/list` is not switched on for your connection
 
 ## `compute_price`
 
-Compute a price for a product/context via the Last Price Pricing Compute Network. Returns the computed price, the function that produced it, token metering/cost, and a `trace` listing each stage the request passed through (cache, route, execute, fallback, constrain, meter). For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata, then supply min_price or unit_cost with target_margin_pct. Missing business inputs return an error naming them. Where quote expiry is switched on for the workspace, the result carries valid_until (RFC 3339): quote or charge the price only before then, and compute again after. Pass intent (the limit the buyer approved) to learn whether the price fits it.
+Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Missing business inputs return an error naming them.
+- **Errors and cautions:** Missing inputs return an error naming them.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -20,25 +20,25 @@ Compute a price for a product/context via the Last Price Pricing Compute Network
 | `current_price` | number | The current or reference price. Optional: functions that price relative to an incumbent need it, but lastprice/cost-plus prices from unit_cost instead. |
 | `unit_cost` | number | What the work costs you. It lets lastprice/cost-plus price with no current_price, which is the usual case when pricing a task you are about to run. Routing picks a function that can use it; to require cost-plus, pass its UUID from list_functions as function_id. |
 | `target_margin_pct` | number | Margin on price for cost-plus, not markup on cost: price = unit_cost / (1 - margin). Defaults to 30. |
-| `outcome_terms` | object | Optional, for a price charged per outcome. When the outcome counts as failed and what is owed then. Where outcome terms are switched on for the workspace, the result carries outcome_terms: these terms normalised, the deadline as a time, the amount owed on timeout, and which terms are missing (complete is false without success_definition, resolve_by and on_timeout). Sending it marks the price as an outcome price; so does metadata.unit "outcome". |
+| `outcome_terms` | object | Optional, for a price charged per outcome: when the outcome counts as failed and what is owed then. The result echoes the terms normalised, with complete false until success_definition, resolve_by and on_timeout are all set. |
 | `min_price` | number | Optional minimum acceptable price. A competitive offer needs this or a declared unit_cost and target_margin_pct. |
 | `max_price` | number | Optional maximum acceptable price. |
 | `currency` **(required)** | string | Three-letter ISO currency code, e.g. USD. |
 | `customer_segment` | string | Optional segment, e.g. enterprise. |
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
-| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt or agent.example.com. A label recorded with the quote only (while its release flag is on); never sent to the pricing function. |
-| `channel` | string | Optional. The sales channel the price is for, such as a shopping agent or an agent marketplace. When your workspace saved a rate for it with set_channel_rates and channel pricing is on, the price is raised so you keep the same amount after the channel's cut. |
+| `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `routing_preference` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How to route across pricing functions. Defaults to "default". |
-| `routing` | object | Optional. Which functions may answer this one call, by UUID from list_functions. A call these leave with no function is refused, naming why, before anything runs or is charged. Where routing preferences are not yet on for your workspace they are ignored. |
-| `learned_routing` | boolean | Optional. With routing_preference cheapest, fastest, round robin or weighted, let the router learn which of the functions that strategy chooses from serves your workspace best (from your own routed calls), falling back to the strategy while there is too little data. Ignored for any other preference or a function_id, and until learned routing is released for your workspace. get_learned_routing with strategy shows what it learned. |
+| `routing` | object | Optional. Which functions may answer this call, by UUID from list_functions. If none qualifies, the call is refused before any charge. |
+| `learned_routing` | boolean | Optional. With routing_preference cheapest, fastest, round_robin or weighted, let the router learn from your own calls which function serves you best (see get_learned_routing). Ignored with a function_id. |
 | `function_id` | string | Optional explicit pricing function UUID to use. |
 | `include_explanation` | boolean | If true, ask for an explanation and confidence with the price. |
 | `no_explore` | boolean | If true, give this price exactly as computed, without the small per-call variation a workspace may run so learned pricing can learn what buyers will pay (see get_price_exploration). |
-| `include_buyer_envelope` | boolean | If true, and metadata.category names a category, the result carries buyer_envelope: what buyers' own spend checks allowed in that category (p25 to p75, the median, and how often checks were refused over a limit, pooled over 5 or more buyer workspaces; no numbers below 5) and where this price sits. A limit, not a valuation: it never changes the price. Where it is not switched on for the workspace it is ignored. |
-| `metadata` | object | Optional context. For competitive pricing: competitor_price, competitor_currency and competitive_action (match or undercut); undercut requires undercut_pct. Confirm product comparability before calling. Or send market_query (the job, in plain words) instead of competitor_price: where market prices are switched on, the market is looked up first and the answer carries market_prices (low, median, high and the pages); with competitive_action and no competitor_price, the lowest market price is used to undercut and the median to match (market_reference: low, median or high chooses). |
+| `include_buyer_envelope` | boolean | If true, with metadata.category set, the result adds buyer_envelope: what buyers' spend limits allowed in that category (pooled over 5 or more buyers) and where this price sits. It never changes the price. |
+| `metadata` | object | Optional context. Competitive pricing: competitor_price, competitor_currency and competitive_action (match, or undercut with undercut_pct); confirm the products are comparable. Or market_query (the job in plain words) to look up market prices instead. |
 | `idempotency_key` | string | Optional. A new value (e.g. a UUID) for each call you mean to make; send the SAME value if you retry after a timeout or error you cannot interpret, and the call is computed and charged once. Ignored without a credential. |
-| `intent` | object | Optional. The spending limit the buyer approved, such as a card network or payment rail mandate. Where this is switched on for the workspace, the result says whether the price fits it, with the reasons when not, and a signed quote binds the same so an issuer or buyer can check it. |
+| `intent` | object | Optional. The spending limit the buyer approved, e.g. a card network mandate. The result says whether the price fits it. |
 
 ## `compute_prices_batch`
 
