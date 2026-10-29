@@ -17,7 +17,7 @@ set (`?profile=directory`), which cannot move money.
 ```bash
 gh extension install github/gh-aw
 gh aw add last-price-ai/skills/price-check
-git add .github/workflows/price-check.md .github/workflows/price-check.lock.yml
+git add .github/   # the workflow, its lock file and shared/lastprice.md
 git commit -m "Add Last Price price check" && git push
 ```
 
