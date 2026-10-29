@@ -213,6 +213,10 @@ node scripts/sync.mjs           # regenerate references/mcp-tools.md
 
 [Recipes](recipes/) cover keyed compute, marketplace publishing, experiments and Rosetta.
 
+## GitHub Agentic Workflows
+
+[`workflows/`](workflows/) has a price check for [GitHub Agentic Workflows](https://github.github.com/gh-aw/): on a pull request that changes prices, an agent checks each one with Last Price and posts one comment. Install it with `gh aw add last-price-ai/skills/price-check`, or import `workflows/shared/lastprice.md` into your own workflow. No key needed.
+
 ## Payments (not in the plugins)
 
 The plugins and the `skills/` folder leave out payments: they use the connector's directory tool set (`?profile=directory`), which has no wallet, top-up, day-pass, spend-session or payout tools. Integrators who pay per call with x402 (USDC on Base) can read [`payments/`](payments/): the [pay-per-call skill](payments/last-price-x402/SKILL.md), the [spend policy skill](payments/last-price-spend-policy/SKILL.md), the [wallet recipe](payments/01-price-with-a-wallet-x402.md) and the [TypeScript x402 client](payments/x402-safe-client/). No plugin loads them.
