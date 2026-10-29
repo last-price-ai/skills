@@ -1,0 +1,27 @@
+name: gh-aw
+
+# Compiles the GitHub Agentic Workflows in workflows/ the way `gh aw add`
+# will in a user's repository, so a broken template fails here first.
+# Nothing runs the agents; this only validates them.
+on:
+  pull_request:
+    paths: ['workflows/**', '.github/workflows/gh-aw.yml']
+  push:
+    branches: [main]
+    paths: ['workflows/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gh-aw CLI
+        uses: github/gh-aw/actions/setup-cli@main
+        with:
+          version: latest
+      - name: Compile
+        run: gh aw compile --dir workflows --strict --validate --verbose
