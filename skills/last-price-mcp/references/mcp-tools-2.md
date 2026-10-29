@@ -4,6 +4,181 @@
 
 Index: [mcp-tools.md](mcp-tools.md).
 
+## `list_usage_events`
+
+List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` | string | Only calls priced by this function. |
+| `start_date` | string | Only calls from this time on, ISO 8601. |
+| `end_date` | string | Only calls up to this time, ISO 8601. |
+| `limit` | integer | Page size. Defaults to 50. |
+| `offset` | integer | Calls to skip. Defaults to 0, at most 1000000. |
+| `buyer_agent` | `all` / `verified` | verified: only calls whose buying agent proved who it was with an AgentID token. Defaults to all. |
+
+## `get_llm_usage`
+
+See what model calls cost your workspace over a period (this month so far by default): totals, how much ran on your own provider key and how much on the platform's, and a daily series. Pass start_date and end_date to choose the period. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
+| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
+
+## `list_llm_usage_events`
+
+List the individual model calls behind get_llm_usage, newest first: what each was for, its provider and model, tokens and cost. Filter by operation and by start_date and end_date, and page with limit and offset. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `operation` | string | Only calls made for this operation. |
+| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
+| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
+| `limit` | integer | How many to return. Defaults to 50. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `get_receipt`
+
+Get the receipt for one of your workspace's priced calls, by its usage event id (the id list_usage_events returns and report_outcome takes): what was priced, by which function and agent, when, the amount, how it was paid, and the outcome if one was reported. Receipts are made only when you ask, never sent for every call. For CSV or a printable page, call GET /api/receipts/{id} with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **REST:** `/api/receipts/{id}`
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `usage_event_id` **(required)** | string | The priced call's usage event id, as list_usage_events returns it. |
+
+## `list_receipts`
+
+Get receipts for many of your workspace's priced calls at once, as one statement with totals: name up to 50 usage event ids, or a period (this calendar month by default, at most 366 days), optionally for one function or agent. A period statement also counts, for each agent, the value signals set up in Settings, Value receipts. Receipts are made only when you ask. For CSV or a printable page, call GET /api/receipts with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `ids` | string | Up to 50 usage event ids, comma separated. Send ids or a period, not both. |
+| `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month (UTC). |
+| `end_date` | string | End of the period, ISO 8601. Defaults to now. |
+| `function_id` | string | Only calls priced by this function. |
+| `agent_id` | string | Only calls made by this agent. A key bound to an agent always gets only its own calls. |
+| `limit` | integer | Receipts per page for a period. Defaults to 100. |
+| `offset` | integer | Receipts to skip for a period. Defaults to 0, at most 1000000. |
+
+## `browse_catalog`
+
+Browse the public marketplace catalog of pricing functions.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **REST:** `/api/functions/catalog`
+
+_No arguments._
+
+## `list_marketplace_listings`
+
+Browse the public marketplace: the pricing functions their owners listed for anyone to use, each cut to its public fields, with usage and rating. Page with limit and offset. Public: needs no credential, limited per address.
+
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
+- **Behaviour:** read-only
+- **Errors and cautions:** Public: needs no credential, limited per address.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | How many to return. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `list_my_marketplace_listings`
+
+List your own marketplace listings, public or not. Page with limit and offset. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `limit` | integer | How many to return. |
+| `offset` | integer | How many to skip, for the next page. |
+
+## `create_marketplace_listing`
+
+List one of your functions on the marketplace: pass function_id, and optionally is_public (default false), commission_rate (default 0.30), min_payout_threshold (default 50) and payout_currency (default USD). A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Where payouts go is set by a person, not by this tool. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **REST:** `/api/marketplace/listings`
+- **Errors and cautions:** A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+| `is_public` | boolean | List it publicly. Defaults to false. |
+| `commission_rate` | number | The share of each sale the marketplace keeps. Defaults to 0.30. |
+| `min_payout_threshold` | number | The least balance that is paid out. Defaults to 50. |
+| `payout_currency` | string | The currency payouts are made in. Defaults to USD. |
+
+## `update_marketplace_listing`
+
+Change one of your marketplace listings: pass listing_id and at least one of is_public, commission_rate and min_payout_threshold. Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/marketplace/listings/{listingId}`
+- **Errors and cautions:** Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
+| `is_public` | boolean | Whether the listing is public. |
+| `commission_rate` | number | The share of each sale the marketplace keeps. |
+| `min_payout_threshold` | number | The least balance that is paid out. |
+
+## `delete_marketplace_listing`
+
+Remove one of your marketplace listings: pass listing_id. The function stays; it is no longer listed. Only the owner can remove a listing. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
+
+## `get_function_review`
+
+Read the latest marketplace review of one of your functions, from its listing: the report, whether the listing is public and the listing id. The review is null when the function has no listing or was never reviewed. Pass function_id. Only the owner can read it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+
+## `run_function_review`
+
+Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the listing is public. Pass function_id. The sample call spends your endpoint or provider key. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** reaches outside Last Price
+- **Errors and cautions:** Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+
 ## `get_public_leaderboard`
 
 Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating. Pass window as 7d, 30d, 90d or all (default all). Public: needs no credential, limited per address.
@@ -119,6 +294,17 @@ Check a webhook signature the way Last Price signs them: pass payload (the raw b
 | `encoding` | `hex` / `base64` | How the signature is encoded. Defaults to hex. |
 | `prefix` | string | A prefix the signature carries, for example sha256=. |
 
+## `rotate_webhook_secret`
+
+Replace a webhook endpoint's signing secret and return the new one (whsec_...), once: list_webhooks shows it masked from then on. Every delivery after this is signed with the new secret and the old one stops verifying, so update your receiver straight away. Use it when the secret leaked, or when you no longer have it. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
+
 ## `list_approvals`
 
 List the actions held for approval in your workspace, newest first: what was asked, who asked (agent or key), its status (pending, approved, rejected or expired) and when it expires. status pending lists what waits for a decision; pass its id to decide_approval. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
@@ -196,6 +382,69 @@ Disconnect an app you connected by signing in: its sign-in stops working at once
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `connected_app_id` **(required)** | string | The connected app's id: id on a list_connected_apps result. |
+
+## `mint_child_key`
+
+Create a short-lived child key for a sub-agent or job, returned only once. Ask for 1 to 20 concrete scopes within your current grants; no wildcards or administration scopes. The default lifetime is five minutes; request 60 to 86400 seconds, capped by your key, token and ancestors. The child stays in this workspace with the same agent binding and quotas. Revoking or rotating an ancestor stops its descendants. Needs an API key or a current token exchanged from one; no human step. Keep the returned key secret.
+
+- **Access:** key
+- **Behaviour:** changes data
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `name` | string |  |
+| `scopes` **(required)** | array |  |
+| `expires_in_seconds` | integer |  |
+
+## `revoke_child_key`
+
+Revoke a direct child of the key this connection uses, by its key id. The child and its descendants stop working. You cannot revoke another parent's child or an unrelated workspace key. Needs an API key or a current token exchanged from one.
+
+- **Access:** key
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `key_id` **(required)** | string |  |
+
+## `get_partner_allowance`
+
+Read your workspace's partner allowance: whether it is a partner (one allowed to open managed workspaces for other people's businesses), its daily allowance, how many workspaces it opened in the last 24 hours and how many remain today, how many it opened in all and how many their owners claimed. A workspace that is not a partner gets partner null and how_to_join. Only where partner workspaces are switched on (else an error with code not_released). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where partner workspaces are switched on (else an error with code not_released).
+
+_No arguments._
+
+## `list_partner_workspaces`
+
+List the workspaces your partner workspace opened for other people's businesses, newest first: each one's name, when it was opened, and whether its owner has claimed it, whether you still manage it, or whether you were let go. status narrows the list (waiting, claimed, managing, released), q searches the names, and before (the oldest opened_at you already have) pages back. Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `all` / `waiting` / `claimed` / `managing` / `released` | Which workspaces: all (the default), waiting for their owner, claimed, still managed by you, or released. |
+| `q` | string | Search the workspace names. |
+| `limit` | integer | How many to return, 1 to 200 (default 50). |
+| `before` | string | Only workspaces opened before this time: the oldest opened_at of the page you have. |
+
+## `create_partner_workspace`
+
+Open a managed workspace for someone's business from your partner workspace: an ordinary production workspace that can take offers, orders and customers at once, owned by an agent until the business owner claims it. The answer carries, once each and never again, your management key in the new workspace (api_key.key: full access, no expiry) and the claim link for the owner (claim.claim_url: works once, for 90 days). Keep the key and send the claim link only to the owner. Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `name` **(required)** | string | The business's name. |
+| `contact_email` | string | The owner's email, if they gave one. Never used to send anything. |
+| `intended_use` | string | What the business does. |
 
 ## `list_aitune_backends`
 
@@ -515,6 +764,124 @@ Take the seller's standing counter: the negotiation closes as accepted at that p
 | `handle` **(required)** | string | The seller's public handle, from the terms they publish. |
 | `negotiation_id` **(required)** | string | The negotiation id from the first answer. |
 | `buyer_token` **(required)** | string | The buyer token the first answer gave you, once. Keep it: it is the only way back into the negotiation. |
+
+## `fill_handover_sheet`
+
+Handover, step 1: while you talk with someone about the business they would like to own (a driver, a stall, a barber), send the conversation so far as transcript and the sheet as it stands, and get the sheet back filled from what they said (their name, WhatsApp, what they sell, prices, country, currency), with the fields still missing. A language model fills it where the deployment has one, plain rules otherwise (filled_by). Nothing is saved. Record a conversation only after the person said yes to it. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `transcript` **(required)** | string | The conversation so far, as text. |
+| `sheet` | object | The sheet as it stands, as the last call returned it; leave out on the first call. |
+
+## `create_handover_business`
+
+Handover, step 2: start a business from a brief (the sheet fill_handover_sheet returned, completed) and the person's consent (when you asked and the words they said yes with). Answers with a draft page proposed from the brief: a look for the trade, items with prices, a floor at 85% on items they will haggle on, and the licence notes for their trade and country. Check every line with the owner, then update_handover_business and publish_handover_business. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `brief` **(required)** | object | What the owner told you, checked with them. |
+| `consent` **(required)** | object | The person's yes to being recorded and to the business: when you asked and their words. |
+
+## `update_handover_business`
+
+Change a Handover business's page with its owner: name, tagline, about, look, items (the whole list, replaced), and licences_confirmed once the owner holds the licences the notes name or will before selling. Only the fields you send change. monthly_fee changes the fee after the free months on a live business only (a draft answers not_live). Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+| `name` | string | The business's name. |
+| `tagline` | string | One line under the name. |
+| `about` | string | A paragraph about the business. |
+| `look` | `market` / `night` / `sun` | The page's look. |
+| `items` | array | Every item on the page, replacing the list. |
+| `licences_confirmed` | boolean | true once the owner holds the licences the notes name, or will before selling. |
+| `monthly_fee` | number | The monthly fee after the 90 free days, in the business's currency. Live businesses only. |
+
+## `publish_handover_business`
+
+Handover, step 3: put a draft business live and hand it over. It opens the business its own Last Price workspace (one of the deployment partner's daily allowance), records the plan (90 days free, then the monthly fee for its market, priced through Last Price), lists its items and opens the haggle items to offers under the business's own handle. A trade that needs a licence is refused (licences_unconfirmed) until you confirm its licences with update_handover_business; a business already live answers not_draft. Then get_handover_pack. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** A trade that needs a licence is refused (licences_unconfirmed) until you confirm its licences with update_handover_business; a business already live answers not_draft. Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+## `get_handover_pack`
+
+Handover, step 4: what you leave the owner with: the page address and its QR code (SVG, to print), the claim link while it can still be used (it makes them the owner: send it only to them), the handover message with the free months and the monthly fee, and a WhatsApp link that sends it. Live businesses only. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+## `list_handover_businesses`
+
+List the businesses your workspace built with Handover, newest first: each one's name, owner, page address, whether it is a draft or live, and its plan (90 days free, then the monthly fee). Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+_No arguments._
+
+## `get_handover_business`
+
+Read one Handover business: the brief, the page (name, words, look, items and prices, floors on items open to offers), the licence check, the consent that was recorded, and its plan once live. The management key and claim link are never returned here: use get_handover_pack. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+## `get_handover_page`
+
+Read a live Handover business by the address of its page (/b/<slug>), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
+
+- **Access:** key
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+
+## `order_from_handover_business`
+
+Order from a live Handover business with no credential: a name, the items by id from get_handover_page with quantities, and optionally when and a note. Prices are the page's. For an item you agreed a price on with make_offer, add it to agreed with its negotiation_id and buyer_token: the agreed price is used only when that negotiation says it was accepted (else offer_not_agreed). The order is recorded on the business's own workspace; the answer carries its reference, the total and a WhatsApp link that sends it to the owner. 10 orders a minute per address.
+
+- **Access:** key
+- **Behaviour:** changes data
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+| `name` **(required)** | string | The name the owner sees on the order. |
+| `items` **(required)** | array | What to order. |
+| `when` | string | When it is wanted, in plain words. |
+| `note` | string | Anything the owner should know. |
+| `agreed` | array | Items you agreed a price on with make_offer. |
 
 ## `get_ucp_profile`
 

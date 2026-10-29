@@ -4,7 +4,7 @@ description: Use when subscribing to last-price.ai events with outbound webhooks
 ---
 # Last Price: outbound webhooks and signature verification
 
-MCP equivalents: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `ping_webhook`, `list_webhook_deliveries`, `verify_webhook_signature`. Re-check OpenAPI when the event list matters; it grows.
+MCP equivalents: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `ping_webhook`, `list_webhook_deliveries`, `verify_webhook_signature`, `rotate_webhook_secret`. Re-check OpenAPI when the event list matters; it grows.
 
 ## Who can call what
 

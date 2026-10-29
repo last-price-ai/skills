@@ -56,6 +56,9 @@
  "check_agent_readiness": [
   "url"
  ],
+ "check_commerce_connector": [
+  "connector_id"
+ ],
  "check_variant_significance": [
   "variants"
  ],
@@ -121,6 +124,10 @@
   "display_name",
   "execution_type"
  ],
+ "create_handover_business": [
+  "brief",
+  "consent"
+ ],
  "create_hosted_model": [
   "name",
   "kind"
@@ -134,6 +141,9 @@
  ],
  "create_order": [
   "customer_id"
+ ],
+ "create_partner_workspace": [
+  "name"
  ],
  "create_payment": [
   "customer_id",
@@ -186,6 +196,9 @@
  "delete_customer": [
   "customer_id"
  ],
+ "delete_experiment": [
+  "experiment_key"
+ ],
  "delete_feature_contract": [],
  "delete_function": [
   "function_id"
@@ -223,6 +236,9 @@
   "countries"
  ],
  "execute_commerce_proposals": [],
+ "fill_handover_sheet": [
+  "transcript"
+ ],
  "freeze_rosetta_adapter": [
   "plan"
  ],
@@ -310,6 +326,15 @@
   "function_id"
  ],
  "get_github_app_connection": [],
+ "get_handover_business": [
+  "business_id"
+ ],
+ "get_handover_pack": [
+  "business_id"
+ ],
+ "get_handover_page": [
+  "slug"
+ ],
  "get_hosted_model": [
   "model_id"
  ],
@@ -337,6 +362,7 @@
  "get_order": [
   "order_id"
  ],
+ "get_partner_allowance": [],
  "get_payment": [
   "payment_id"
  ],
@@ -344,6 +370,7 @@
   "check_id"
  ],
  "get_price_exploration": [],
+ "get_price_foundation_report": [],
  "get_price_guardrails": [],
  "get_pricing_analysis": [],
  "get_prompt_class_benchmarks": [],
@@ -412,6 +439,7 @@
  ],
  "list_experiments": [],
  "list_functions": [],
+ "list_handover_businesses": [],
  "list_hosted_demos": [],
  "list_hosted_models": [],
  "list_integrations": [],
@@ -426,11 +454,13 @@
   "order_id"
  ],
  "list_orders": [],
+ "list_partner_workspaces": [],
  "list_payments": [],
  "list_price_checks": [],
  "list_pricing_pipelines": [],
  "list_product_categories": [],
  "list_receipts": [],
+ "list_rosetta_adapters": [],
  "list_rosetta_review": [],
  "list_routing_policies": [],
  "list_scrape_job_runs": [
@@ -459,6 +489,9 @@
   "product_id",
   "offered_price"
  ],
+ "mint_child_key": [
+  "scopes"
+ ],
  "negotiate_stop": [
   "context"
  ],
@@ -469,6 +502,11 @@
  "open_monetization_pull_request": [
   "repository",
   "framework"
+ ],
+ "order_from_handover_business": [
+  "slug",
+  "name",
+  "items"
  ],
  "ping_webhook": [
   "webhook_id"
@@ -485,6 +523,7 @@
   "product_id",
   "offered_price"
  ],
+ "preview_price_change": [],
  "preview_scrape_job": [
   "url",
   "price_selector"
@@ -495,6 +534,9 @@
   "experiment_key",
   "variant"
  ],
+ "promote_forge_candidate": [
+  "candidate_id"
+ ],
  "promote_hosted_model_version": [
   "model_id",
   "version"
@@ -502,6 +544,9 @@
  "propose_experiment_variant": [
   "experiment_key",
   "price"
+ ],
+ "publish_handover_business": [
+  "business_id"
  ],
  "query_jale_pool": [],
  "quote_storefront_domain": [
@@ -533,6 +578,9 @@
  "reject_forge_candidate": [
   "candidate_id"
  ],
+ "remove_experiment_conversions": [
+  "experiment_key"
+ ],
  "remove_offer_product": [
   "product_id"
  ],
@@ -551,8 +599,20 @@
  "report_problem": [
   "reason"
  ],
+ "retire_forge_candidate": [
+  "candidate_id"
+ ],
+ "revoke_child_key": [
+  "key_id"
+ ],
+ "revoke_rosetta_adapter": [
+  "adapter_id"
+ ],
  "rollback_hosted_model": [
   "model_id"
+ ],
+ "rotate_webhook_secret": [
+  "webhook_id"
  ],
  "run_agent_behaviour_tests": [
   "agent_id"
@@ -596,6 +656,10 @@
  "set_experiment_bandit": [
   "experiment_key",
   "bandit_enabled"
+ ],
+ "set_experiment_status": [
+  "experiment_key",
+  "status"
  ],
  "set_feature_contract": [
   "contract"
@@ -672,6 +736,9 @@
  ],
  "update_function": [
   "function_id"
+ ],
+ "update_handover_business": [
+  "business_id"
  ],
  "update_invoice": [
   "invoice_id"

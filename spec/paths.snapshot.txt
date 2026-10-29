@@ -1,4 +1,5 @@
 DELETE /api/agents/{id}
+DELETE /api/api-keys/children/{keyId}
 DELETE /api/api-keys/{keyId}
 DELETE /api/blocks/{blockId}
 DELETE /api/commerce/observations/{id}
@@ -65,6 +66,8 @@ GET /agents.json
 GET /api/agent-protocol
 GET /api/agents
 GET /api/agents/allowance
+GET /api/agents/recover
+GET /api/agents/upgrade
 GET /api/agents/wallet
 GET /api/agents/workspaces
 GET /api/agents/{id}
@@ -187,6 +190,7 @@ GET /api/partner/workspaces
 GET /api/payments
 GET /api/payments/{paymentId}
 GET /api/payouts/account
+GET /api/price-foundation
 GET /api/price-guardrails
 GET /api/price-router
 GET /api/price-router/checks
@@ -198,6 +202,7 @@ GET /api/pricing-analyst/brief
 GET /api/pricing-analyst/findings
 GET /api/pricing-analyst/settings
 GET /api/pricing-models
+GET /api/pricing/preview
 GET /api/product-categories
 GET /api/public/agent-feed
 GET /api/public/changelog
@@ -284,6 +289,7 @@ GET /api/workspaces/{workspaceId}/team
 GET /api/workspaces/{workspaceId}/tester-tag
 GET /ask
 GET /llms.txt
+GET /q/{token}
 PATCH /api/agents/{id}
 PATCH /api/billing/balance
 PATCH /api/commerce/connectors/{id}
@@ -321,7 +327,9 @@ POST /api/agents/chat/negotiator
 POST /api/agents/claim
 POST /api/agents/estimate-task
 POST /api/agents/generate
+POST /api/agents/recover
 POST /api/agents/register
+POST /api/agents/upgrade
 POST /api/agents/workspaces
 POST /api/agents/{id}/behaviour-tests
 POST /api/agents/{id}/behaviour-tests/{runId}/cancel
@@ -330,6 +338,7 @@ POST /api/agents/{id}/keys
 POST /api/alerts/learned-pricing/unsubscribe
 POST /api/alerts/unsubscribe
 POST /api/api-keys
+POST /api/api-keys/children
 POST /api/api-keys/rotate
 POST /api/approvals/{id}/apply
 POST /api/approvals/{id}/approve
@@ -343,6 +352,7 @@ POST /api/blocks
 POST /api/blocks/generate
 POST /api/cloudinary/sign-upload
 POST /api/commerce/connectors
+POST /api/commerce/connectors/{id}/check
 POST /api/commerce/connectors/{id}/orders/sync
 POST /api/commerce/connectors/{id}/sync
 POST /api/commerce/cycle
@@ -450,6 +460,7 @@ POST /api/price-router/tag
 POST /api/price-router/verify
 POST /api/pricing-analyst/ask
 POST /api/pricing-models
+POST /api/pricing/preview
 POST /api/problem-reports
 POST /api/public/agent-ready-check
 POST /api/public/compute/demo
@@ -461,9 +472,11 @@ POST /api/public/market-prices
 POST /api/public/pipelines
 POST /api/public/price-check
 POST /api/public/price-router/verify
+POST /api/public/product-prices
 POST /api/public/storefronts/{ref}/mcp
 POST /api/public/webhook-verify
 POST /api/quotes/verify
+POST /api/receipts/verify
 POST /api/rosetta/freeze
 POST /api/rosetta/ingest
 POST /api/rosetta/normalize

@@ -4,7 +4,7 @@ description: Use when closing the last-price.ai pricing feedback loop - reportin
 ---
 # Last Price: the learning loop
 
-Last Price gets smarter per workspace only when quotes get outcomes: **quote -> outcome -> nightly elasticity fit -> analyst findings -> learned pricing on -> re-quote**. Every endpoint here is 401 without a credential. MCP equivalents include `report_outcome`, `get_pricing_analysis`, `get_analyst_brief`, `ask_pricing_analyst`, `get_learned_pricing`, `set_learned_pricing`, `list_learned_price_changes`, `decide_learned_price_change`, `get_price_exploration`, `set_price_exploration`, `recommend_jale_price` (see `last-price-mcp`).
+Last Price gets smarter per workspace only when quotes get outcomes: **quote -> outcome -> nightly elasticity fit -> analyst findings -> learned pricing on -> re-quote**. Every endpoint here is 401 without a credential. MCP equivalents include `report_outcome`, `get_pricing_analysis`, `get_analyst_brief`, `ask_pricing_analyst`, `get_learned_pricing`, `set_learned_pricing`, `list_learned_price_changes`, `decide_learned_price_change`, `get_price_exploration`, `set_price_exploration`, `recommend_jale_price`, `get_price_foundation_report`, `get_forge_status`, `promote_forge_candidate`, `retire_forge_candidate` (see `last-price-mcp`).
 
 ## Endpoints
 
@@ -51,6 +51,7 @@ Last Price gets smarter per workspace only when quotes get outcomes: **quote -> 
 3. **Turn learning on:** only when findings say an estimate is ready. Prefer `{"enabled":true,"apply_mode":"approve"}` first; then review `/changes` and approve. Re-quote one product without `metadata.elasticity` and confirm the explanation names the learned estimate. Revert with `{"enabled":false}`.
 4. **Experiment optimize:** POST optimize with the user's objective; report `recommendedPrice`, `confidence`, `data_status`, and the simulation table as a recommendation, not an applied price.
 5. **Data exchange:** contribute only public prices with a real `sourceUrl`; check token balance before pool reads.
+6. **Shadow models:** `get_price_foundation_report` (`GET /api/price-foundation`) shows what the shadow ML pricing mix learned last night; it only logs and never changes a price. A Forge model that passed shadow pricing shows as promotable in `get_forge_status`; `promote_forge_candidate` puts it on live learned prices (inside the charged range widened by 10%, never below unit cost) and `retire_forge_candidate` stops it, which works even while promotion is off. Promote only after the user agrees.
 
 ## Guardrails
 

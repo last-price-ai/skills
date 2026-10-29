@@ -115,3 +115,30 @@ List the canonical schemas the Rosetta translator maps any vendor's data onto: p
 - **REST:** `/api/rosetta/canonical-schemas`
 
 _No arguments._
+
+## `list_rosetta_adapters`
+
+List the workspace's Rosetta adapters, newest first: each one's id, status (active, superseded or revoked), canonical target, shape fingerprint, mappings, confidence, merchant_id and when it was frozen or replaced. An active adapter is what ingest_with_rosetta answers from for that merchant and payload shape. Pass status, canonical_target, merchant_id or limit (1 to 500, default 100) to narrow it. Read-only. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `active` / `superseded` / `revoked` | Only adapters with this status. |
+| `canonical_target` | string | Only adapters for this canonical schema, e.g. canonical-offer. |
+| `merchant_id` | string | Only adapters for this merchant_id, as ingest_with_rosetta was given it. |
+| `limit` | integer | How many to return. Defaults to 100. |
+
+## `revoke_rosetta_adapter`
+
+Revoke one Rosetta adapter by adapter_id from list_rosetta_adapters, so ingest_with_rosetta stops answering from it: the next payload of that shape plans a new mapping, which may be queued for review. Revoking cannot be undone; an adapter already revoked answers 409 and an unknown id 404. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Revoking cannot be undone; an adapter already revoked answers 409 and an unknown id 404. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `adapter_id` **(required)** | string | The adapter id, as list_rosetta_adapters gives it. |

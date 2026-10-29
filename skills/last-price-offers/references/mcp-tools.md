@@ -198,3 +198,121 @@ Decide whether one more round of a negotiation is worth what it costs (the optim
 | :-- | :-- | :-- |
 | `context` **(required)** | object | The negotiation, as POST /api/negotiate/stop takes it. |
 | `options` | object | fairness_mode (default false) caps your rounds at the counterparty's smaller horizon. |
+
+## `fill_handover_sheet`
+
+Handover, step 1: while you talk with someone about the business they would like to own (a driver, a stall, a barber), send the conversation so far as transcript and the sheet as it stands, and get the sheet back filled from what they said (their name, WhatsApp, what they sell, prices, country, currency), with the fields still missing. A language model fills it where the deployment has one, plain rules otherwise (filled_by). Nothing is saved. Record a conversation only after the person said yes to it. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `transcript` **(required)** | string | The conversation so far, as text. |
+| `sheet` | object | The sheet as it stands, as the last call returned it; leave out on the first call. |
+
+## `create_handover_business`
+
+Handover, step 2: start a business from a brief (the sheet fill_handover_sheet returned, completed) and the person's consent (when you asked and the words they said yes with). Answers with a draft page proposed from the brief: a look for the trade, items with prices, a floor at 85% on items they will haggle on, and the licence notes for their trade and country. Check every line with the owner, then update_handover_business and publish_handover_business. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `brief` **(required)** | object | What the owner told you, checked with them. |
+| `consent` **(required)** | object | The person's yes to being recorded and to the business: when you asked and their words. |
+
+## `update_handover_business`
+
+Change a Handover business's page with its owner: name, tagline, about, look, items (the whole list, replaced), and licences_confirmed once the owner holds the licences the notes name or will before selling. Only the fields you send change. monthly_fee changes the fee after the free months on a live business only (a draft answers not_live). Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+| `name` | string | The business's name. |
+| `tagline` | string | One line under the name. |
+| `about` | string | A paragraph about the business. |
+| `look` | `market` / `night` / `sun` | The page's look. |
+| `items` | array | Every item on the page, replacing the list. |
+| `licences_confirmed` | boolean | true once the owner holds the licences the notes name, or will before selling. |
+| `monthly_fee` | number | The monthly fee after the 90 free days, in the business's currency. Live businesses only. |
+
+## `publish_handover_business`
+
+Handover, step 3: put a draft business live and hand it over. It opens the business its own Last Price workspace (one of the deployment partner's daily allowance), records the plan (90 days free, then the monthly fee for its market, priced through Last Price), lists its items and opens the haggle items to offers under the business's own handle. A trade that needs a licence is refused (licences_unconfirmed) until you confirm its licences with update_handover_business; a business already live answers not_draft. Then get_handover_pack. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** A trade that needs a licence is refused (licences_unconfirmed) until you confirm its licences with update_handover_business; a business already live answers not_draft. Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+## `get_handover_pack`
+
+Handover, step 4: what you leave the owner with: the page address and its QR code (SVG, to print), the claim link while it can still be used (it makes them the owner: send it only to them), the handover message with the free months and the monthly fee, and a WhatsApp link that sends it. Live businesses only. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+## `list_handover_businesses`
+
+List the businesses your workspace built with Handover, newest first: each one's name, owner, page address, whether it is a draft or live, and its plan (90 days free, then the monthly fee). Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+_No arguments._
+
+## `get_handover_business`
+
+Read one Handover business: the brief, the page (name, words, look, items and prices, floors on items open to offers), the licence check, the consent that was recorded, and its plan once live. The management key and claim link are never returned here: use get_handover_pack. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+## `get_handover_page`
+
+Read a live Handover business by the address of its page (/b/<slug>), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
+
+- **Access:** key
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+
+## `order_from_handover_business`
+
+Order from a live Handover business with no credential: a name, the items by id from get_handover_page with quantities, and optionally when and a note. Prices are the page's. For an item you agreed a price on with make_offer, add it to agreed with its negotiation_id and buyer_token: the agreed price is used only when that negotiation says it was accepted (else offer_not_agreed). The order is recorded on the business's own workspace; the answer carries its reference, the total and a WhatsApp link that sends it to the owner. 10 orders a minute per address.
+
+- **Access:** key
+- **Behaviour:** changes data
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+| `name` **(required)** | string | The name the owner sees on the order. |
+| `items` **(required)** | array | What to order. |
+| `when` | string | When it is wanted, in plain words. |
+| `note` | string | Anything the owner should know. |
+| `agreed` | array | Items you agreed a price on with make_offer. |

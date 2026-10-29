@@ -5,6 +5,30 @@
 Every tool below is on the Last Price MCP server (`https://api.last-price.ai/api/mcp/rpc?profile=directory`).
 A tool missing from your own `tools/list` is not switched on for your connection yet.
 
+## `mint_child_key`
+
+Create a short-lived child key for a sub-agent or job, returned only once. Ask for 1 to 20 concrete scopes within your current grants; no wildcards or administration scopes. The default lifetime is five minutes; request 60 to 86400 seconds, capped by your key, token and ancestors. The child stays in this workspace with the same agent binding and quotas. Revoking or rotating an ancestor stops its descendants. Needs an API key or a current token exchanged from one; no human step. Keep the returned key secret.
+
+- **Access:** key
+- **Behaviour:** changes data
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `name` | string |  |
+| `scopes` **(required)** | array |  |
+| `expires_in_seconds` | integer |  |
+
+## `revoke_child_key`
+
+Revoke a direct child of the key this connection uses, by its key id. The child and its descendants stop working. You cannot revoke another parent's child or an unrelated workspace key. Needs an API key or a current token exchanged from one.
+
+- **Access:** key
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `key_id` **(required)** | string |  |
+
 ## `archive_notifications`
 
 Archive notifications for this reader only (your agent, or your key): pass ids, each an item id as list_notifications returns it (at most 100), or all: true to archive everything created up to archive_through (default now). An archived item leaves your list and never counts as unread; list_notifications with view archived shows it, and unarchive_notifications moves it back. Ids that are not in your feed are listed as not found. Answers 404 (not released) until notification archive is switched on for your workspace. Needs a Last Price credential with notifications write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
@@ -68,6 +92,45 @@ List the agent workspaces under yours, newest first: the children your agents cr
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `limit` | integer | Most workspaces to return. Defaults to 50. |
+
+## `get_partner_allowance`
+
+Read your workspace's partner allowance: whether it is a partner (one allowed to open managed workspaces for other people's businesses), its daily allowance, how many workspaces it opened in the last 24 hours and how many remain today, how many it opened in all and how many their owners claimed. A workspace that is not a partner gets partner null and how_to_join. Only where partner workspaces are switched on (else an error with code not_released). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only where partner workspaces are switched on (else an error with code not_released).
+
+_No arguments._
+
+## `create_partner_workspace`
+
+Open a managed workspace for someone's business from your partner workspace: an ordinary production workspace that can take offers, orders and customers at once, owned by an agent until the business owner claims it. The answer carries, once each and never again, your management key in the new workspace (api_key.key: full access, no expiry) and the claim link for the owner (claim.claim_url: works once, for 90 days). Keep the key and send the claim link only to the owner. Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **Errors and cautions:** Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `name` **(required)** | string | The business's name. |
+| `contact_email` | string | The owner's email, if they gave one. Never used to send anything. |
+| `intended_use` | string | What the business does. |
+
+## `list_partner_workspaces`
+
+List the workspaces your partner workspace opened for other people's businesses, newest first: each one's name, when it was opened, and whether its owner has claimed it, whether you still manage it, or whether you were let go. status narrows the list (waiting, claimed, managing, released), q searches the names, and before (the oldest opened_at you already have) pages back. Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+- **Errors and cautions:** Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `all` / `waiting` / `claimed` / `managing` / `released` | Which workspaces: all (the default), waiting for their owner, claimed, still managed by you, or released. |
+| `q` | string | Search the workspace names. |
+| `limit` | integer | How many to return, 1 to 200 (default 50). |
+| `before` | string | Only workspaces opened before this time: the oldest opened_at of the page you have. |
 
 ## `list_account_sessions`
 

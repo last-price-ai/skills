@@ -140,3 +140,51 @@ Ask Jale for the price to run next in one of your experiments: it simulates each
 | `objective` | `revenue` / `conversion` / `profit` / `market_share` | What to optimise for. Defaults to revenue. |
 | `candidates` | array | The prices to compare. Otherwise a grid is chosen. |
 | `lookback_days` | integer | How many days of results to learn from. |
+
+## `get_price_foundation_report`
+
+Read what the shadow ML pricing mix learned last night from your workspace's outcomes. On every learned quote it logs the price it would have set and each expert's chance of a sale, and never changes the price. Shows the outcomes it learned from, the groups it added to its vocabulary (a category, way of charging or kind of buyer it had no name for) with the replay evidence that kept each, proposals it turned down, and how its logged answers scored against what buyers did (log loss per expert and for the mix, lower is better). Answers released: false while it is not switched on for your workspace. Read only. Needs a Last Price credential with routing read scope.
+
+- **Access:** key, routing read scope
+- **Behaviour:** read-only
+- **Errors and cautions:** Answers released: false while it is not switched on for your workspace.
+
+_No arguments._
+
+## `get_forge_status`
+
+Read Forge for your workspace: the pricing models the nightly job trained on your own reported quotes (for the workspace and its busiest products, the model and data window it chose and how often the market drifted), each with the rung it reached on the promotion ladder (bench, replay on your logged quotes, then shadow pricing on new live quotes) and every gate's evidence. A model in shadow shows how many live quotes it has priced and when it will be judged; a promoted one, the quotes it has priced and its current watch window; promotable marks the one promote_forge_candidate takes. Also the recent runs, and the pricing experts the self-recoding coder wrote and tested on the test bench, without their source. Reading changes nothing. Not available until Forge is switched on for your workspace. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `stage` | `proposed` / `sandboxed` / `bench` / `replay` / `shadow` / `promoted` / `rejected` / `retired` | Only candidates at this rung, e.g. replay. |
+| `loop` | `self_training` / `self_recoding` | Only candidates from this loop. |
+| `limit` | integer | Most candidates to return. Defaults to 50. |
+
+## `promote_forge_candidate`
+
+Put one of your workspace's Forge models on live prices: the newest model that passed shadow pricing for its product (promotable in get_forge_status) prices that product's live quotes from now on (a workspace-wide model: every product without its own), and the model it replaces stops. It prices only learned and optimizer prices, never a price you fixed, a channel price or a pricing chain stage; it stays inside the range your quotes were charged at widened by 10% and never below unit cost, then your limits and guardrails apply. It retrains each night, and a watch retires it if your learned price would clearly have earned more. Any other candidate is refused. Not available until Forge promotion is switched on for your workspace. Needs a Last Price credential with routing write scope; from the dashboard, an owner or admin. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Any other candidate is refused.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `candidate_id` **(required)** | string | The candidate id, as get_forge_status gives it. |
+
+## `retire_forge_candidate`
+
+Stop one of your workspace's promoted Forge models pricing live quotes: your learned price prices them again, and the model keeps its evidence, with your reason added. candidate_id is a promoted model from get_forge_status; any other is refused. Works even while Forge promotion is off, so a promoted model can always be stopped. Needs a Last Price credential with routing write scope; from the dashboard, an owner or admin. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** candidate_id is a promoted model from get_forge_status; any other is refused.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `candidate_id` **(required)** | string | The candidate id, as get_forge_status gives it. |
+| `reason` | string | Why, kept with its evidence; not blank. |

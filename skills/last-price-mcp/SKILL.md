@@ -18,23 +18,23 @@ description: Use when the Last Price MCP connector is available and the task is 
 
 **Functions and routing**
 - `list_functions`, `get_function`, `create_function`, `update_function`, `delete_function`, `test_function`, `get_function_health`, `run_function_health_probe`.
-- `list_routing_policies`, `get_routing_policy`, `create_routing_policy`, `update_routing_policy`, `delete_routing_policy`, `get_learned_routing`, `get_prompt_class_benchmarks`, `list_pricing_pipelines`, `list_vendor_adapters`.
+- `list_routing_policies`, `get_routing_policy`, `create_routing_policy`, `update_routing_policy`, `delete_routing_policy`, `get_learned_routing`, `get_prompt_class_benchmarks`, `list_pricing_pipelines`, `list_vendor_adapters`, `preview_price_change` (replays a price change on past calls; changes nothing).
 - Guardrails: `get_price_guardrails`, `set_price_guardrails` (replaces the whole set), `delete_price_guardrails`. Channel rates: `get_channel_rates`, `set_channel_rates`.
 
 **Experiments**
-- `list_experiments`, `create_experiment`, `get_experiment_definition`, `get_experiment_results`, `get_experiment_stopping`, `set_experiment_bandit`, `propose_experiment_variant`, `check_variant_significance`, `allocate_variant_traffic`, `recommend_jale_price`.
+- `list_experiments`, `create_experiment`, `get_experiment_definition`, `get_experiment_results`, `get_experiment_stopping`, `set_experiment_bandit`, `propose_experiment_variant`, `check_variant_significance`, `allocate_variant_traffic`, `recommend_jale_price`, `set_experiment_status`, `delete_experiment`, `remove_experiment_conversions`.
 
 **Learning loop and analyst**
 - `get_pricing_analysis` (free findings), `get_analyst_brief`, `ask_pricing_analyst`, `get_analyst_settings`, `set_analyst_settings`, `apply_analyst_proposal`.
 - `get_learned_pricing`, `set_learned_pricing`, `get_learned_elasticity_curve`, `list_learned_price_changes`, `decide_learned_price_change`, `get_price_exploration`, `set_price_exploration`.
-- Buyer-aware and hosted models: `get_buyer_aware_pricing`, `set_buyer_aware_pricing`, `get_feature_contract`, `set_feature_contract`, `infer_feature_contract`, `delete_feature_contract`, `list_hosted_models`, `create_hosted_model`, `get_hosted_model`, `train_hosted_model`, `upload_hosted_model_version`, `predict_with_hosted_model`, `promote_hosted_model_version`, `rollback_hosted_model`, `get_forge_status`, `reject_forge_candidate`, `get_frontier_model`, `suggest_frontier_price`, `list_product_categories`, `set_product_category`.
+- Buyer-aware and hosted models: `get_buyer_aware_pricing`, `set_buyer_aware_pricing`, `get_feature_contract`, `set_feature_contract`, `infer_feature_contract`, `delete_feature_contract`, `list_hosted_models`, `create_hosted_model`, `get_hosted_model`, `train_hosted_model`, `upload_hosted_model_version`, `predict_with_hosted_model`, `promote_hosted_model_version`, `rollback_hosted_model`, `get_forge_status`, `reject_forge_candidate`, `promote_forge_candidate` (changes live prices), `retire_forge_candidate`, `get_price_foundation_report`, `get_frontier_model`, `suggest_frontier_price`, `list_product_categories`, `set_product_category`.
 - Data exchange: `contribute_price_data`, `contribute_price_data_batch`, `list_jale_contributions`, `get_jale_token_balance`, `query_jale_pool` (each query spends tokens).
 
 **Rosetta**
-- `get_rosetta_health`, `list_canonical_schemas` (both public), `ingest_with_rosetta`, `plan_rosetta_mapping`, `translate_with_rosetta`, `freeze_rosetta_adapter`, `normalize_with_rosetta`, `list_rosetta_review`, `decide_rosetta_review`.
+- `get_rosetta_health`, `list_canonical_schemas` (both public), `ingest_with_rosetta`, `plan_rosetta_mapping`, `translate_with_rosetta`, `freeze_rosetta_adapter`, `normalize_with_rosetta`, `list_rosetta_review`, `decide_rosetta_review`, `list_rosetta_adapters`, `revoke_rosetta_adapter`.
 
 **Commerce pipeline**
-- `list_commerce_connectors`, `create_commerce_connector`, `set_commerce_connector_active`, `sync_commerce_connector`, `sync_commerce_orders`, `list_commerce_catalog`, `list_commerce_observations`, `add_commerce_observation`, `list_commerce_policies`, `get_commerce_policy`, `create_commerce_policy`, `update_commerce_policy`, `delete_commerce_policy`, `test_commerce_policy`, `run_commerce_cycle`, `list_commerce_proposals`, `approve_commerce_proposal`, `reject_commerce_proposal`, `execute_commerce_proposals` (changes live store prices), `list_commerce_audit_events`, `seed_commerce_sample`.
+- `list_commerce_connectors`, `create_commerce_connector`, `check_commerce_connector` (tries a store, stores nothing), `set_commerce_connector_active`, `sync_commerce_connector`, `sync_commerce_orders`, `list_commerce_catalog`, `list_commerce_observations`, `add_commerce_observation`, `list_commerce_policies`, `get_commerce_policy`, `create_commerce_policy`, `update_commerce_policy`, `delete_commerce_policy`, `test_commerce_policy`, `run_commerce_cycle`, `list_commerce_proposals`, `approve_commerce_proposal`, `reject_commerce_proposal`, `execute_commerce_proposals` (changes live store prices), `list_commerce_audit_events`, `seed_commerce_sample`.
 - Hosted price scraping (501 `hosted_scraping_not_enabled` until its release flag is on for the workspace): `preview_scrape_job` (try selectors, stores nothing), `create_scrape_job`, `list_scrape_jobs`, `update_scrape_job` (`enabled: false` pauses), `run_scrape_job`, `list_scrape_job_runs`, `delete_scrape_job` (also deletes run history).
 
 **Order to cash**
@@ -49,16 +49,17 @@ description: Use when the Last Price MCP connector is available and the task is 
 - `browse_catalog`, `list_marketplace_listings` (public), `list_my_marketplace_listings`, `create_marketplace_listing`, `update_marketplace_listing`, `delete_marketplace_listing`, `get_function_review`, `run_function_review`, `get_public_leaderboard`, `get_marketplace_earnings`.
 
 **Webhooks, notifications, approvals, audit**
-- `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `ping_webhook`, `list_webhook_deliveries`, `verify_webhook_signature`.
+- `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `ping_webhook`, `list_webhook_deliveries`, `verify_webhook_signature`, `rotate_webhook_secret` (the old secret stops verifying).
 - `list_approvals`, `get_approval`, `decide_approval`, `list_audit_events`.
 
 **Workspace, team, agents**
-- Workspace settings, team and notifications are managed in the dashboard (`https://app.last-price.ai`). Connected apps: `list_connected_apps`, `disconnect_connected_app`.
+- Workspace settings, team and notifications are managed in the dashboard (`https://app.last-price.ai`). Connected apps: `list_connected_apps`, `disconnect_connected_app`. Child keys for sub-agents: `mint_child_key`, `revoke_child_key`. Partner workspaces: `get_partner_allowance`, `list_partner_workspaces`, `create_partner_workspace`.
 - Self-hosted inference sidecar (AITune): `list_aitune_backends`, `start_aitune_profiling`, `get_aitune_profiling`, `get_aitune_system_stats`.
 - Agents: `get_agent_capabilities`, `get_agent_value_receipt`, `estimate_task_cost`, `get_agent_behaviour_tests`, `run_agent_behaviour_tests`, `get_agent_behaviour_test_run`, `get_agent_protocol`, `set_agent_protocol`, `verify_agent_protocol`.
 
 **Offers**
 - Negotiation: sellers use `get_offer_settings`, `set_offer_settings`, `set_offer_product`, `remove_offer_product`, `preview_offer`, `list_negotiations`; buyers use `get_offer_terms`, `make_offer`, `get_negotiation`, `accept_counter` (commits the buyer).
+- Handover (a page for someone else's business): `fill_handover_sheet`, `create_handover_business`, `update_handover_business`, `publish_handover_business`, `get_handover_pack`, `list_handover_businesses`, `get_handover_business`; buyers with no key: `get_handover_page`, `order_from_handover_business` (records an order, moves no money).
 
 **UCP and storefronts**
 - `get_ucp_profile` (public), `get_ucp_quote`, `create_ucp_checkout`, `get_ucp_checkout`, `list_ucp_checkouts`, `update_ucp_checkout`, `complete_ucp_checkout`, `cancel_ucp_checkout`.

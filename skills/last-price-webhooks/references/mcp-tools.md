@@ -94,3 +94,14 @@ Check a webhook signature the way Last Price signs them: pass payload (the raw b
 | `secret` **(required)** | string | The signing secret. Use a test secret where you can. |
 | `encoding` | `hex` / `base64` | How the signature is encoded. Defaults to hex. |
 | `prefix` | string | A prefix the signature carries, for example sha256=. |
+
+## `rotate_webhook_secret`
+
+Replace a webhook endpoint's signing secret and return the new one (whsec_...), once: list_webhooks shows it masked from then on. Every delivery after this is signed with the new secret and the old one stops verifying, so update your receiver straight away. Use it when the secret leaked, or when you no longer have it. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |

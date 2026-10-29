@@ -119,6 +119,24 @@ Save the price guardrails for your workspace. max_change_pct, min_margin_pct and
 | `min_margin_pct` | number / null | Least margin over the unit cost a call sends, in percent of the price. Null (the default) for no minimum. |
 | `never_below_cost` | boolean | Never price below the unit cost a call sends. Defaults to true. |
 
+## `preview_price_change`
+
+Preview a price change on your own past calls: replay a proposed price for the pricing functions your workspace owns over the calls they served in a window, with the metering formula that charged them, once at today's price and once at the proposed one. Send change_pct (one function, or every function you own when function_id is left out), or a new cost_per_unit and/or cost_multiplier for one function_id. Returns totals, the change per function, how many customers would pay more, less or the same, the biggest movers (lettered, never named), threshold crossings and a confidence note. Read only: nothing is saved, billed or changed; to use a price, save it on the function. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `function_id` | string | One of your functions. Leave it out to move every function you own by change_pct. |
+| `change_pct` | number | Move the price by this percent. Send this, or cost_per_unit and/or cost_multiplier. |
+| `cost_per_unit` | number | A new cost per unit for function_id. |
+| `cost_multiplier` | number | A new cost multiplier for function_id. |
+| `from` | string | Start of the window, an ISO 8601 date or date-time. Defaults to 30 days before to. |
+| `to` | string | End of the window, inclusive. Defaults to now; at most 366 days after from. |
+| `threshold_usd` | number | Count the customers whose spend in the window would cross this amount, up or down. |
+| `movers` | integer | How many of the biggest movers to list. Defaults to 10. |
+
 ## `get_routing_experiment`
 
 Read the experiment one of your routing policies runs and how far it has got: each arm with the function it runs and the calls it recorded, the experiment's status, the promoted winner (every call the policy routes then runs its function), and any arm of the stored experiment the policy gives no function. status says where it stands: not released for your workspace yet, not configured, waiting for the first routed call, running or promoted. Only the default policy routes calls. Read only. Leave policy_id out for your default policy. Needs a Last Price credential with routing read scope.

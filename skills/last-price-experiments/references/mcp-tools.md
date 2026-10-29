@@ -169,6 +169,45 @@ List the demo apps Last Price runs on its own site under /demos (a SaaS plan pag
 
 _No arguments._
 
+## `set_experiment_status`
+
+Start, pause, resume or complete one of your experiments: pass experiment_key and status. active starts or resumes it; paused stops it for now, so every buyer sees the control price and nothing is recorded; completed ends it for good and keeps its results. A completed experiment cannot change again. Read the outcome with get_experiment_definition. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Needs a claimed Last Price credential for the workspace that owns the experiment.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+| `status` **(required)** | `active` / `paused` / `completed` | active starts or resumes it, paused stops it for now, completed ends it for good. |
+
+## `delete_experiment`
+
+Delete one of your experiments with every assignment, view and conversion recorded for it: pass experiment_key. To stop one and keep its results, use set_experiment_status with completed instead. Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+
+## `remove_experiment_conversions`
+
+Take wrong or abusive conversions out of an experiment's results: pass experiment_key and exactly one of user_id (every conversion that buyer made) or variant (every conversion in that arm). Views and assignments stay, so the buyer keeps their price and can convert again. Returns how many conversions were removed and the revenue they carried, and the removal is written to the audit log. Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `experiment_key` **(required)** | string | The experiment key: key on a list_experiments result, lowercase letters, digits and underscores. |
+| `user_id` | string | The buyer whose conversions to remove: the user id your site sent with them. Give this or variant. |
+| `variant` | string | The arm whose conversions to remove, such as control or variant_1. Give this or user_id. |
+
 ## `get_receipt`
 
 Get the receipt for one of your workspace's priced calls, by its usage event id (the id list_usage_events returns and report_outcome takes): what was priced, by which function and agent, when, the amount, how it was paid, and the outcome if one was reported. Receipts are made only when you ask, never sent for every call. For CSV or a printable page, call GET /api/receipts/{id} with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
