@@ -19,7 +19,7 @@ Buyer side (public, no credential):
 
 ## Handover: a business page for someone else
 
-Handover builds a small business (a driver, a stall, a barber) a page whose items take offers, then hands it to its owner. Early access (`not_released` until switched on for the workspace); the reads need `commerce:catalog:read`, the writes `commerce:configure`, and a claimed workspace.
+Handover builds a small business (a driver, a stall, a barber) a page whose items take offers, then hands it to its owner. Early access (`not_released` until switched on for the workspace) and a claimed workspace. `list_handover_businesses`, `get_handover_business` and `get_handover_pack` need `commerce:catalog:read`; `fill_handover_sheet` and the steps that create, change or publish need `commerce:configure`.
 
 1. `fill_handover_sheet`: send the conversation so far and the sheet; get it back filled (name, WhatsApp, what they sell, prices, country, currency) with the missing fields. Nothing is saved. Record a conversation only after the person agreed.
 2. `create_handover_business`: the completed sheet plus the person's consent (when you asked, the words they said yes with) give a draft page with items, a floor at 85% on items open to haggling, and licence notes. Check every line with the owner, then `update_handover_business` (only the fields sent change; `items` replaces the whole list).

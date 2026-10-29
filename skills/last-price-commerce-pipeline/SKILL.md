@@ -58,7 +58,7 @@ Every op needs a credential and a claimed workspace; each op names its scope in 
 
 **Safe end-to-end smoke (no real store):** seed-sample -> catalog + observations -> evaluate the seeded policy on one item -> cycle `{}` -> approve one proposal and reject another with reasons -> execution (safe: in-memory platform) -> audit for the proposal.
 
-**Onboarding a real store:** connector (owner/admin) -> sync -> observation sources -> policy in `shadow` -> evaluate several items -> cycle -> review proposals -> switch to `manual`, later `auto` with a tight delta.
+**Onboarding a real store:** connector (owner/admin) -> check -> sync -> observation sources -> policy in `shadow` -> evaluate several items -> cycle -> review proposals -> switch to `manual`, later `auto` with a tight delta.
 
 ## Guardrails
 

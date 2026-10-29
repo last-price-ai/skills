@@ -147,6 +147,7 @@ Read what the shadow ML pricing mix learned last night from your workspace's out
 
 - **Access:** key, routing read scope
 - **Behaviour:** read-only
+- **REST:** `/api/price-foundation`
 - **Errors and cautions:** Answers released: false while it is not switched on for your workspace.
 
 _No arguments._
@@ -170,6 +171,7 @@ Put one of your workspace's Forge models on live prices: the newest model that p
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/forge/candidates/{id}/promote`
 - **Errors and cautions:** Any other candidate is refused.
 
 | Argument | Type | Meaning |
@@ -182,7 +184,21 @@ Stop one of your workspace's promoted Forge models pricing live quotes: your lea
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/forge/candidates/{id}/retire`
 - **Errors and cautions:** candidate_id is a promoted model from get_forge_status; any other is refused.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `candidate_id` **(required)** | string | The candidate id, as get_forge_status gives it. |
+| `reason` | string | Why, kept with its evidence; not blank. |
+
+## `reject_forge_candidate`
+
+Reject one of your workspace's Forge candidates: it stops climbing the promotion ladder and keeps its evidence, with your reason added. candidate_id is an id from get_forge_status; a candidate already rejected, retired or promoted cannot be. Needs a Last Price credential with routing write scope; from the dashboard, an owner or admin. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+- **REST:** `/api/forge/candidates/{id}/reject`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

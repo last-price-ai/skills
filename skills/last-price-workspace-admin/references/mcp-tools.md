@@ -11,6 +11,7 @@ Create a short-lived child key for a sub-agent or job, returned only once. Ask f
 
 - **Access:** key
 - **Behaviour:** changes data
+- **REST:** `/api/api-keys/children`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -24,6 +25,7 @@ Revoke a direct child of the key this connection uses, by its key id. The child 
 
 - **Access:** key
 - **Behaviour:** **destructive**
+- **REST:** `/api/api-keys/children/{keyId}`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -99,6 +101,7 @@ Read your workspace's partner allowance: whether it is a partner (one allowed to
 
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/partner`
 - **Errors and cautions:** Only where partner workspaces are switched on (else an error with code not_released).
 
 _No arguments._
@@ -109,6 +112,7 @@ Open a managed workspace for someone's business from your partner workspace: an 
 
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
+- **REST:** `/api/partner/workspaces`
 - **Errors and cautions:** Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
 
 | Argument | Type | Meaning |
@@ -123,6 +127,7 @@ List the workspaces your partner workspace opened for other people's businesses,
 
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/partner/workspaces`
 - **Errors and cautions:** Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
 
 | Argument | Type | Meaning |

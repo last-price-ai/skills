@@ -17,8 +17,8 @@ Every route needs `x-api-key` or a Bearer token (keyless is 401); scopes `experi
 - **Start / pause / complete:** `PATCH /api/experiments/{experimentId}` `{"status":"active|paused|completed"}`. Completed is final. Paused or completed experiments serve the control price to everyone, record nothing, and answer conversions with 409 `experiment_not_running`.
 - **Assign + price:** `GET /api/experiments/{experimentId}/pricing?userId=...` (1-200 chars). Deterministic per user, honours weights. Returns `variant` and `pricing`.
 - **Convert:** `POST /api/experiments/{experimentId}/convert` with `userId`, optional `revenue` (omitted = the variant's list price; explicit `0` = zero-revenue conversion). 404 means the user was never assigned.
-- **Start, pause, resume, complete:** `set_experiment_status` (`experiment_key`, `status`: `active`, `paused` or `completed`). Paused serves every buyer the control price and records nothing; completed is final and keeps the results.
-- **Void conversions:** `DELETE /api/experiments/{experimentId}/conversions` (`remove_experiment_conversions`) with exactly one of `userId` or `variant`. Views and assignments stay; the removal is audited and cannot be undone.
+- **Start, pause, resume, complete:** `set_experiment_status` (`experiment_key`, `status`: `active`, `paused` or `completed`). Paused serves every buyer the control price and records nothing; completed is final and keeps the results, so confirm before completing.
+- **Void conversions:** `DELETE /api/experiments/{experimentId}/conversions` with exactly one of `userId` or `variant` (MCP `remove_experiment_conversions`: `user_id` or `variant`). Views and assignments stay; the removal is audited and cannot be undone.
 - **Results:** `GET /api/experiments/{experimentId}/results`: per-arm `views`, `conversions`, `revenue`, `conversionRate`, `arpu`, and a comparison against control. Numbers may arrive as strings; parse before math.
 - **Add an arm:** `POST /api/jale/propose-variant` `{experimentId, price, label?, metadata?}`. Only on evenly split (unweighted) experiments, max 10 arms; already-assigned users keep their arm.
 - **Promote the winner:** `POST /api/experiments/{experimentId}/promote` (`promote_experiment_winner`, with `experiment_key` and `variant`) ends the experiment and serves that arm's price to everyone; results are kept. Early access (404 `not_released`).
@@ -46,7 +46,7 @@ To see experiments from the shopper's side before building one, `list_hosted_dem
 2. Read the definition and results before changing anything.
 3. Creating: validate arms (one `control`, names, weights rule) and real `metadata.features` copy.
 4. Deciding: prefer `/sequential` on stored experiments; only call a winner on `stop` or `winner`, and promote only after the user agrees. Never present `continue`, `keep_running`, or `no_winner_yet` as a result.
-5. Confirm before deleting an experiment or voiding conversions.
+5. Confirm before completing or deleting an experiment, or voiding conversions.
 6. Report the numbers the API returned; never fabricate counts, rates, or significance.
 
 Legacy routes `GET /api/pricing` and `POST /api/convert` still exist; prefer per-experiment routes. `GET /api/debug/assignments` is development-only.

@@ -101,6 +101,7 @@ Replace a webhook endpoint's signing secret and return the new one (whsec_...), 
 
 - **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/webhooks/{webhookId}/rotate-secret`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

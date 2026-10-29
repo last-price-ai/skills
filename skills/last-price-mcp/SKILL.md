@@ -77,6 +77,6 @@ description: Use when the Last Price MCP connector is available and the task is 
 
 ## Rules
 
-- Tools that change live prices, money, access, or delete data (`set_price_guardrails`, `update_function` status, `execute_commerce_proposals`, `refund_payment`, `send_invoice`, `issue_invoice_with_stripe`, `grant_credit_bundle_plan`, `cancel_credit_bundle_subscription`, `open_monetization_pull_request`, `accept_counter`, every `delete_*`): read current state first, confirm with the user, verify after.
+- Tools that change live prices, money, access, or delete data (`set_price_guardrails`, `update_function` status, `execute_commerce_proposals`, `refund_payment`, `send_invoice`, `issue_invoice_with_stripe`, `grant_credit_bundle_plan`, `cancel_credit_bundle_subscription`, `open_monetization_pull_request`, `accept_counter`, `promote_forge_candidate`, `retire_forge_candidate`, `set_experiment_status` (completed is final), `revoke_rosetta_adapter`, `remove_experiment_conversions`, `rotate_webhook_secret`, `revoke_child_key`, every `delete_*`): read current state first, confirm with the user, verify after.
 - These tools never pay anyone: `create_payment` and `refund_payment` only record, `issue_invoice_with_stripe` sends an invoice the customer pays. Never fabricate a payment signature.
 - Report numbers verbatim with their period; never invent prices, findings, ids, or verdicts.

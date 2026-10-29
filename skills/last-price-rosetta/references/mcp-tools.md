@@ -122,6 +122,7 @@ List the workspace's Rosetta adapters, newest first: each one's id, status (acti
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/rosetta/adapters`
 - **Errors and cautions:** Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
@@ -137,6 +138,7 @@ Revoke one Rosetta adapter by adapter_id from list_rosetta_adapters, so ingest_w
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/rosetta/adapters/{id}`
 - **Errors and cautions:** Revoking cannot be undone; an adapter already revoked answers 409 and an unknown id 404. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |

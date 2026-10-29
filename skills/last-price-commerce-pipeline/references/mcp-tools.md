@@ -61,6 +61,7 @@ Try one linked store without changing anything, and see which part answers: reac
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only, reaches outside Last Price
+- **REST:** `/api/commerce/connectors/{id}/check`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

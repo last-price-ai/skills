@@ -34,7 +34,7 @@ Single-call compute payloads live in `last-price-compute`; marketplace listings 
 
 Read `builtins` from `GET /api/price-router` each time. Only functions with `computes_price: true` produce a price; only those with `prices_without_incumbent: true` (for example `cost-plus`, `competitive-price`) work without a positive `context.current_price`. Rosetta, `elo-significance`, `elo-allocator`, `jale-bundle`, `jale-tier-optimizer` do not compute a single price: naming one answers 422 `not_a_pricing_function` (nothing metered). Metering is `(input_units * cost_per_unit * input_factor + output_units * cost_per_unit * output_factor) * cost_multiplier`.
 
-Before changing what your own functions charge, `preview_price_change` (`GET|POST /api/pricing/preview`) replays a proposed `change_pct`, or a new `cost_per_unit` / `cost_multiplier` for one `function_id`, over the calls they served in a window: totals, the change per function, and how many customers would pay more, less or the same. It changes nothing.
+Before changing what your own functions charge, `preview_price_change` (`POST /api/pricing/preview`) replays a proposed `change_pct`, or a new `cost_per_unit` / `cost_multiplier` for one `function_id`, over the calls they served in a window: totals, the change per function, and how many customers would pay more, less or the same. `GET /api/pricing/preview` only lists your functions' current prices and the limits POST accepts. Neither changes anything; both need billing read scope and a claimed workspace.
 
 ## Registering a function
 

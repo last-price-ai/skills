@@ -20,6 +20,9 @@ Last Price gets smarter per workspace only when quotes get outcomes: **quote -> 
 | GET | `/api/learned-elasticity/curve` | `pcn:routing:read` | Outcome counts by quoted/current price bin plus the fitted curve. |
 | GET/PUT | `/api/learned-elasticity/exploration` | read / write | Small randomized price variation so the fit can learn (`rate` 0.005-0.1). |
 | GET/PUT | `/api/learned-elasticity/buyer-models`, `/feature-contract` | read / write | Buyer-aware pricing (off, shadow, live) and the request fields it learns from. |
+| GET | `/api/price-foundation` | `pcn:routing:read` | Shadow ML pricing mix report (`get_price_foundation_report`); read only, never changes a price. |
+| GET | `/api/forge` | `pcn:routing:read` | Forge models and which are promotable (`get_forge_status`). |
+| POST | `/api/forge/candidates/{id}/promote`, `/retire`, `/reject` | `pcn:routing:write` | Put a passed model on live learned prices, stop a promoted one, or reject one (`promote_forge_candidate`, `retire_forge_candidate`, `reject_forge_candidate`). Promote changes live prices. |
 | GET | `/api/pricing-analyst/findings` | `pcn:routing:read` | Free, no-AI findings, most urgent first, each with a `next_step`. |
 | GET | `/api/pricing-analyst/brief` | `pcn:routing:read` | Latest written brief; every claim cites findings and is number-checked. |
 | POST | `/api/pricing-analyst/ask` | `pcn:routing:read` | One plain-language question, answered in cited claims. |

@@ -35,7 +35,7 @@ Wherever a target is taken you can pass the key or a full schema `{id, fields:[{
 | GET | `/api/rosetta/review?status=pending|approved|rejected` | | `items[]`, newest first |
 | POST | `/api/rosetta/review` | **`id`**, **`action`** `approve|reject`, `reviewer` | `item`; 404 other workspace, 409 already decided |
 | GET | `/api/rosetta/adapters` | | Frozen adapters, `list_rosetta_adapters` (early access; 404 `not_released` until enabled) |
-| DELETE | `/api/rosetta/adapters/{id}` | | Retire an adapter, `revoke_rosetta_adapter` (cannot be undone); the next payload of that shape re-plans |
+| DELETE | `/api/rosetta/adapters/{id}` | | Retire an adapter, `revoke_rosetta_adapter` (cannot be undone; early access, 404 `not_released` until enabled; 409 if already revoked, 404 if unknown); the next payload of that shape re-plans |
 
 ## Ingest statuses
 

@@ -492,6 +492,7 @@ Preview a price change on your own past calls: replay a proposed price for the p
 
 - **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/pricing/preview`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -713,6 +714,7 @@ Start, pause, resume or complete one of your experiments: pass experiment_key an
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}`
 - **Errors and cautions:** Needs a claimed Last Price credential for the workspace that owns the experiment.
 
 | Argument | Type | Meaning |
@@ -726,6 +728,7 @@ Delete one of your experiments with every assignment, view and conversion record
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}`
 - **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
 
 | Argument | Type | Meaning |
@@ -738,6 +741,7 @@ Take wrong or abusive conversions out of an experiment's results: pass experimen
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}/conversions`
 - **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
 
 | Argument | Type | Meaning |
@@ -1118,6 +1122,7 @@ Put one of your workspace's Forge models on live prices: the newest model that p
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/forge/candidates/{id}/promote`
 - **Errors and cautions:** Any other candidate is refused.
 
 | Argument | Type | Meaning |
@@ -1130,6 +1135,7 @@ Stop one of your workspace's promoted Forge models pricing live quotes: your lea
 
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/forge/candidates/{id}/retire`
 - **Errors and cautions:** candidate_id is a promoted model from get_forge_status; any other is refused.
 
 | Argument | Type | Meaning |
@@ -1143,6 +1149,7 @@ Read what the shadow ML pricing mix learned last night from your workspace's out
 
 - **Access:** key, routing read scope
 - **Behaviour:** read-only
+- **REST:** `/api/price-foundation`
 - **Errors and cautions:** Answers released: false while it is not switched on for your workspace.
 
 _No arguments._
@@ -1401,6 +1408,7 @@ List the workspace's Rosetta adapters, newest first: each one's id, status (acti
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/rosetta/adapters`
 - **Errors and cautions:** Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
@@ -1416,6 +1424,7 @@ Revoke one Rosetta adapter by adapter_id from list_rosetta_adapters, so ingest_w
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/rosetta/adapters/{id}`
 - **Errors and cautions:** Revoking cannot be undone; an adapter already revoked answers 409 and an unknown id 404. Until Rosetta strict checks are switched on for your workspace it answers 404 not_released. Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
@@ -1453,6 +1462,7 @@ Try one linked store without changing anything, and see which part answers: reac
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only, reaches outside Last Price
+- **REST:** `/api/commerce/connectors/{id}/check`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -2588,16 +2598,3 @@ Total your workspace's priced calls over a period, this calendar month by defaul
 | :-- | :-- | :-- |
 | `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month. |
 | `end_date` | string | End of the period, ISO 8601. Defaults to now. |
-
-## `get_usage_breakdown`
-
-See your usage grouped by pricing function: calls, spend and outcomes for each function over a period. Pass start_date and end_date to choose the period, and group_by function, the only grouping there is. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
-| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
-| `group_by` | `function` | How to group. Only function is available. |

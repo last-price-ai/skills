@@ -125,6 +125,7 @@ Preview a price change on your own past calls: replay a proposed price for the p
 
 - **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/pricing/preview`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

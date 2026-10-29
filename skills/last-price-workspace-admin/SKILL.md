@@ -13,6 +13,7 @@ Covers the admin surface behind `https://app.last-price.ai`. Re-check OpenAPI (t
 | Workspace create/get/patch/delete, `/settings`, `/llm-key`, `/inference-providers` | yes (owner/admin to change; owner only to delete) | no | no | no |
 | Team `/team`, `/invitations` | yes | 403 `team_admin_requires_api_key` | only with exact `team:admin` | 403 |
 | `/api/api-keys` list/create/revoke | yes | yes | no | no |
+| `/api/api-keys/children` create/revoke (child keys) | n/a | n/a | the calling key, for its own children | via its key |
 | `/api/api-keys/rotate`, `DELETE /api/me/key` | n/a | n/a | the calling key itself | via its key |
 | `/api/embed-tokens` | yes | yes | refused | no |
 | `/api/approvals` list/get | yes | yes | yes | yes |
@@ -69,7 +70,7 @@ Covers the admin surface behind `https://app.last-price.ai`. Re-check OpenAPI (t
 - `POST /api/workspaces` (session) creates a production workspace plus a paired sandbox.
 - `GET /api/workspaces/{id}`; `PATCH` `{name?, slug?}` (owner/admin); `DELETE` (owner only) removes the workspace **and** its sandbox: irreversible.
 - By key: `create_workspace` (`name`, `email`) creates a free workspace and sandbox owned by the key's creator; it needs an `x-api-key` with `workspace:admin` and is early access. Agents: `create_child_workspace` (`POST /api/agents/workspaces`) makes an unclaimed child sandbox with its own key (shown once) and claim link, at most 10 by default; `list_child_workspaces` (`GET /api/agents/workspaces`) lists them.
-- Partner workspaces (early access; only in a workspace Last Price staff made a partner): `get_partner_allowance` shows the daily allowance and what is left; `create_partner_workspace` opens a managed production workspace for someone's business and returns, once each, a management key and the owner's claim link (send it only to the owner); `list_partner_workspaces` lists them with whether each was claimed, is still managed, or was released.
+- Partner workspaces (early access; only in a workspace Last Price staff made a partner; partner workspaces scope and a claimed workspace, so a self-registered sandbox key gets 403): `get_partner_allowance` shows the daily allowance and what is left; `create_partner_workspace` opens a managed production workspace for someone's business and returns, once each, a management key (full access, no expiry: keep it in a secret store) and the owner's claim link (send it only to the owner); `list_partner_workspaces` lists them with whether each was claimed, is still managed, or was released.
 - `GET|PATCH /api/workspaces/{id}/settings` (company, address, tax, invoice fields); `POST /settings/enrich` fills company info from a domain.
 
 ## Account security

@@ -4,6 +4,19 @@
 
 Index: [mcp-tools.md](mcp-tools.md).
 
+## `get_usage_breakdown`
+
+See your usage grouped by pricing function: calls, spend and outcomes for each function over a period. Pass start_date and end_date to choose the period, and group_by function, the only grouping there is. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
+| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
+| `group_by` | `function` | How to group. Only function is available. |
+
 ## `list_usage_events`
 
 List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
@@ -300,6 +313,7 @@ Replace a webhook endpoint's signing secret and return the new one (whsec_...), 
 
 - **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/webhooks/{webhookId}/rotate-secret`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -389,6 +403,7 @@ Create a short-lived child key for a sub-agent or job, returned only once. Ask f
 
 - **Access:** key
 - **Behaviour:** changes data
+- **REST:** `/api/api-keys/children`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -402,6 +417,7 @@ Revoke a direct child of the key this connection uses, by its key id. The child 
 
 - **Access:** key
 - **Behaviour:** **destructive**
+- **REST:** `/api/api-keys/children/{keyId}`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -413,6 +429,7 @@ Read your workspace's partner allowance: whether it is a partner (one allowed to
 
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/partner`
 - **Errors and cautions:** Only where partner workspaces are switched on (else an error with code not_released).
 
 _No arguments._
@@ -423,6 +440,7 @@ List the workspaces your partner workspace opened for other people's businesses,
 
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/partner/workspaces`
 - **Errors and cautions:** Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
 
 | Argument | Type | Meaning |
@@ -438,6 +456,7 @@ Open a managed workspace for someone's business from your partner workspace: an 
 
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
+- **REST:** `/api/partner/workspaces`
 - **Errors and cautions:** Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
 
 | Argument | Type | Meaning |
@@ -771,6 +790,7 @@ Handover, step 1: while you talk with someone about the business they would like
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
+- **REST:** `/api/handover/sheet`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
@@ -784,6 +804,7 @@ Handover, step 2: start a business from a brief (the sheet fill_handover_sheet r
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
+- **REST:** `/api/handover/businesses`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
@@ -797,6 +818,7 @@ Change a Handover business's page with its owner: name, tagline, about, look, it
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/handover/businesses/{id}`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
@@ -816,6 +838,7 @@ Handover, step 3: put a draft business live and hand it over. It opens the busin
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
+- **REST:** `/api/handover/businesses/{id}/publish`
 - **Errors and cautions:** A trade that needs a licence is refused (licences_unconfirmed) until you confirm its licences with update_handover_business; a business already live answers not_draft. Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
@@ -828,6 +851,7 @@ Handover, step 4: what you leave the owner with: the page address and its QR cod
 
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/handover/businesses/{id}/pack`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
@@ -840,6 +864,7 @@ List the businesses your workspace built with Handover, newest first: each one's
 
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/handover/businesses`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 _No arguments._
@@ -850,6 +875,7 @@ Read one Handover business: the brief, the page (name, words, look, items and pr
 
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
+- **REST:** `/api/handover/businesses/{id}`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
@@ -860,8 +886,9 @@ Read one Handover business: the brief, the page (name, words, look, items and pr
 
 Read a live Handover business by the address of its page (/b/<slug>), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
 
-- **Access:** key
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
+- **REST:** `/api/handover/public/{slug}`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -871,8 +898,9 @@ Read a live Handover business by the address of its page (/b/<slug>), with no cr
 
 Order from a live Handover business with no credential: a name, the items by id from get_handover_page with quantities, and optionally when and a note. Prices are the page's. For an item you agreed a price on with make_offer, add it to agreed with its negotiation_id and buyer_token: the agreed price is used only when that negotiation says it was accepted (else offer_not_agreed). The order is recorded on the business's own workspace; the answer carries its reference, the total and a WhatsApp link that sends it to the owner. 10 orders a minute per address.
 
-- **Access:** key
+- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** changes data
+- **REST:** `/api/handover/public/{slug}/orders`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |

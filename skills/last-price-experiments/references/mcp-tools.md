@@ -175,6 +175,7 @@ Start, pause, resume or complete one of your experiments: pass experiment_key an
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}`
 - **Errors and cautions:** Needs a claimed Last Price credential for the workspace that owns the experiment.
 
 | Argument | Type | Meaning |
@@ -188,6 +189,7 @@ Delete one of your experiments with every assignment, view and conversion record
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}`
 - **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
 
 | Argument | Type | Meaning |
@@ -200,6 +202,7 @@ Take wrong or abusive conversions out of an experiment's results: pass experimen
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
+- **REST:** `/api/experiments/{experimentId}/conversions`
 - **Errors and cautions:** Cannot be undone. Needs a claimed Last Price credential for the workspace that owns the experiment.
 
 | Argument | Type | Meaning |

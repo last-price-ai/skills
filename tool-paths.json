@@ -35,6 +35,9 @@
  "check_agent_readiness": [
   "/api/public/agent-ready-check"
  ],
+ "check_commerce_connector": [
+  "/api/commerce/connectors/{id}/check"
+ ],
  "check_purchase": [
   "/api/spend-policy/check"
  ],
@@ -83,6 +86,9 @@
  "create_function": [
   "/api/functions"
  ],
+ "create_handover_business": [
+  "/api/handover/businesses"
+ ],
  "create_hosted_model": [
   "/api/hosted-models"
  ],
@@ -94,6 +100,9 @@
  ],
  "create_order": [
   "/api/orders"
+ ],
+ "create_partner_workspace": [
+  "/api/partner/workspaces"
  ],
  "create_payment": [
   "/api/payments"
@@ -112,6 +121,9 @@
  ],
  "decide_rosetta_review": [
   "/api/rosetta/review"
+ ],
+ "delete_experiment": [
+  "/api/experiments/{experimentId}"
  ],
  "delete_feature_contract": [
   "/api/learned-elasticity/feature-contract"
@@ -133,6 +145,9 @@
  ],
  "execute_commerce_proposals": [
   "/api/commerce/execution"
+ ],
+ "fill_handover_sheet": [
+  "/api/handover/sheet"
  ],
  "freeze_rosetta_adapter": [
   "/api/rosetta/freeze"
@@ -191,6 +206,15 @@
  "get_frontier_model": [
   "/api/frontier-model"
  ],
+ "get_handover_business": [
+  "/api/handover/businesses/{id}"
+ ],
+ "get_handover_pack": [
+  "/api/handover/businesses/{id}/pack"
+ ],
+ "get_handover_page": [
+  "/api/handover/public/{slug}"
+ ],
  "get_invoice": [
   "/api/invoices/{invoiceId}"
  ],
@@ -204,6 +228,9 @@
  "get_offer_settings": [
   "/api/negotiation/settings"
  ],
+ "get_partner_allowance": [
+  "/api/partner"
+ ],
  "get_payment": [
   "/api/payments/{paymentId}"
  ],
@@ -212,6 +239,9 @@
  ],
  "get_price_exploration": [
   "/api/learned-elasticity/exploration"
+ ],
+ "get_price_foundation_report": [
+  "/api/price-foundation"
  ],
  "get_price_guardrails": [
   "/api/price-guardrails"
@@ -276,6 +306,9 @@
  "list_functions": [
   "/api/functions"
  ],
+ "list_handover_businesses": [
+  "/api/handover/businesses"
+ ],
  "list_hosted_models": [
   "/api/hosted-models"
  ],
@@ -285,6 +318,9 @@
  "list_notifications": [
   "/api/workspaces/{workspaceId}/notifications"
  ],
+ "list_partner_workspaces": [
+  "/api/partner/workspaces"
+ ],
  "list_pricing_pipelines": [
   "/api/price-router/pipelines"
  ],
@@ -293,6 +329,9 @@
  ],
  "list_reels": [
   "/api/public/reels"
+ ],
+ "list_rosetta_adapters": [
+  "/api/rosetta/adapters"
  ],
  "list_routing_policies": [
   "/api/routing-policies"
@@ -321,11 +360,17 @@
  "mark_notifications_read": [
   "/api/workspaces/{workspaceId}/notifications/read"
  ],
+ "mint_child_key": [
+  "/api/api-keys/children"
+ ],
  "normalize_with_rosetta": [
   "/api/rosetta/normalize"
  ],
  "open_spend_session": [
   "/api/spend-policy/check"
+ ],
+ "order_from_handover_business": [
+  "/api/handover/public/{slug}/orders"
  ],
  "plan_rosetta_mapping": [
   "/api/rosetta/plan"
@@ -333,11 +378,20 @@
  "preview_offer": [
   "/api/negotiation/preview"
  ],
+ "preview_price_change": [
+  "/api/pricing/preview"
+ ],
  "pricing_conversation": [
   "/api/compute/conversation"
  ],
+ "promote_forge_candidate": [
+  "/api/forge/candidates/{id}/promote"
+ ],
  "propose_experiment_variant": [
   "/api/jale/propose-variant"
+ ],
+ "publish_handover_business": [
+  "/api/handover/businesses/{id}/publish"
  ],
  "quote_storefront_domain": [
   "/api/storefronts/{storefrontId}/domain-quotes"
@@ -360,6 +414,9 @@
  "reject_forge_candidate": [
   "/api/forge/candidates/{id}/reject"
  ],
+ "remove_experiment_conversions": [
+  "/api/experiments/{experimentId}/conversions"
+ ],
  "remove_storefront_dns_record": [
   "/api/storefronts/{storefrontId}/domains/{domainId}/dns-records/{recordId}"
  ],
@@ -372,8 +429,20 @@
  "request_payout_run": [
   "/api/marketplace/payouts/runs"
  ],
+ "retire_forge_candidate": [
+  "/api/forge/candidates/{id}/retire"
+ ],
+ "revoke_child_key": [
+  "/api/api-keys/children/{keyId}"
+ ],
  "revoke_invitation": [
   "/api/workspaces/{workspaceId}/invitations/{invitationId}"
+ ],
+ "revoke_rosetta_adapter": [
+  "/api/rosetta/adapters/{id}"
+ ],
+ "rotate_webhook_secret": [
+  "/api/webhooks/{webhookId}/rotate-secret"
  ],
  "run_agent_behaviour_tests": [
   "/api/agents/{id}/behaviour-tests"
@@ -407,6 +476,9 @@
  ],
  "set_experiment_bandit": [
   "/api/experiments/{experimentId}/sequential"
+ ],
+ "set_experiment_status": [
+  "/api/experiments/{experimentId}"
  ],
  "set_feature_contract": [
   "/api/learned-elasticity/feature-contract"
@@ -462,6 +534,9 @@
  ],
  "update_dispute": [
   "/api/disputes/{disputeId}"
+ ],
+ "update_handover_business": [
+  "/api/handover/businesses/{id}"
  ],
  "update_invoice": [
   "/api/invoices/{invoiceId}"
