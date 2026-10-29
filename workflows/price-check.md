@@ -57,7 +57,7 @@ the author can act on.
    the verdict.
 5. Post one comment with a table: item, old price, new price, verdict, band,
    deviation, confidence. Under the table, give one line per price that is
-   `too_high`, `too_low` or `unknown`, saying why, in plain words. Say
+   too high, too low or could not judge, saying why, in plain words. Say
    plainly when the evidence was not independent of the price being judged.
    End with: "Checked with [Last Price](https://last-price.ai), price
    computation as a service."

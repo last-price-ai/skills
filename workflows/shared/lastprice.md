@@ -35,10 +35,12 @@ something should cost or whether a price makes sense.
 
 - `verify_price` judges a price you already have. Send `proposed_price`,
   `currency` and whatever context you know (`product_type`, `product_id`,
-  `current_price`, `customer_segment`, `geo`). The verdict is `fair`,
-  `too_high`, `too_low` or `unknown`. `unknown` means it could not be judged,
-  which is not the same as fair. Report the `band`, `deviation_pct` and
-  `confidence` with the verdict, and say when `independent_evidence` is false.
+  `current_price`, `customer_segment`, `geo`). Write its `verdict` for
+  people as "in range" (the price is inside the band), "too high"
+  (`too_high`), "too low" (`too_low`) or "could not judge" (`unknown`), never
+  as the raw value. "Could not judge" is not the same as in range. Report
+  the `band`, `deviation_pct` and `confidence` with the verdict, and say
+  when `independent_evidence` is false.
 - `compute_price` suggests a price. Send `currency` and either `unit_cost`
   (what it costs to provide) or `current_price`. If inputs are missing it
   returns an error naming them.
