@@ -24,4 +24,4 @@ jobs:
         with:
           version: latest
       - name: Compile
-        run: gh aw compile --workflows-dir workflows --strict --verbose
+        run: gh aw compile --dir workflows --strict --validate --verbose
