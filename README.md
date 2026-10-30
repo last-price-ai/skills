@@ -150,7 +150,7 @@ The [skills CLI](https://skills.sh) installs the skills into Claude Code, Cursor
 
 ## What the plugin connects to
 
-The plugin, extension and manifests in this repository contain no code that runs on install. They point the assistant at one remote server, `https://api.last-price.ai/api/mcp/rpc`, run by Last Price. Each manifest asks for the directory tool set (`profile=directory`) and adds a `via` tag (`via=claude-plugin`, `cursor-plugin`, `openai-plugin`, `gemini-cli`) so Last Price can count installs by assistant; the tag changes nothing about the answers. Tool calls send the arguments the assistant chooses (pricing context such as currency, cost and product type) and, if you set one, your API key in the `x-api-key` header. Nothing else is read from your machine. Privacy policy: https://last-price.ai/privacy.
+The plugin, extension and manifests in this repository contain no code that runs on install. They point the assistant at one remote server, `https://api.last-price.ai/api/mcp/rpc`, run by Last Price. Each manifest asks for the directory tool set (`profile=directory`) and adds a `via` tag (`via=claude-plugin`, `cursor-plugin`, `openai-plugin`, `gemini-cli`) so Last Price can count installs by assistant; the tag changes nothing about the answers. Tool calls send the arguments the assistant chooses (pricing context such as currency, cost and product type) and, if you set one, your API key in the `x-api-key` header. If the assistant opts in, a call can also carry a W3C `traceparent` and a short stated reason (`_meta.reason`), which Last Price keeps with that call in your workspace's usage records. Nothing else is read from your machine. Privacy policy: https://last-price.ai/privacy.
 
 ## Plugin files
 
