@@ -93,5 +93,5 @@ It links calls, grants no authority and does not prove backend retention.
 
 For priced calls, `list_usage_events` returns optional `mcp_reason` and
 `mcp_trace_id` in the workspace's own ledger. Unmetered tools do not create
-priced events. Span cost is recorded USD, not a guessed credit conversion.
+priced events.
 Sampling and export follow existing deployment configuration.
