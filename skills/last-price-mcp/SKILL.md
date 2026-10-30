@@ -80,3 +80,18 @@ description: Use when the Last Price MCP connector is available and the task is 
 - Tools that change live prices, money, access, or delete data (`set_price_guardrails`, `update_function` status, `execute_commerce_proposals`, `refund_payment`, `send_invoice`, `issue_invoice_with_stripe`, `grant_credit_bundle_plan`, `cancel_credit_bundle_subscription`, `open_monetization_pull_request`, `accept_counter`, `promote_forge_candidate`, `retire_forge_candidate`, `set_experiment_status` (completed is final), `revoke_rosetta_adapter`, `remove_experiment_conversions`, `rotate_webhook_secret`, `revoke_child_key`, every `delete_*`): read current state first, confirm with the user, verify after.
 - These tools never pay anyone: `create_payment` and `refund_payment` only record, `issue_invoice_with_stripe` sends an invoice the customer pays. Never fabricate a payment signature.
 - Report numbers verbatim with their period; never invent prices, findings, ids, or verdicts.
+
+## Trace a hosted tool call
+
+For hosted HTTP calls, send a W3C version 00 `traceparent` in `params._meta`
+or the HTTP header. A valid message value wins, so batch entries can have
+different parents. Optional `_meta.reason` explains the action briefly; leave
+out credentials, personal information and hidden reasoning. It is capped at
+512 characters with pattern-based redaction, not guaranteed anonymization.
+Read the trace id from `result._meta["com.lastprice/trace"].trace_id` when present.
+It links calls, grants no authority and does not prove backend retention.
+
+For priced calls, `list_usage_events` returns optional `mcp_reason` and
+`mcp_trace_id` in the workspace's own ledger. Unmetered tools do not create
+priced events. Span cost is recorded USD, not a guessed credit conversion.
+Sampling and export follow existing deployment configuration.
