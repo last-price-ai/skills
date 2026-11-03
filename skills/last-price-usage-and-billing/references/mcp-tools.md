@@ -32,7 +32,7 @@ See your usage grouped by pricing function: calls, spend and outcomes for each f
 
 ## `list_usage_events`
 
-List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Hosted MCP calls that carried a stated reason or trace also include mcp_reason and mcp_trace_id. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only

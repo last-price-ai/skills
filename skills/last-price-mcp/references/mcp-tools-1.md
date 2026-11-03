@@ -20,7 +20,7 @@ Ask Last Price what pricing inputs are missing. Start with request: {}, return i
 
 ## `compute_price`
 
-Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then.
+Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then. confidence is the function's own 0 to 1 score for its price, not a probability that a buyer accepts.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -69,7 +69,7 @@ Price up to 100 requests in one call. Each item in requests is the same request 
 
 ## `verify_price`
 
-Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (fair, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as fair. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
+Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (within_band, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as within_band. Act on next_step: buy (within band on confident, independent evidence), negotiate (too high), walk_away (far too high, confidently) or check_more (unknown, too low, or weak evidence); next_step_reason says why. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -95,7 +95,7 @@ Ask whether a price makes sense for its context, rather than what the price shou
 
 ## `list_verification_strategies`
 
-List what a price verification can stand on: the verdicts it can give (fair, too high, too low or unknown) and the evidence strategies a verdict is checked against. Use it at planning time, before you call verify_price. Public: needs no credential.
+List what a price verification can stand on: the verdicts it can give (within band, too high, too low or unknown) and the evidence strategies a verdict is checked against. Use it at planning time, before you call verify_price. Public: needs no credential.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
@@ -261,7 +261,13 @@ List the pricing functions registered for the authenticated tenant.
 - **Behaviour:** read-only
 - **REST:** `/api/functions`
 
-_No arguments._
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `draft` / `review` / `active` / `inactive` / `deprecated` | Only functions in this status. |
+| `execution_type` | `rule_based` / `ml_model` / `llm_prompt` / `external_api` / `composite` | Only functions of this execution type. |
+| `is_builtin` | boolean | True for built-in functions only, false for the tenant's own only. |
+| `limit` | integer | Page size. Defaults to 50; the API caps it at 100. |
+| `offset` | integer | Rows to skip. Defaults to 0. |
 
 ## `get_function`
 
@@ -500,8 +506,8 @@ Preview a price change on your own past calls: replay a proposed price for the p
 | `change_pct` | number | Move the price by this percent. Send this, or cost_per_unit and/or cost_multiplier. |
 | `cost_per_unit` | number | A new cost per unit for function_id. |
 | `cost_multiplier` | number | A new cost multiplier for function_id. |
-| `from` | string | Start of the window, an ISO 8601 date or date-time. Defaults to 30 days before to. |
-| `to` | string | End of the window, inclusive. Defaults to now; at most 366 days after from. |
+| `from` | string | Start of the window, an ISO 8601 date or date-time. Defaults to 30 days before the to date. |
+| `to` | string | End of the window, inclusive. Defaults to now; at most 366 days after the from date. |
 | `threshold_usd` | number | Count the customers whose spend in the window would cross this amount, up or down. |
 | `movers` | integer | How many of the biggest movers to list. Defaults to 10. |
 
@@ -710,7 +716,7 @@ Ask Jale for the price to run next in one of your experiments: it simulates each
 
 ## `set_experiment_status`
 
-Start, pause, resume or complete one of your experiments: pass experiment_key and status. active starts or resumes it; paused stops it for now, so every buyer sees the control price and nothing is recorded; completed ends it for good and keeps its results. A completed experiment cannot change again. Read the outcome with get_experiment_definition. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Start, pause, resume or complete one of your experiments: pass experiment_key and status. active starts or resumes it; paused stops it for now, so every buyer sees the control price and nothing is recorded; completed ends it for good and keeps its results. A completed experiment cannot change again. Read the results with get_experiment_results. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
@@ -2586,15 +2592,3 @@ Open the Last Price integration code (the files generate_monetization_code write
 | `base` | string | Branch to open the pull request against; the default branch when absent. |
 | `branch` | string | New branch for the commit; last-price/billing-setup when absent. |
 | `title` | string | Pull request title. |
-
-## `get_usage`
-
-Total your workspace's priced calls over a period, this calendar month by default: requests, units, compute time, cost, cached and prepaid calls, and the part of this month's cost still to be billed. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month. |
-| `end_date` | string | End of the period, ISO 8601. Defaults to now. |

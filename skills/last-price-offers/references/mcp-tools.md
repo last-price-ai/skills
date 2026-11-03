@@ -241,7 +241,7 @@ Handover, step 4: what you leave the owner with: the page address and its QR cod
 Handover, step 1: while you talk with someone about the business they would like to own (a driver, a stall, a barber), send the conversation so far as transcript and the sheet as it stands, and get the sheet back filled from what they said (their name, WhatsApp, what they sell, prices, country, currency), with the fields still missing. A language model fills it where the deployment has one, plain rules otherwise (filled_by). Nothing is saved. Record a conversation only after the person said yes to it. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/handover/sheet`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
@@ -299,7 +299,7 @@ Handover, step 3: put a draft business live and hand it over. It opens the busin
 
 ## `get_handover_page`
 
-Read a live Handover business by the address of its page (/b/<slug>), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
+Read a live Handover business by the address of its page (/b/{slug}), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
@@ -307,7 +307,7 @@ Read a live Handover business by the address of its page (/b/<slug>), with no cr
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+| `slug` **(required)** | string | The page address, the slug in /b/{slug}: 3 to 40 lowercase letters, digits or hyphens. |
 
 ## `order_from_handover_business`
 
@@ -319,7 +319,7 @@ Order from a live Handover business with no credential: a name, the items by id 
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+| `slug` **(required)** | string | The page address, the slug in /b/{slug}: 3 to 40 lowercase letters, digits or hyphens. |
 | `name` **(required)** | string | The name the owner sees on the order. |
 | `items` **(required)** | array | What to order. |
 | `when` | string | When it is wanted, in plain words. |

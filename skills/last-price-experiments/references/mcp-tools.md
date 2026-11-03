@@ -171,7 +171,7 @@ _No arguments._
 
 ## `set_experiment_status`
 
-Start, pause, resume or complete one of your experiments: pass experiment_key and status. active starts or resumes it; paused stops it for now, so every buyer sees the control price and nothing is recorded; completed ends it for good and keeps its results. A completed experiment cannot change again. Read the outcome with get_experiment_definition. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Start, pause, resume or complete one of your experiments: pass experiment_key and status. active starts or resumes it; paused stops it for now, so every buyer sees the control price and nothing is recorded; completed ends it for good and keeps its results. A completed experiment cannot change again. Read the results with get_experiment_results. Needs a claimed Last Price credential for the workspace that owns the experiment. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**

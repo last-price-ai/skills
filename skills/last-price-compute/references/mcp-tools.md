@@ -7,7 +7,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 
 ## `compute_price`
 
-Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then.
+Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then. confidence is the function's own 0 to 1 score for its price, not a probability that a buyer accepts.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -62,4 +62,10 @@ List the pricing functions registered for the authenticated tenant.
 - **Behaviour:** read-only
 - **REST:** `/api/functions`
 
-_No arguments._
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `draft` / `review` / `active` / `inactive` / `deprecated` | Only functions in this status. |
+| `execution_type` | `rule_based` / `ml_model` / `llm_prompt` / `external_api` / `composite` | Only functions of this execution type. |
+| `is_builtin` | boolean | True for built-in functions only, false for the tenant's own only. |
+| `limit` | integer | Page size. Defaults to 50; the API caps it at 100. |
+| `offset` | integer | Rows to skip. Defaults to 0. |

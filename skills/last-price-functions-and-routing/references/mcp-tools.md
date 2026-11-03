@@ -79,7 +79,7 @@ Run a pricing chain: stages one after another, each stage's price feeding the ne
 
 ## `verify_price`
 
-Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (fair, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as fair. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
+Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (within_band, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as within_band. Act on next_step: buy (within band on confident, independent evidence), negotiate (too high), walk_away (far too high, confidently) or check_more (unknown, too low, or weak evidence); next_step_reason says why. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -133,8 +133,8 @@ Preview a price change on your own past calls: replay a proposed price for the p
 | `change_pct` | number | Move the price by this percent. Send this, or cost_per_unit and/or cost_multiplier. |
 | `cost_per_unit` | number | A new cost per unit for function_id. |
 | `cost_multiplier` | number | A new cost multiplier for function_id. |
-| `from` | string | Start of the window, an ISO 8601 date or date-time. Defaults to 30 days before to. |
-| `to` | string | End of the window, inclusive. Defaults to now; at most 366 days after from. |
+| `from` | string | Start of the window, an ISO 8601 date or date-time. Defaults to 30 days before the to date. |
+| `to` | string | End of the window, inclusive. Defaults to now; at most 366 days after the from date. |
 | `threshold_usd` | number | Count the customers whose spend in the window would cross this amount, up or down. |
 | `movers` | integer | How many of the biggest movers to list. Defaults to 10. |
 

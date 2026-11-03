@@ -13,7 +13,12 @@ Browse the public marketplace catalog of pricing functions.
 - **Behaviour:** read-only
 - **REST:** `/api/functions/catalog`
 
-_No arguments._
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `execution_type` | `rule_based` / `ml_model` / `llm_prompt` / `external_api` / `composite` | Only functions of this execution type. |
+| `tags` | array | Only functions carrying these tags. |
+| `limit` | integer | Page size. Defaults to 50; the API caps it at 100. |
+| `offset` | integer | Rows to skip. Defaults to 0. |
 
 ## `list_marketplace_listings`
 
