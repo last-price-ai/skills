@@ -4,6 +4,18 @@
 
 Index: [mcp-tools.md](mcp-tools.md).
 
+## `get_usage`
+
+Total your workspace's priced calls over a period, this calendar month by default: requests, units, compute time, cost, cached and prepaid calls, and the part of this month's cost still to be billed. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month. |
+| `end_date` | string | End of the period, ISO 8601. Defaults to now. |
+
 ## `get_usage_breakdown`
 
 See your usage grouped by pricing function: calls, spend and outcomes for each function over a period. Pass start_date and end_date to choose the period, and group_by function, the only grouping there is. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
@@ -19,7 +31,7 @@ See your usage grouped by pricing function: calls, spend and outcomes for each f
 
 ## `list_usage_events`
 
-List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Hosted MCP calls that carried a stated reason or trace also include mcp_reason and mcp_trace_id. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
@@ -97,7 +109,12 @@ Browse the public marketplace catalog of pricing functions.
 - **Behaviour:** read-only
 - **REST:** `/api/functions/catalog`
 
-_No arguments._
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `execution_type` | `rule_based` / `ml_model` / `llm_prompt` / `external_api` / `composite` | Only functions of this execution type. |
+| `tags` | array | Only functions carrying these tags. |
+| `limit` | integer | Page size. Defaults to 50; the API caps it at 100. |
+| `offset` | integer | Rows to skip. Defaults to 0. |
 
 ## `list_marketplace_listings`
 
@@ -789,7 +806,7 @@ Take the seller's standing counter: the negotiation closes as accepted at that p
 Handover, step 1: while you talk with someone about the business they would like to own (a driver, a stall, a barber), send the conversation so far as transcript and the sheet as it stands, and get the sheet back filled from what they said (their name, WhatsApp, what they sell, prices, country, currency), with the fields still missing. A language model fills it where the deployment has one, plain rules otherwise (filled_by). Nothing is saved. Record a conversation only after the person said yes to it. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** changes data
+- **Behaviour:** reaches outside Last Price
 - **REST:** `/api/handover/sheet`
 - **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
@@ -884,7 +901,7 @@ Read one Handover business: the brief, the page (name, words, look, items and pr
 
 ## `get_handover_page`
 
-Read a live Handover business by the address of its page (/b/<slug>), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
+Read a live Handover business by the address of its page (/b/{slug}), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
@@ -892,7 +909,7 @@ Read a live Handover business by the address of its page (/b/<slug>), with no cr
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+| `slug` **(required)** | string | The page address, the slug in /b/{slug}: 3 to 40 lowercase letters, digits or hyphens. |
 
 ## `order_from_handover_business`
 
@@ -904,7 +921,7 @@ Order from a live Handover business with no credential: a name, the items by id 
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `slug` **(required)** | string | The page address, the <slug> in /b/<slug>: 3 to 40 lowercase letters, digits or hyphens. |
+| `slug` **(required)** | string | The page address, the slug in /b/{slug}: 3 to 40 lowercase letters, digits or hyphens. |
 | `name` **(required)** | string | The name the owner sees on the order. |
 | `items` **(required)** | array | What to order. |
 | `when` | string | When it is wanted, in plain words. |
