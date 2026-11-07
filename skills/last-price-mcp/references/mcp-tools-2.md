@@ -4,6 +4,26 @@
 
 Index: [mcp-tools.md](mcp-tools.md).
 
+## `open_monetization_pull_request`
+
+Open the Last Price integration code (the files generate_monetization_code writes) as a pull request in one of the workspace's own GitHub repositories, through the installed Last Price GitHub App. Commits to a new branch (last-price/billing-setup unless branch is given) and opens a pull request against base or the default branch; never merges, and refuses a branch that exists. Early access. Needs a Last Price credential with billing write scope and the App installed (get_github_app_connection). Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** reaches outside Last Price
+- **Errors and cautions:** Commits to a new branch (last-price/billing-setup unless branch is given) and opens a pull request against base or the default branch; never merges, and refuses a branch that exists.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `repository` **(required)** | string | owner/name, like acme/agent-app; must be a repository the installation can use. |
+| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` | The app framework the code is written for. |
+| `agent_id` | string | One of your agents, filled into the code. |
+| `event_name` | string | The billable event the example records, like chat.completed. |
+| `customers` | boolean | Include creating customers at sign-up (default true). |
+| `payments` | boolean | Include billing through Stripe (default true). |
+| `base` | string | Branch to open the pull request against; the default branch when absent. |
+| `branch` | string | New branch for the commit; last-price/billing-setup when absent. |
+| `title` | string | Pull request title. |
+
 ## `get_usage`
 
 Total your workspace's priced calls over a period, this calendar month by default: requests, units, compute time, cost, cached and prepaid calls, and the part of this month's cost still to be billed. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
