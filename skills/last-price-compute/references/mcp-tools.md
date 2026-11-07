@@ -7,7 +7,7 @@ A tool missing from your own `tools/list` is not switched on for your connection
 
 ## `compute_price`
 
-Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then. confidence is the function's own 0 to 1 score for its price, not a probability that a buyer accepts.
+Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then. confidence is the function's own 0 to 1 score for its price, not a probability that a buyer accepts. price_statement says what the answer is: a third party's estimate for you, or the workspace's commitment when a signed quote is attached.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -28,6 +28,7 @@ Compute a price. Returns the price, the function that produced it, the metered c
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
 | `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `buyer_ceiling` | number / null | Optional. The most the buyer says it will pay, in the request currency (its budget, spend limit or offer cap). Never reaches the pricing function, so it cannot set the price; the model layer reads it as evidence about the buyer and checks it against what the buyer then does. Echoed in price_object.evidence.declared_ceiling. |
 | `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `routing_preference` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How to route across pricing functions. Defaults to "default". |
 | `routing` | object | Optional. Which functions may answer this call, by UUID from list_functions. If none qualifies, the call is refused before any charge. |

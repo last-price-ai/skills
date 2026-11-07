@@ -20,7 +20,7 @@ Ask Last Price what pricing inputs are missing. Start with request: {}, return i
 
 ## `compute_price`
 
-Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then. confidence is the function's own 0 to 1 score for its price, not a probability that a buyer accepts.
+Compute a price. Returns the price, the function that produced it, the metered cost and a `trace` of each stage. Send currency plus unit_cost (what the work costs you) or current_price. Missing inputs return an error naming them. For a competitor offer, put competitor_price, competitor_currency and competitive_action in metadata. A result with valid_until (RFC 3339) holds only until then. confidence is the function's own 0 to 1 score for its price, not a probability that a buyer accepts. price_statement says what the answer is: a third party's estimate for you, or the workspace's commitment when a signed quote is attached.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -41,6 +41,7 @@ Compute a price. Returns the price, the function that produced it, the metered c
 | `geo` | string | Optional geography hint, e.g. US. |
 | `buyer_type` | `agent` / `person` / `null` | Optional. Who the price is for: an AI agent or a person. Recorded with the quote only. |
 | `buyer_agent` | string / null | Optional. The buying agent, e.g. chatgpt. A label recorded with the quote only. |
+| `buyer_ceiling` | number / null | Optional. The most the buyer says it will pay, in the request currency (its budget, spend limit or offer cap). Never reaches the pricing function, so it cannot set the price; the model layer reads it as evidence about the buyer and checks it against what the buyer then does. Echoed in price_object.evidence.declared_ceiling. |
 | `channel` | string | Optional. The sales channel, e.g. an agent marketplace. With a rate saved by set_channel_rates, the price covers the channel's cut. |
 | `routing_preference` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How to route across pricing functions. Defaults to "default". |
 | `routing` | object | Optional. Which functions may answer this call, by UUID from list_functions. If none qualifies, the call is refused before any charge. |
@@ -69,7 +70,7 @@ Price up to 100 requests in one call. Each item in requests is the same request 
 
 ## `verify_price`
 
-Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (within_band, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as within_band. Act on next_step: buy (within band on confident, independent evidence), negotiate (too high), walk_away (far too high, confidently) or check_more (unknown, too low, or weak evidence); next_step_reason says why. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict.
+Ask whether a price makes sense for its context, rather than what the price should be. Returns a verdict (within_band, too_high, too_low, or unknown), the band it was judged against, a signed deviation from the reference, a confidence, and the evidence behind it. A verdict of "unknown" means the price could not be judged, which is not the same as within_band. Act on next_step: buy (within band on confident, independent evidence), negotiate (too high), walk_away (far too high, confidently) or check_more (unknown, too low, or weak evidence); next_step_reason says why. Pass quote_valid_until from the compute_price result the price came from, and where quote expiry is switched on the answer says quote_expired when that quote is stale. Where buyers' spend limits are switched on and metadata.category names a category, the evidence includes buyer_budget: what buyers' own spend checks allowed for it (buyer_envelope), reported and never counted in the verdict. price_statement says what the answer is: a third party's estimate whose band is an acceptance range around the reference, not an interval of value.
 
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** reaches outside Last Price
@@ -1217,7 +1218,7 @@ Confirm or change the category of one of your workspace's products: product_id i
 
 ## `contribute_price_data`
 
-Share one observed price with the data exchange and earn 10 tokens. The data point joins the shared pool that other workspaces can read, so send only prices that are public. The same source, product and price within 24 hours is refused as a duplicate and earns nothing. Send source_url, product_name, price and a vertical such as saas. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Share one observed price with the data exchange and earn 10 tokens. The data point joins the shared pool that other workspaces can read, so send only prices that are public. The same source, product and price within 24 hours is refused as a duplicate and earns nothing. Send source_url, product_name, price and a vertical such as saas. Say what the price is with speaker, standing and audience (defaults: a seller's public proposal, which is what a listed price is) and tax_included when the page says; a field you leave out is unknown, never a default. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
@@ -1234,6 +1235,10 @@ Share one observed price with the data exchange and earn 10 tokens. The data poi
 | `plan_name` | string | The plan tier, when the product has several. |
 | `scraped_at` | string | When the price was seen, as an ISO 8601 date-time. Defaults to now. |
 | `metadata` | object | Any extra detail to keep with the data point. |
+| `speaker` | `seller` / `buyer` / `both` / `third_party` / `market` | Who stood behind the price. Defaults to seller: a price on a public page is the seller's. |
+| `standing` | `proposal` / `commitment` | What the price committed anyone to. Defaults to proposal (a listed price); a metered rate card is a commitment. The pool never records that money moved, so a sale is not a pool entry. |
+| `audience` | `public` / `one_counterparty` | Whom the price was addressed to. Defaults to public. A private constraint such as a reserve or a ceiling is never shared. |
+| `tax_included` | boolean / null | Whether the price includes tax. Leave it out or send null when the page does not say; never guess. |
 
 ## `contribute_price_data_batch`
 
@@ -1275,7 +1280,7 @@ Read your balance of data-exchange tokens: what you hold, what you have earned b
 
 ## `query_jale_pool`
 
-Read price data other workspaces have shared in the data exchange: the newest data points, optionally for one vertical, with how many contributors back each and how fresh it is. Each query spends 5 tokens; below 5 tokens it is refused with your balance, and you earn tokens with contribute_price_data. Page with limit and offset. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read price data other workspaces have shared in the data exchange: the newest data points, optionally for one vertical, with how many contributors back each and how fresh it is. Each query spends 5 tokens; below 5 tokens it is refused with your balance, and you earn tokens with contribute_price_data. Page with limit and offset. Each point says who stood behind it (speaker), what it committed anyone to (standing) and whom it was for (audience): nearly every point is a seller's public proposal, which bounds what the seller would take and is not a sale. A null tax_included means unknown. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
@@ -2572,23 +2577,3 @@ Whether the workspace can open its billing code as a pull request: if that is sw
 - **Behaviour:** read-only
 
 _No arguments._
-
-## `open_monetization_pull_request`
-
-Open the Last Price integration code (the files generate_monetization_code writes) as a pull request in one of the workspace's own GitHub repositories, through the installed Last Price GitHub App. Commits to a new branch (last-price/billing-setup unless branch is given) and opens a pull request against base or the default branch; never merges, and refuses a branch that exists. Early access. Needs a Last Price credential with billing write scope and the App installed (get_github_app_connection). Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Commits to a new branch (last-price/billing-setup unless branch is given) and opens a pull request against base or the default branch; never merges, and refuses a branch that exists.
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `repository` **(required)** | string | owner/name, like acme/agent-app; must be a repository the installation can use. |
-| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` | The app framework the code is written for. |
-| `agent_id` | string | One of your agents, filled into the code. |
-| `event_name` | string | The billable event the example records, like chat.completed. |
-| `customers` | boolean | Include creating customers at sign-up (default true). |
-| `payments` | boolean | Include billing through Stripe (default true). |
-| `base` | string | Branch to open the pull request against; the default branch when absent. |
-| `branch` | string | New branch for the commit; last-price/billing-setup when absent. |
-| `title` | string | Pull request title. |
