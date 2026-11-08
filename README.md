@@ -58,12 +58,20 @@ This repository is a plugin for Claude Code, Cursor, Codex and ChatGPT, and an e
 
 **Claude Code**
 
+One command, in your shell (Claude Code 2.1.292 or later) or in a session with a leading `/`:
+
+```bash
+claude plugin install lastprice --marketplace last-price-ai/skills
+```
+
+On an older Claude Code, add the marketplace first, then install:
+
 ```
 /plugin marketplace add last-price-ai/skills
 /plugin install lastprice@last-price
 ```
 
-Claude Code asks for an optional API key when the plugin is enabled and keeps it in your system's secure storage.
+Claude Code asks for an optional API key when the plugin is enabled and keeps it in your system's secure storage. Skills only, no MCP server: `npx skills add last-price-ai/skills` (see below).
 
 **Codex**
 
