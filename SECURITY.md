@@ -15,7 +15,7 @@ This repository holds instructions and manifests, not a server. The plugins run 
 
 - A skill or manifest that tells an assistant to leak a key, skip a confirmation, or act outside what the user asked for.
 - A manifest that connects to anything other than `https://api.last-price.ai/api/mcp/rpc`, or that installs payment tools (the plugins use the directory tool set, which has none).
-- A problem in the TypeScript x402 client under `payments/x402-safe-client/`.
+- A problem in the TypeScript x402 client under `payments/x402-safe-client/` on the `tooling` branch.
 - Anything in the published ClawHub package (`@last-price/lastprice`) that isn't in this repository.
 
 ## Supported versions

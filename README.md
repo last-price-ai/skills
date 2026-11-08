@@ -170,7 +170,7 @@ The plugin, extension and manifests in this repository contain no code that runs
 | `gemini-extension.json`, `GEMINI.md` | Gemini CLI |
 | `skills/` | all of them |
 
-Keep the version in all four manifests equal; `scripts/check-manifests.mjs` fails when they differ.
+Keep the version in all the manifests equal; `scripts/check-manifests.mjs` on the [`tooling`](https://github.com/last-price-ai/skills/tree/tooling) branch fails when they differ. (Scripts and `package.json` live on that branch because the Claude plugin directory accepts no scripts or package-manager files inside a plugin from an unverified organisation; check it out beside this one with `git worktree add ../skills-tooling tooling` and run the commands below from here.)
 
 ## API keys
 
@@ -192,21 +192,21 @@ Both are first class and reach the same backend.
 
 ## Keeping skills current
 
-`scripts/check-spec-drift.py` (Python 3, standard library only):
+`../skills-tooling/scripts/check-spec-drift.py` (Python 3, standard library only):
 
 - diffs the live OpenAPI operations against the committed snapshot `spec/paths.snapshot.txt`, and
 - checks that every API path mentioned in `skills/*/SKILL.md` still exists in the live spec.
 
 ```bash
-python3 scripts/check-spec-drift.py           # exit 1 on drift or missing paths
-python3 scripts/check-spec-drift.py --update  # refresh the snapshot after re-verifying skills
+python3 ../skills-tooling/scripts/check-spec-drift.py           # exit 1 on drift or missing paths
+python3 ../skills-tooling/scripts/check-spec-drift.py --update  # refresh the snapshot after re-verifying skills
 ```
 
-`scripts/sync.mjs` (Node 18+, no dependencies) does the same for the MCP connector: it reads the live `tools/list`, fails when a tool is named in no skill or a known tool disappears or changes its required arguments, and regenerates each skill's `references/mcp-tools.md` (split into an index and `mcp-tools-<n>.md` parts when it would pass 200 kB; every argument, access level and documented refusal of the tools that skill names).
+`../skills-tooling/scripts/sync.mjs` (Node 18+, no dependencies) does the same for the MCP connector: it reads the live `tools/list`, fails when a tool is named in no skill or a known tool disappears or changes its required arguments, and regenerates each skill's `references/mcp-tools.md` (split into an index and `mcp-tools-<n>.md` parts when it would pass 200 kB; every argument, access level and documented refusal of the tools that skill names).
 
 ```bash
-node scripts/sync.mjs --check   # exit 1 on drift
-node scripts/sync.mjs           # regenerate references/mcp-tools.md
+node ../skills-tooling/scripts/sync.mjs --check   # exit 1 on drift
+node ../skills-tooling/scripts/sync.mjs           # regenerate references/mcp-tools.md
 ```
 
 `.github/workflows/spec-drift.yml` runs both every weekday, on demand, and on a `repository_dispatch` (`api-changed`) that Last Price can send after each release, and opens a pull request when anything drifted. When it reports drift, re-read the changed operations, update the affected skills, add a `CHANGELOG.md` entry, and refresh the snapshot.
@@ -227,7 +227,7 @@ node scripts/sync.mjs           # regenerate references/mcp-tools.md
 
 ## Payments (not in the plugins)
 
-The plugins and the `skills/` folder leave out payments: they use the connector's directory tool set (`?profile=directory`), which has no wallet, top-up, day-pass, spend-session or payout tools. Integrators who pay per call with x402 (USDC on Base) can read [`payments/`](payments/): the [pay-per-call skill](payments/last-price-x402/SKILL.md), the [spend policy skill](payments/last-price-spend-policy/SKILL.md), the [wallet recipe](payments/01-price-with-a-wallet-x402.md) and the [TypeScript x402 client](payments/x402-safe-client/). No plugin loads them.
+The plugins and the `skills/` folder leave out payments: they use the connector's directory tool set (`?profile=directory`), which has no wallet, top-up, day-pass, spend-session or payout tools. Integrators who pay per call with x402 (USDC on Base) can read [`payments/`](payments/): the [pay-per-call skill](payments/last-price-x402/SKILL.md), the [spend policy skill](payments/last-price-spend-policy/SKILL.md), the [wallet recipe](payments/01-price-with-a-wallet-x402.md) and the [TypeScript x402 client](https://github.com/last-price-ai/skills/tree/tooling/payments/x402-safe-client) (on the `tooling` branch). No plugin loads them.
 
 ## License
 
