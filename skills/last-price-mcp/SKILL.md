@@ -6,7 +6,7 @@ description: Use when the Last Price MCP connector is available and the task is 
 
 - Endpoint (install/reconnect): `https://api.last-price.ai/api/mcp/rpc?profile=directory`. This skill pack covers the directory tool set, which leaves out payments, wallets and payouts. Discovery: `https://api.last-price.ai/.well-known/mcp.json`.
 - The connector exposes roughly 260 tools and grows often. Always list the live tools (and read the full schema of the one you call) before calling; treat the map below as a guide, not a frozen schema.
-- Credential: set `LASTPRICE_API_KEY` in the connector config (an `lp_...` key). Without one, the compute/verify tools silently run the **public demo** (one pinned function, `metadata` and constraints dropped, elasticity assumed -1.2). Read `_lastprice_notice` on every response and label demo results as demo.
+- Credential: in the Claude Code plugin, the API-key option asked at install (an `lp_...` key); in other MCP clients, the connector's own settings. Without one, the compute/verify tools silently run the **public demo** (one pinned function, `metadata` and constraints dropped, elasticity assumed -1.2). Read `_lastprice_notice` on every response and label demo results as demo.
 - Many tools state "Needs a claimed workspace": a self-registered sandbox key gets 403 until a person claims it (see `last-price-auth`).
 
 ## Tool map by job

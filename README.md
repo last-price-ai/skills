@@ -176,10 +176,11 @@ Keep the version in all the manifests equal; `scripts/check-manifests.mjs` on th
 
 For workspace access, create a scoped key in [Settings](https://app.last-price.ai), or self-register with `POST /api/agents/register` for a sandbox key and claim link.
 
-Store the key in your environment or secret store:
+Where the key lives:
 
-- HTTP: `LP_API_KEY`, sent as `x-api-key: $LP_API_KEY`.
-- MCP: `LASTPRICE_API_KEY` in the connector configuration.
+- Claude Code plugin: the API-key option asked at install; change it with `/plugin` settings. Nothing reads your environment.
+- HTTP: your key in the `x-api-key` header (`$LP_API_KEY` in the examples is a placeholder).
+- Other MCP clients: the connector's own settings.
 
 Verify a key with `GET https://api.last-price.ai/api/me`. See [authentication](skills/last-price-auth/SKILL.md) for scopes, sandbox limits and OAuth.
 

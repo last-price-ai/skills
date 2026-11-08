@@ -40,7 +40,7 @@ Common named scopes: `price:compute`, `price:compute:batch`, `pcn:function:read|
 
 ## Secret handling
 
-- Environment variable `LP_API_KEY` for HTTP; the MCP connector reads `LASTPRICE_API_KEY`. Same secret class.
+- Where the key lives: in the Claude Code plugin, the plugin's own API-key option (asked at install, sent as the header for you); in other MCP clients, the connector's own settings; for direct HTTP, the secret store your system already uses, passed as `x-api-key`. The `$LP_API_KEY` in the examples below is a placeholder for that value. Same secret class everywhere.
 - Never ask a user to paste a key into chat; use the host's secret store or connector auth.
 - Never log keys, claim tokens (`lpc_...`), or payment headers. Do not pretend auth succeeded when the API refuses.
 

@@ -25,7 +25,7 @@ The free demo at `/api/public/compute/demo` has narrower inputs and routing. Ful
 
 ## Credentials in one line
 
-HTTP: `x-api-key: $LP_API_KEY`. MCP connector: `LASTPRICE_API_KEY`. Never paste keys into chat or logs. See `last-price-auth`.
+HTTP: the `x-api-key` header carries the key. In the Claude Code plugin the key is the plugin's own API-key option, asked once at install and sent for you; nothing reads it from the machine. Never paste keys into chat or logs. See `last-price-auth`.
 
 ## Which skill
 
