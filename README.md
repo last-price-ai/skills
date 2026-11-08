@@ -58,7 +58,7 @@ This repository is a plugin for Claude Code, Cursor, Codex and ChatGPT, and an e
 
 **Claude Code**
 
-One command, in your shell (Claude Code 2.1.292 or later) or in a session with a leading `/`:
+One command in your shell (Claude Code 2.1.292 or later), or `/plugin install lastprice --marketplace last-price-ai/skills` inside a session:
 
 ```bash
 claude plugin install lastprice --marketplace last-price-ai/skills
