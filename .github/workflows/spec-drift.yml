@@ -2,7 +2,7 @@ name: spec-drift
 
 # Re-checks every skill against the live Last Price API: the OpenAPI
 # operations (check-spec-drift.py) and the MCP connector's tools
-# (scripts/sync.mjs). api.last-price.ai is production, which ships from the
+# (scripts/sync.mjs, both on the tooling branch). api.last-price.ai is production, which ships from the
 # last-price `release` branch, so this keeps the skills in step with prod
 # (not with last-price main). Runs every three hours, on demand, and when
 # Last Price sends a repository_dispatch "api-changed" event after a release.
@@ -40,6 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: tooling
+          path: tooling
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -49,20 +53,20 @@ jobs:
       - name: OpenAPI operations and skill paths
         id: spec
         continue-on-error: true
-        run: python3 scripts/check-spec-drift.py | tee spec.txt
+        run: python3 tooling/scripts/check-spec-drift.py | tee spec.txt
       - name: MCP tools and generated references
         id: tools
         continue-on-error: true
-        run: node scripts/sync.mjs --check | tee tools.txt
+        run: node tooling/scripts/sync.mjs --check | tee tools.txt
       - name: Regenerate tool references
         if: steps.tools.outcome == 'failure' && github.ref == 'refs/heads/main'
-        run: node scripts/sync.mjs --keep-required || true
+        run: node tooling/scripts/sync.mjs --keep-required || true
       # A branch run is someone reviewing the skills: regenerate and record the
       # required arguments as reviewed, then commit to the branch.
       - name: Regenerate and commit to this branch
         if: steps.tools.outcome == 'failure' && github.ref != 'refs/heads/main'
         run: |
-          node scripts/sync.mjs || true
+          node tooling/scripts/sync.mjs || true
           git add skills/ required-args.json
           if git diff --cached --quiet; then exit 0; fi
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
