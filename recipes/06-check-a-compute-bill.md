@@ -4,7 +4,7 @@ An agent rents compute, does the job and reports what it cost. This recipe check
 
 The example is a real one: an agent wrote a Blender scene, rented 10 GPUs on RunPod for 52 minutes, rendered the film in 4K and reported **$5.75 total**. Every call below was run against the live connector without a key (the public demo), and the outputs are trimmed from the real answers.
 
-You need nothing for steps 1 to 3: all three ran keyless, step 3 included (the demo routed it to `lastprice/cost-plus`). Without a key the answers come from the public demo, which is rate limited per IP and pinned to one pricing function. Read `_lastprice_notice` on each answer and say "demo" when you report it.
+You need nothing for steps 1 to 3: all three ran keyless, step 3 included (the demo routed it to `lastprice/cost-plus`). Without a key the answers come from the public demo, which is rate limited per IP. Read `_lastprice_notice` on each answer and say "demo" when you report it.
 
 ## 1. Don't ask with the price alone
 
