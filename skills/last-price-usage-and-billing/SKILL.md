@@ -46,5 +46,5 @@ The one click instrumentation setup mints an API key, so only a person signed in
 - Keep keys and payment headers out of chat and logs.
 
 ```bash
-curl -sS 'https://api.last-price.ai/api/usage' -H "User-Agent: acme-bot/billing" -H "x-api-key: $LP_API_KEY"
+curl -sS 'https://api.last-price.ai/api/usage' -H "User-Agent: acme-bot/billing" -H "x-api-key: YOUR_API_KEY"
 ```

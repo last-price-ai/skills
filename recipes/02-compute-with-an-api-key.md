@@ -6,13 +6,13 @@ Pick one:
 - **No human, free sandbox:** `POST /api/agents/register` with `{"name":"my-system/pricing-agent"}` (optional `contact_email`, `intended_use`). Answers `201` with a sandbox workspace, an API key shown once in `api_key.key`, and `claim.claim_url` for a person. Free: 25 compute calls a day on built-in functions; the key lasts 30 days. Features that need a claimed workspace answer `403 sandbox_restricted`.
 - **Person-owned workspace:** a person signs up at https://app.last-price.ai/sign-up and creates a key with the `price:compute` scope in Settings.
 
-Store the key as `LP_API_KEY`. Check it: `GET /api/me` with `x-api-key` returns `tenant_id`, `auth_method`, `scopes`. A key that reaches `/api/me` but lacks `price:compute` gets `403 insufficient_scope` on compute.
+Keep the key in the plugin option, the connector settings or your secret store. Check it: `GET /api/me` with `x-api-key` returns `tenant_id`, `auth_method`, `scopes`. A key that reaches `/api/me` but lacks `price:compute` gets `403 insufficient_scope` on compute.
 
 Not sure which inputs you have? `POST /api/compute/conversation` with `{}` (no credential needed for preparation) answers `needs_input` with `questions` and a `continuation`. Ask your caller those questions; never guess costs or bounds.
 
 ## The request
 
-`POST /api/compute/price`, header `x-api-key: $LP_API_KEY`. `context.currency` is required. Omit optional fields rather than sending `null`. Turn on `options.include_explanation`, `include_confidence`, `include_alternatives` while you learn the API.
+`POST /api/compute/price`, header `x-api-key: YOUR_API_KEY`. `context.currency` is required. Omit optional fields rather than sending `null`. Turn on `options.include_explanation`, `include_confidence`, `include_alternatives` while you learn the API.
 
 ### A. You have an incumbent price
 
