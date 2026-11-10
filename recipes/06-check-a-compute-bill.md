@@ -51,7 +51,7 @@ verify_price {
 | Secure Cloud, $7.72 | 6.99 | `too_low` | 5.94 to 8.04 | −17.74 | `check_more` |
 | Community Cloud, $2.95 | 2.70 | `too_high` | 2.30 to 3.11 | +112.96 | `walk_away` |
 
-`deviation_pct` is measured against `reference_price`, not against what you sent: 5.75 / 6.99 − 1 = −17.7%. The demo turns `current_price` into a profit-maximising reference with an assumed elasticity of −1.2, and the evidence `note` says so.
+`deviation_pct` is measured against `reference_price`, not against what you sent: 5.75 / 6.99 − 1 = −17.7%. The demo turns `current_price` into a reference with an assumed elasticity of −1.2 and no unit cost, so in effect it maximises revenue, not profit. The evidence `note` says so; send `metadata.unit_cost` to price for profit.
 
 Both answers rest on independent evidence (`independent_evidence: true`, confidence 0.5), and they disagree. $5.75 works out to about $0.66 per GPU-hour. That is too cheap for a Secure Cloud 4090 and about twice the Community Cloud rate, so the bill doesn't match an RTX 4090 on either tier. Most likely it was a different GPU, or a mix of tiers.
 
