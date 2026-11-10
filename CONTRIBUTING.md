@@ -30,7 +30,7 @@ Thanks for helping. This repository is the Last Price agent skills and the plugi
 - **No payments in the plugins.** Every MCP server definition points at `?profile=directory`, which has no wallet, top-up, spend-session or payout tools. Payment material lives in `payments/`, which no plugin loads. Don't move it into `skills/`.
 - **One server.** MCP server definitions connect only to `https://api.last-price.ai/api/mcp/rpc`, with a `via` tag for the host.
 - **Keep the versions equal.** A release bumps the version in all six manifests (`.claude-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `plugin.json`, `gemini-extension.json`, `openclaw.plugin.json`, and `package.json` on the `tooling` branch). `check-manifests.mjs` fails if they differ.
-- **Keys stay out of files.** Never commit an API key, even in an example. Use `LP_API_KEY` or `LASTPRICE_API_KEY` from the environment.
+- **Keys stay out of files.** Never commit an API key, even in an example. Examples write `YOUR_API_KEY` where the key goes.
 
 ## Releases
 

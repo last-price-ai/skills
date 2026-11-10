@@ -14,7 +14,7 @@ Examples for workspace compute, checking a compute bill, marketplace listings, e
 
 - Base URL: `https://api.last-price.ai`. The contract is the OpenAPI document at `https://api.last-price.ai/api/openapi` (YAML). Re-read it when a field looks unfamiliar; it wins over these recipes.
 - Send a descriptive `User-Agent` of the form `<your-agent>/<role>`.
-- Send API keys as `x-api-key: $LP_API_KEY`. Do **not** put an API key in `Authorization: Bearer` (bearer is for JWTs).
-- Keep secrets (API keys, embed tokens, wallet keys) in environment variables or a secret store. Never put them in code, prompts, logs or reports.
+- Send API keys in the `x-api-key` header. Do **not** put an API key in `Authorization: Bearer` (bearer is for JWTs).
+- Keep secrets (API keys, embed tokens, wallet keys) in the plugin option, the connector settings or the secret store your system already uses. Never put them in code, prompts, logs or reports.
 - Error bodies carry `error`, often a `code`, and may carry `hint`, `next`, `example`, `issues` and `retry_after`. Read them before retrying.
 - A `429` means wait `retry_after` seconds. A `429 quota_exceeded` lists ways past the limit in `next`.

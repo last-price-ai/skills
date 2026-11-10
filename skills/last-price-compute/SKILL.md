@@ -8,7 +8,7 @@ Use when the user wants a price decision: quote a SKU, plan, or task; match or u
 
 ## Defaults
 
-- `POST https://api.last-price.ai/api/compute/price` with `x-api-key: $LP_API_KEY` and `User-Agent: <system>/<role>` (see `last-price-auth`). Scoped and agent keys need `price:compute` (batch: `price:compute:batch`).
+- `POST https://api.last-price.ai/api/compute/price` with the `x-api-key` header and `User-Agent: <system>/<role>` (see `last-price-auth`). Scoped and agent keys need `price:compute` (batch: `price:compute:batch`).
 - MCP equivalent: `compute_price` / `compute_prices_batch` (see `last-price-mcp`). Without a credential the MCP tool runs the demo.
 - The returned price is advice; it never updates a store.
 
@@ -78,7 +78,7 @@ curl -sS -X POST https://api.last-price.ai/api/public/compute/demo \
 ```bash
 curl -sS -X POST https://api.last-price.ai/api/compute/price \
   -H "User-Agent: acme-bot/pricing" \
-  -H "x-api-key: $LP_API_KEY" \
+  -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "context": {

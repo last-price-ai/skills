@@ -24,7 +24,7 @@ A key limited to specific scopes may be refused on operations that name no scope
 
 ```bash
 curl -sS -X POST https://api.last-price.ai/api/webhooks \
-  -H "User-Agent: acme-bot/integrator" -H "x-api-key: $LP_API_KEY" -H 'Content-Type: application/json' \
+  -H "User-Agent: acme-bot/integrator" -H "x-api-key: YOUR_API_KEY" -H 'Content-Type: application/json' \
   -d '{"url":"https://example.com/lp-hooks","events":["price_proposal.created","approval.requested","balance.low"]}'
 ```
 

@@ -7,7 +7,7 @@ description: Use when a last-price.ai call needs a credential, returns 401/402/4
 ## Request headers (every HTTP call)
 
 - `User-Agent: <system>/<role>` (lowercase, hyphenated, for example `acme-bot/repricer`). Last Price uses it for attribution when several agents share a workspace.
-- API keys (`lp_...`) go in `x-api-key: $LP_API_KEY`. **Never** put an API key in `Authorization: Bearer`: that answers 401 `api_key_in_bearer` and emails the workspace owner a misuse alert.
+- API keys (`lp_...`) go in the `x-api-key` header. **Never** put an API key in `Authorization: Bearer`: that answers 401 `api_key_in_bearer` and emails the workspace owner a misuse alert.
 - `Authorization: Bearer <token>` is only for a session JWT or an OAuth access token the product issued.
 - A 401 on a key check is not proof the key is dead; read the error `code` in the body.
 
@@ -15,7 +15,7 @@ description: Use when a last-price.ai call needs a credential, returns 401/402/4
 
 The live list is in `/llms.txt` and `/.well-known/agents.json` (`access_options`, `pay_or_auth`). Re-read them; they change.
 
-1. **Self-register an agent (no human):** `POST /api/agents/register` with `{"name":"your-system/role"}` (optional `contact_email`, `intended_use`). Returns a sandbox key once plus a claim link for a person. Store the key immediately as `LP_API_KEY` in a secret store. Over MCP the same sign-up is the `register_agent` tool; a key you already hold can be attached to a keyless MCP session with `use_api_key`. Both appear in the tool list only where self-registration is switched on.
+1. **Self-register an agent (no human):** `POST /api/agents/register` with `{"name":"your-system/role"}` (optional `contact_email`, `intended_use`). Returns a sandbox key once plus a claim link for a person. Hand the key straight to the plugin's API-key option or your client's connector settings; do not write it to a file. Over MCP the same sign-up is the `register_agent` tool; a key you already hold can be attached to a keyless MCP session with `use_api_key`. Both appear in the tool list only where self-registration is switched on.
 2. **OAuth client credentials:** `POST /api/oauth/register` (RFC 7591) then `client_credentials` at `POST /api/oauth/token`. Same sandbox as self-registration.
 3. **Person-owned workspace:** a person signs up at `https://app.last-price.ai/sign-up` and creates a scoped API key (Settings) or an agent-bound key (`POST /api/agents/{id}/keys`) for the agent.
 
@@ -40,7 +40,7 @@ Common named scopes: `price:compute`, `price:compute:batch`, `pcn:function:read|
 
 ## Secret handling
 
-- Where the key lives: in the Claude Code plugin, the plugin's own API-key option (asked at install, sent as the header for you); in other MCP clients, the connector's own settings; for direct HTTP, the secret store your system already uses, passed as `x-api-key`. The `$LP_API_KEY` in the examples below is a placeholder for that value. Same secret class everywhere.
+- Where the key lives: in the Claude Code plugin, the plugin's own API-key option (asked at install, sent as the header for you); in other MCP clients, the connector's own settings; for direct HTTP, the secret store your system already uses, passed as `x-api-key`. `YOUR_API_KEY` in the examples below marks where that value goes. Same secret class everywhere.
 - Never ask a user to paste a key into chat; use the host's secret store or connector auth.
 - Never log keys, claim tokens (`lpc_...`), or payment headers. Do not pretend auth succeeded when the API refuses.
 
@@ -49,5 +49,5 @@ Common named scopes: `price:compute`, `price:compute:batch`, `pcn:function:read|
 ```bash
 curl -sS https://api.last-price.ai/api/me \
   -H "User-Agent: acme-bot/setup" \
-  -H "x-api-key: $LP_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 ```

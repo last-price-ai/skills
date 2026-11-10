@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/banner.svg" alt="Last Price: Price computation as a service" width="100%">
+  <img src="assets/banner.png" alt="Last Price: Price computation as a service" width="100%">
 </p>
 
 <h1 align="center">Last Price Agent Skills</h1>
@@ -86,7 +86,7 @@ codex plugin add lastprice@last-price
 gemini extensions install https://github.com/last-price-ai/skills
 ```
 
-Gemini CLI asks for an optional API key at install time (stored in your keychain); change it later with `gemini extensions config lastprice`.
+Gemini CLI asks for an optional API key at install time and keeps it in the extension's own settings; change it later with `gemini extensions config lastprice`.
 
 **Cursor**
 
@@ -179,7 +179,7 @@ For workspace access, create a scoped key in [Settings](https://app.last-price.a
 Where the key lives:
 
 - Claude Code plugin: the API-key option asked at install; change it with `/plugin` settings. Nothing reads your environment.
-- HTTP: your key in the `x-api-key` header (`$LP_API_KEY` in the examples is a placeholder).
+- HTTP: your key in the `x-api-key` header (`YOUR_API_KEY` in the examples is where it goes).
 - Other MCP clients: the connector's own settings.
 
 Verify a key with `GET https://api.last-price.ai/api/me`. See [authentication](skills/last-price-auth/SKILL.md) for scopes, sandbox limits and OAuth.
