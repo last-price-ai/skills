@@ -32,29 +32,28 @@ verify_price {
 Turn the job into units and multiply by a posted rate:
 
 - Units: 10 GPUs × 52 minutes = **8.67 GPU-hours**.
-- Rate: use the GPU model and cloud tier on your own receipt, look its rate up on the provider's pricing page, and keep the link. The post this example comes from didn't name the GPU, so here we assume an RTX 4090, a common choice for Blender renders. When this was written, RunPod's [RTX 4090 page](https://www.runpod.io/gpu/4090) listed $0.34 per GPU-hour on Community Cloud and $0.69 on Secure Cloud.
-- Reference: 8.67 × $0.69 = **$5.98** (Secure Cloud). On Community Cloud it would be 8.67 × $0.34 = $2.95. If you don't know the model or tier, check against every candidate and report the range instead of choosing one.
+- Rate: use the GPU model and cloud tier on your own receipt, look its rate up on the provider's pricing page, and keep the link. The post this example comes from didn't name the GPU or the tier, so here we assume an RTX 4090, a common choice for Blender renders. On 10 Nov 2026 RunPod's [RTX 4090 page](https://www.runpod.io/gpu/4090) listed $0.89 per GPU-hour on Secure Cloud and $0.34 on Community Cloud.
+- References: 8.67 × $0.89 = **$7.72** (Secure Cloud) and 8.67 × $0.34 = **$2.95** (Community Cloud).
 
-Send the reference as `current_price`:
+The tier isn't known, so check against both. Send each reference as `current_price`:
 
 ```json
 verify_price {
-  "proposed_price": 5.75, "currency": "USD", "current_price": 5.98, "buyer_type": "agent",
+  "proposed_price": 5.75, "currency": "USD", "current_price": 7.72, "buyer_type": "agent",
   "metadata": { "job": "10 GPUs x 52 min = 8.67 GPU-hours",
-                "reference": "RunPod Secure Cloud RTX 4090 $0.69/GPU-hour x 8.67 (GPU model assumed)",
+                "reference": "RunPod Secure Cloud RTX 4090 $0.89/GPU-hour x 8.67 (GPU model assumed)",
                 "reference_url": "https://www.runpod.io/gpu/4090" }
 }
 ```
 
-```json
-{
-  "verdict": "within_band", "band": { "lower": 4.66, "upper": 6.3 },
-  "deviation_pct": 4.93, "confidence": 0.5, "independent_evidence": true,
-  "next_step": "buy"
-}
-```
+| Reference | `verdict` | `band` | `deviation_pct` | `next_step` |
+|---|---|---|---|---|
+| Secure Cloud, $7.72 | `too_low` | 5.94 to 8.04 | −17.74 | `check_more` |
+| Community Cloud, $2.95 | `too_high` | 2.30 to 3.11 | +112.96 | `walk_away` |
 
-Now the evidence doesn't come from the bill, and the answer is `buy`, as long as the GPU really was a 4090. $5.75 works out to about $0.66 per GPU-hour, which is what Secure Cloud costs. Tell the person two things: the bill was fair for Secure Cloud, and Community Cloud would have done the same job for about half.
+Both answers rest on independent evidence (`independent_evidence: true`, confidence 0.5), and they disagree. $5.75 works out to about $0.66 per GPU-hour. That is too cheap for a Secure Cloud 4090 and about twice the Community Cloud rate, so the bill doesn't match an RTX 4090 on either tier. Most likely it was a different GPU, or a mix of tiers.
+
+So the honest report is not "fair" or "unfair". It is: "the bill doesn't match a posted rate for the GPU I assumed. Show me the GPU model and tier on the receipt." With that line in hand, run the single check again. If the job ran on Community Cloud 4090s, `walk_away` means the next render can be done for about half.
 
 ## 3. Reselling the render: price it from cost
 

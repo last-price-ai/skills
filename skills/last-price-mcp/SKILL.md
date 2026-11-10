@@ -72,7 +72,7 @@ description: Use when the Last Price MCP connector is available and the task is 
 
 - **Quote with missing inputs:** `pricing_conversation` prepare, ask the user the returned questions, resend with answers, then compute.
 - **Quote, then learn:** `compute_price` (keep `receipt.id`), later `report_outcome` with what really happened.
-- **Check a compute or rental bill:** turn the job into units (10 GPUs × 52 min = 8.67 GPU-hours), multiply by a posted rate you can link, and pass that as `current_price` to `verify_price`. With the bill alone the evidence is circular (`independent_evidence: false`, `next_step: check_more`). Worked example: `recipes/06-check-a-compute-bill.md`.
+- **Check a compute or rental bill:** turn the job into units (10 GPUs × 52 min = 8.67 GPU-hours), multiply by a posted rate you can link, and pass that as `current_price` to `verify_price`. With the bill alone the evidence is circular (`independent_evidence: false`, `next_step: check_more`). If the model or tier is unknown, check every candidate rate and report the disagreement. Worked example: `recipes/06-check-a-compute-bill.md`.
 - **Workspace health check:** `get_pricing_analysis`, `get_price_guardrails`, `get_usage`, `list_approvals`.
 - **Tighten guardrails safely:** `get_price_guardrails`, merge the change, `set_price_guardrails` with every rule, read back.
 
