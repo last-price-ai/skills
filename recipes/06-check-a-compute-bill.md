@@ -4,7 +4,7 @@ An agent rents compute, does the job and reports what it cost. This recipe check
 
 The example is a real one: an agent wrote a Blender scene, rented 10 GPUs on RunPod for 52 minutes, rendered the film in 4K and reported **$5.75 total**. Every call below was run against the live connector without a key (the public demo), and the outputs are trimmed from the real answers.
 
-You need nothing for these steps. Without a key the answers come from the public demo, which is rate limited per IP and pinned to one pricing function. Read `_lastprice_notice` on each answer and say "demo" when you report it.
+You need nothing for steps 1 to 3: all three ran keyless, step 3 included (the demo routed it to `lastprice/cost-plus`). Without a key the answers come from the public demo, which is rate limited per IP and pinned to one pricing function. Read `_lastprice_notice` on each answer and say "demo" when you report it.
 
 ## 1. Don't ask with the price alone
 
@@ -32,8 +32,8 @@ verify_price {
 Turn the job into units and multiply by a posted rate:
 
 - Units: 10 GPUs × 52 minutes = **8.67 GPU-hours**.
-- Rate: look the rate up yourself, on the provider's pricing page or a price tracker, and keep the link. When this was written, RunPod listed an RTX 4090 at $0.34 per GPU-hour on Community Cloud and $0.69 on Secure Cloud.
-- Reference: 8.67 × $0.69 = **$5.98** (Secure Cloud). On Community Cloud it would be 8.67 × $0.34 = $2.95.
+- Rate: use the GPU model and cloud tier on your own receipt, look its rate up on the provider's pricing page, and keep the link. The post this example comes from didn't name the GPU, so here we assume an RTX 4090, a common choice for Blender renders. When this was written, RunPod's [RTX 4090 page](https://www.runpod.io/gpu/4090) listed $0.34 per GPU-hour on Community Cloud and $0.69 on Secure Cloud.
+- Reference: 8.67 × $0.69 = **$5.98** (Secure Cloud). On Community Cloud it would be 8.67 × $0.34 = $2.95. If you don't know the model or tier, check against every candidate and report the range instead of choosing one.
 
 Send the reference as `current_price`:
 
@@ -41,7 +41,8 @@ Send the reference as `current_price`:
 verify_price {
   "proposed_price": 5.75, "currency": "USD", "current_price": 5.98, "buyer_type": "agent",
   "metadata": { "job": "10 GPUs x 52 min = 8.67 GPU-hours",
-                "reference": "RunPod Secure Cloud RTX 4090 $0.69/GPU-hour x 8.67" }
+                "reference": "RunPod Secure Cloud RTX 4090 $0.69/GPU-hour x 8.67 (GPU model assumed)",
+                "reference_url": "https://www.runpod.io/gpu/4090" }
 }
 ```
 
@@ -53,7 +54,7 @@ verify_price {
 }
 ```
 
-Now the evidence doesn't come from the bill, and the answer is `buy`. $5.75 works out to about $0.66 per GPU-hour, which is what Secure Cloud costs. Tell the person two things: the bill was fair for Secure Cloud, and Community Cloud would have done the same job for about half.
+Now the evidence doesn't come from the bill, and the answer is `buy`, as long as the GPU really was a 4090. $5.75 works out to about $0.66 per GPU-hour, which is what Secure Cloud costs. Tell the person two things: the bill was fair for Secure Cloud, and Community Cloud would have done the same job for about half.
 
 ## 3. Reselling the render: price it from cost
 
@@ -74,7 +75,7 @@ compute_price {
 }
 ```
 
-`target_margin_pct` is the margin on the price, not a markup on cost: 5.75 / (1 − 0.30) = 8.21. The quote holds until `valid_until`. Keep `request_id`, and once you know whether the client paid, send that with `report_outcome`.
+`target_margin_pct` is the margin on the price, not a markup on cost: 5.75 / (1 − 0.30) = 8.21. The quote holds until `valid_until`. With a claimed workspace key the result carries `receipt.id`: keep it, and once you know whether the client paid, pass it as `usage_event_id` to `report_outcome`. Demo results have no receipt and can't be reported.
 
 ## Rules
 
