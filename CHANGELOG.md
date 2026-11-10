@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recipe 06, check a compute bill: a real example of an agent that rented 10 GPUs for 52 minutes and reported $5.75. It shows why `verify_price` with the bill alone answers `check_more`, how to build a reference from GPU-hours times a posted rate, and how to price a resale with cost-plus. The MCP skill's common flows point to it.
 - Scripts, `package.json` and the TypeScript x402 client moved to the orphan `tooling` branch. The Claude plugin directory refused v0.3.0 on 8 Nov 2026 because an unverified organisation may not ship scripts, programs or package-manager files inside a plugin, and the plugin is this repository's root. The workflows check `tooling` out beside the plugin and run the same scripts; nothing a user installs changed.
 - Tracing: the MCP skill says how to link a hosted tool call to your own trace (W3C `traceparent` in `params._meta` or the header), how to say why you called it (`_meta.reason`, capped at 512 characters), where the trace id comes back (`result._meta`), and where the reason and trace id of priced calls appear (`list_usage_events`).
 - GitHub Agentic Workflows: `workflows/price-check.md` checks the prices a pull request changes with `verify_price` and posts one comment (install with `gh aw add last-price-ai/skills/price-check`), and `workflows/shared/lastprice.md` adds the Last Price server and firewall rule to any agentic workflow. Both use the keyless directory tool set. A `gh-aw` check compiles them on every change.

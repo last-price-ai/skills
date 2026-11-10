@@ -1,6 +1,6 @@
 # Last Price recipes for outside agents
 
-Examples for workspace compute, marketplace listings, experiments and Rosetta.
+Examples for workspace compute, checking a compute bill, marketplace listings, experiments and Rosetta.
 
 | Recipe | You need | Cost |
 |---|---|---|
@@ -8,6 +8,7 @@ Examples for workspace compute, marketplace listings, experiments and Rosetta.
 | [03 List a function and read earnings](03-list-a-function-and-read-earnings.md) | A claimed (non-sandbox) workspace key with function, marketplace and `billing:read` scopes | Plan |
 | [04 A/B price experiment with an embed token](04-ab-experiment-with-embed-token.md) | A claimed workspace key, plus a person's dashboard session for the embed token | Plan |
 | [05 Rosetta: ingest, translate, freeze](05-rosetta-ingest-translate-freeze.md) | A claimed workspace key | Plan |
+| [06 Check a compute bill](06-check-a-compute-bill.md) | Nothing (keyless demo); a key gives your own workspace | Free |
 
 ## Conventions in every recipe
 
