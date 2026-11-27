@@ -5,14 +5,25 @@ description: Use when the Last Price MCP connector is available and the task is 
 # Last Price: using the MCP connector
 
 - Endpoint (install/reconnect): `https://api.last-price.ai/api/mcp/rpc?profile=directory`. This skill pack covers the directory tool set, which leaves out payments, wallets and payouts. Discovery: `https://api.last-price.ai/.well-known/mcp.json`.
-- The connector exposes roughly 260 tools and grows often. Always list the live tools (and read the full schema of the one you call) before calling; treat the map below as a guide, not a frozen schema.
+- The connector has over 300 tools and grows often, but `tools/list` shows only a short set (about 20: the tools that reach a price, the everyday reads and settings, and the two below). Every tool in the map below is still callable; see **Finding and calling unlisted tools**. Read the full schema of a tool before you call it; treat the map as a guide, not a frozen schema.
 - Credential: in the Claude Code plugin, the API-key option asked at install (an `lp_...` key); in other MCP clients, the connector's own settings. Without one, the compute/verify tools silently run the **public demo** (one pinned function, `metadata` and constraints dropped, elasticity assumed -1.2). Read `_lastprice_notice` on every response and label demo results as demo.
 - Many tools state "Needs a claimed workspace": a self-registered sandbox key gets 403 until a person claims it (see `last-price-auth`).
+
+## Finding and calling unlisted tools
+
+The connector runs in code mode: a tool missing from your `tools/list` is not gone, it is reached through two listed tools.
+
+1. `search_tools` with `query` set to the job in a few words ("create a webhook", "experiment results") or to a tool name from the map below. It answers the best matches with their full input schemas (`limit` 1 to 10, default 5). With no `query` it returns every tool name the connection can run.
+2. `call_tool` with `name` and `arguments`: `{"name": "create_webhook", "arguments": {"url": "https://...", "events": ["order.created"]}}`. The arguments go inside `arguments`, exactly as the schema from `search_tools` describes. It does whatever that tool does, so the rules below apply to the tool you run, not to `call_tool`.
+
+Many clients also let you call an unlisted tool by its own name once you know it. If `search_tools` cannot find a tool, it is not switched on for your connection yet; say so rather than guessing. Each skill's `references/mcp-tools.md` says, per tool, whether it is listed or reached through `call_tool`.
+
+Listed up front today: `pricing_conversation`, `compute_price`, `compute_prices_batch`, `verify_price`, `check_priceable`, `report_outcome`, `get_receipt`, `verify_signed_quote`, `list_functions`, `preview_price_change`, `get_price_guardrails`, `set_price_guardrails`, `get_learned_pricing`, `list_price_checks`, `get_usage`, `get_changelog`, `report_problem`, `explain_term`, `tell_last_price`, `search_tools`, `call_tool`.
 
 ## Tool map by job
 
 **Price**
-- `pricing_conversation` (prepare is free and keyless: returns the questions to ask; then resend `continuation.request` + answers), `compute_price`, `compute_prices_batch` (up to 100), `verify_price`, `list_verification_strategies`, `run_pricing_chain`, `report_outcome`, `verify_signed_quote`, `read_quote_reply` (reads a buyer's reply to a quote: accept, too high, counter, question, decline).
+- `pricing_conversation` (prepare is free and keyless: returns the questions to ask; then resend `continuation.request` + answers), `check_priceable` (before computing: can Last Price price this at all), `compute_price`, `compute_prices_batch` (up to 100), `verify_price`, `verify_prices_batch` (up to 50 prices), `report_outcomes_batch` (up to 50 outcomes, claimed workspace), `list_verification_strategies`, `run_pricing_chain`, `report_outcome`, `verify_signed_quote`, `read_quote_reply` (reads a buyer's reply to a quote: accept, too high, counter, question, decline).
 - From a photo, link, PDF, barcode or description: `price_from_capture`, `describe_item_so_far` (while the person is still typing), `list_price_checks`, `get_price_check`, `report_problem` (the person says a price or answer is wrong).
 - `run_reference_pipeline` runs one of the seven reference pipelines without a key (10 per hour per IP; 501 `pipeline_execution_unavailable` while its flag is off).
 
@@ -66,13 +77,16 @@ description: Use when the Last Price MCP connector is available and the task is 
 - Storefronts (early access): `list_storefronts`, `create_storefront`, `get_storefront`, `update_storefront`, `delete_storefront`, domain tools (`search_storefront_domains`, `quote_storefront_domain`, `list_storefront_domain_quotes`, `add_storefront_domain`, `verify_storefront_domain`, `remove_storefront_domain`, `list_storefront_dns_records`, `add_storefront_dns_record`, `remove_storefront_dns_record`), `check_agent_readiness`.
 
 **Discovery and help**
-- `get_changelog`, `list_demo_apps`, `simulate_agent_cut`, `get_cut_advisor_settings`.
+- `search_tools` and `call_tool` (above), `explain_term` (what a field or word in an answer means, such as `band` or `confidence`; look it up before acting on it), `get_changelog`, `list_demo_apps`, `simulate_agent_cut`, `get_cut_advisor_settings`.
+- `estimate_plan_cost` prices a whole plan of catalog steps before any of it runs (pass `plan` and `steps`).
+- `tell_last_price`: when something got in your way, say what you were `trying_to` do and what stopped you. The team reads every answer. Use `report_problem` instead when a specific price or answer is wrong.
 
 ## Common flows
 
 - **Quote with missing inputs:** `pricing_conversation` prepare, ask the user the returned questions, resend with answers, then compute.
 - **Quote, then learn:** `compute_price` (keep `receipt.id`), later `report_outcome` with what really happened.
 - **Check a compute or rental bill:** turn the job into units (10 GPUs × 52 min = 8.67 GPU-hours), multiply by a posted rate you can link, and pass that as `current_price` to `verify_price`. With the bill alone the evidence is circular (`independent_evidence: false`, `next_step: check_more`). If the model or tier is unknown, check every candidate rate and report the disagreement. Worked example: `recipes/06-check-a-compute-bill.md`.
+- **Reach a tool that is not listed:** `search_tools` with the job or the tool name, read the schema, then `call_tool` with `name` and `arguments`. Example: `search_tools` `{"query": "list webhooks"}`, then `call_tool` `{"name": "list_webhooks", "arguments": {}}`.
 - **Workspace health check:** `get_pricing_analysis`, `get_price_guardrails`, `get_usage`, `list_approvals`.
 - **Tighten guardrails safely:** `get_price_guardrails`, merge the change, `set_price_guardrails` with every rule, read back.
 

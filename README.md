@@ -36,7 +36,7 @@ Choose a starting point in the [user guide](skills/last-price-overview/reference
 |---|---|
 | [`last-price-overview`](skills/last-price-overview/SKILL.md) | Start here: what Last Price is, MCP vs HTTP, which skill does what |
 | [`last-price-auth`](skills/last-price-auth/SKILL.md) | Getting and verifying a key, request headers, sandbox limits, scopes |
-| [`last-price-mcp`](skills/last-price-mcp/SKILL.md) | Using the MCP connector: ~260 tools mapped by job |
+| [`last-price-mcp`](skills/last-price-mcp/SKILL.md) | Using the MCP connector: 300+ tools mapped by job, about 20 listed up front and the rest found with `search_tools` and run with `call_tool` |
 | [`last-price-compute`](skills/last-price-compute/SKILL.md) | Quoting prices: single, batch, demo, input clarifier, errors |
 | [`last-price-functions-and-routing`](skills/last-price-functions-and-routing/SKILL.md) | Pricing functions, routing policies, router, chains, verify, guardrails |
 | [`last-price-experiments`](skills/last-price-experiments/SKILL.md) | A/B and multi-arm price experiments, stopping, significance, bandits |
@@ -203,7 +203,7 @@ python3 ../skills-tooling/scripts/check-spec-drift.py           # exit 1 on drif
 python3 ../skills-tooling/scripts/check-spec-drift.py --update  # refresh the snapshot after re-verifying skills
 ```
 
-`../skills-tooling/scripts/sync.mjs` (Node 18+, no dependencies) does the same for the MCP connector: it reads the live `tools/list`, fails when a tool is named in no skill or a known tool disappears or changes its required arguments, and regenerates each skill's `references/mcp-tools.md` (split into an index and `mcp-tools-<n>.md` parts when it would pass 200 kB; every argument, access level and documented refusal of the tools that skill names).
+`../skills-tooling/scripts/sync.mjs` (Node 18+, no dependencies) does the same for the MCP connector: it reads the live `tools/list` (and, in code mode, the full catalogue through `search_tools`, so unlisted tools still count as present), fails when a tool is named in no skill or a known tool disappears or changes its required arguments, and regenerates each skill's `references/mcp-tools.md` (split into an index and `mcp-tools-<n>.md` parts when it would pass 200 kB; every argument, access level and documented refusal of the tools that skill names).
 
 ```bash
 node ../skills-tooling/scripts/sync.mjs --check   # exit 1 on drift
