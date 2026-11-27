@@ -57,16 +57,19 @@ jobs:
       - name: MCP tools and generated references
         id: tools
         continue-on-error: true
-        run: node tooling/scripts/sync.mjs --check | tee tools.txt
+        # The connector is in code mode, so reading every tool takes about 70
+        # search_tools calls; keyless calls are limited to 120 an hour per
+        # address. Read the catalogue once here and reuse it below.
+        run: node tooling/scripts/sync.mjs --check --save-tools catalog.json | tee tools.txt
       - name: Regenerate tool references
         if: steps.tools.outcome == 'failure' && github.ref == 'refs/heads/main'
-        run: node tooling/scripts/sync.mjs --keep-required || true
+        run: node tooling/scripts/sync.mjs --keep-required $( [ -s catalog.json ] && echo --tools catalog.json ) || true
       # A branch run is someone reviewing the skills: regenerate and record the
       # required arguments as reviewed, then commit to the branch.
       - name: Regenerate and commit to this branch
         if: steps.tools.outcome == 'failure' && github.ref != 'refs/heads/main'
         run: |
-          node tooling/scripts/sync.mjs || true
+          node tooling/scripts/sync.mjs $( [ -s catalog.json ] && echo --tools catalog.json ) || true
           git add skills/ required-args.json
           if git diff --cached --quiet; then exit 0; fi
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
