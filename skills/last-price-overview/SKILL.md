@@ -19,7 +19,7 @@ The free demo at `/api/public/compute/demo` has narrower inputs and routing. Ful
 
 ## MCP or HTTP
 
-- **MCP connector** (`https://api.last-price.ai/api/mcp/rpc`): structured tools, now covering most of the API (compute, functions, routing, guardrails, experiments, learning, Rosetta, commerce, order-to-cash, webhooks, billing, team). Prefer it when the connector is installed. See `last-price-mcp`.
+- **MCP connector** (`https://api.last-price.ai/api/mcp/rpc`): structured tools, now covering most of the API (compute, functions, routing, guardrails, experiments, learning, Rosetta, commerce, order-to-cash, webhooks, billing, team). Prefer it when the connector is installed. Its `tools/list` shows about 20 tools; the rest are found with `search_tools` and run with `call_tool`. See `last-price-mcp`.
 - **HTTP API**: everything, including surfaces without a tool. Use it from scripts, CI, or agents without the connector.
 - Both are first class and hit the same backend. Without a credential the MCP compute tools fall back to the public demo; label those results as demo.
 
