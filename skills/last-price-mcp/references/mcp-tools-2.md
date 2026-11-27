@@ -4,13 +4,246 @@
 
 Index: [mcp-tools.md](mcp-tools.md).
 
-## `open_monetization_pull_request`
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
-Open the Last Price integration code (the files generate_monetization_code writes) as a pull request in one of the workspace's own GitHub repositories, through the installed Last Price GitHub App. Commits to a new branch (last-price/billing-setup unless branch is given) and opens a pull request against base or the default branch; never merges, and refuses a branch that exists. Early access. Needs a Last Price credential with billing write scope and the App installed (get_github_app_connection). Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+## `record_cost`
 
+Record a cost in your workspace, such as a vendor or infrastructure cost, so the Value Receipt and the cost analytics count it: pass amount, and optionally currency (default USD), cost_type (default… Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "record_cost", "arguments": {...}}`
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+- **REST:** `/api/costs`
+- **Errors and cautions:** Record a cost in your workspace, such as a vendor or infrastructure cost, so the Value Receipt and the cost analytics count it: pass amount, and optionally currency (default USD), cost_type (default… Needs a claimed Last Price credential.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `amount` **(required)** | number | What it cost, in the currency. |
+| `currency` | string | The currency code. |
+| `cost_type` | string | What kind of cost it is. |
+| `agent_id` | string | The agent: its id, as it shows in your workspace. |
+| `customer_id` | string | The customer: its id, as it shows in your workspace. |
+| `metadata` | object | Anything worth keeping with the record. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `get_cost_analytics`
+
+Total the costs recorded in your workspace over a period, grouped by day (the default), week, month, agent, customer or type: count, total, average, smallest and largest amount for each group and… Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_cost_analytics", "arguments": {...}}`
+- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `start_date` | string | The start of the period, as an ISO 8601 date and time. |
+| `end_date` | string | The end of the period, as an ISO 8601 date and time. |
+| `group_by` | `day` / `week` / `month` / `agent` / `customer` / `type` | How to group. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `list_credit_bundle_plans`
+
+List the credit bundles your workspace sells: each one's id, name, code, price, billing frequency, credits (null for unlimited), rollover and status (active, inactive or archived). Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_credit_bundle_plans", "arguments": {...}}`
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `status` | `active` / `inactive` / `archived` | Only bundles with this status. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `create_credit_bundle_plan`
+
+Create a credit bundle to sell: a name, price, billing frequency and credits (null for unlimited). Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "create_credit_bundle_plan", "arguments": {...}}`
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `name` **(required)** | string | What buyers see, e.g. |
+| `description` | string | Optional longer text shown with the bundle. |
+| `code` | string | Unique in the workspace; cannot change later. |
+| `currency` **(required)** | string | ISO 4217 code in upper case; cannot change later. |
+| `price` **(required)** | number | Price per billing period in currency, e.g. |
+| `billing_frequency` **(required)** | `monthly` / `quarterly` / `annually` / `one_time` | How often the price is charged; one_time for a single purchase. |
+| `credits` **(required)** | number / null | Credits per period; null for unlimited. |
+| `rollover_credits` | number / null | Most credits that roll over; 0 for none, null for unlimited. |
+| `status` | `active` / `inactive` | active puts it on sale now; inactive (the default) saves it for later. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `update_credit_bundle_plan`
+
+Change a credit bundle: activate it (status active), take it off sale (inactive), archive it, or change its name, description, price, credits or rollover. Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "update_credit_bundle_plan", "arguments": {...}}`
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `plan_id` **(required)** | string | The bundle id from list_credit_bundle_plans. |
+| `name` | string | New name buyers see. |
+| `description` | string | New longer text shown with the bundle. |
+| `price` | number | New price per billing period, in the bundle currency. |
+| `credits` | number / null | Credits per period; null for unlimited. |
+| `rollover_credits` | number / null | Most credits that roll over; 0 for none, null for unlimited. |
+| `status` | `active` / `inactive` / `archived` | active puts it on sale, inactive takes it off sale, archived retires it. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `grant_credit_bundle_plan`
+
+Give a customer an active credit bundle: its credits are added to their balance and, unless create_invoice is false, a draft invoice for its price is made. Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "grant_credit_bundle_plan", "arguments": {...}}`
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** changes data
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `plan_id` **(required)** | string | An active bundle id from list_credit_bundle_plans. |
+| `customer_id` **(required)** | string | One of your customers. |
+| `create_invoice` | boolean | Also create a draft invoice for the price (default true). |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `list_credit_bundle_subscriptions`
+
+List the customers on a recurring credit bundle (monthly, quarterly or annually), newest first: each subscription's customer, status, current period and when it renews, and why it was cancelled. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_credit_bundle_subscriptions", "arguments": {...}}`
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `plan_id` **(required)** | string | The bundle id from list_credit_bundle_plans. |
+| `status` | `active` / `cancelled` | Only subscriptions with this status. |
+| `limit` | integer | Page size, 100 by default. |
+| `offset` | integer | Rows to skip. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `cancel_credit_bundle_subscription`
+
+Stop a customer's credit bundle subscription from renewing. The customer keeps the credits of the period they are in, and invoices already written stay. Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "cancel_credit_bundle_subscription", "arguments": {...}}`
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** **destructive**
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `subscription_id` **(required)** | string | The subscription id from list_credit_bundle_subscriptions. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `calculate_tax`
+
+Preview the tax an invoice or order would get from the registrations saved on Settings, Tax (US nexus, EU VAT OSS, other VAT and GST), without saving anything: the subtotal, each jurisdiction's rate… Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "calculate_tax", "arguments": {...}}`
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `amount` **(required)** | number | The pre-tax amount, in the currency's major unit. |
+| `currency` **(required)** | string | ISO 4217 code, like USD or EUR. |
+| `customer_id` | string | A customer whose saved address and tax id to use when destination is not given. |
+| `destination` | object | Where the customer is. |
+| `customer_tax_id` | string | The customer's VAT or tax id; an EU business with one is reverse charged. |
+| `exempt` | boolean | True for a tax-exempt customer. |
+| `date` | string | The sale date (YYYY-MM-DD); today when absent. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `get_stripe_connection`
+
+Read whether your workspace has a Stripe account connected for invoices (Connect with Stripe on the Monetization page), its account id and mode, and whether this deployment can connect one. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_stripe_connection", "arguments": {...}}`
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+_No arguments._
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `issue_invoice_with_stripe`
+
+Issue one of your invoices through your connected Stripe account so the customer pays on Stripe's page: returns the hosted invoice URL. Needs a Last Price credential with billing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "issue_invoice_with_stripe", "arguments": {...}}`
 - **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Commits to a new branch (last-price/billing-setup unless branch is given) and opens a pull request against base or the default branch; never merges, and refuses a branch that exists.
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `invoice_id` **(required)** | string | The invoice UUID: id on a list_invoices result. |
+| `send` | boolean | Also email it to the customer (default false). |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `generate_monetization_code`
+
+Write the Last Price integration code for an app (Next.js, Express or FastAPI): a client that records signals, prices calls, creates customers and bills them through Stripe, plus an example, as files… Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "generate_monetization_code", "arguments": {...}}`
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `framework` **(required)** | `nextjs-app` / `express` / `python-fastapi` | The app framework the code is written for. |
+| `agent_id` | string | One of your agents, filled into the code. |
+| `event_name` | string | The billable event the example records, like chat.completed. |
+| `customers` | boolean | Include creating customers at sign-up (default true). |
+| `payments` | boolean | Include billing through Stripe (default true). |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `get_github_app_connection`
+
+Whether the workspace can open its billing code as a pull request: if that is switched on, whether the Last Price GitHub App is set up on this deployment, and which GitHub account the workspace… Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_github_app_connection", "arguments": {...}}`
+- **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** read-only
+
+_No arguments._
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `open_monetization_pull_request`
+
+Open the Last Price integration code (the files generate_monetization_code writes) as a pull request in one of the workspace's own GitHub repositories, through the installed Last Price GitHub App. Needs a Last Price credential with billing write scope and the App installed (get_github_app_connection). Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "open_monetization_pull_request", "arguments": {...}}`
+- **Access:** key, billing write scope (claimed workspace only: a self-registered sandbox key gets 403)
+- **Behaviour:** reaches outside Last Price
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -24,22 +257,14 @@ Open the Last Price integration code (the files generate_monetization_code write
 | `branch` | string | New branch for the commit; last-price/billing-setup when absent. |
 | `title` | string | Pull request title. |
 
-## `get_usage`
-
-Total your workspace's priced calls over a period, this calendar month by default: requests, units, compute time, cost, cached and prepaid calls, and the part of this month's cost still to be billed. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month. |
-| `end_date` | string | End of the period, ISO 8601. Defaults to now. |
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_usage_breakdown`
 
-See your usage grouped by pricing function: calls, spend and outcomes for each function over a period. Pass start_date and end_date to choose the period, and group_by function, the only grouping there is. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+See your usage grouped by pricing function: calls, spend and outcomes for each function over a period. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_usage_breakdown", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
@@ -47,12 +272,16 @@ See your usage grouped by pricing function: calls, spend and outcomes for each f
 | :-- | :-- | :-- |
 | `start_date` | string | The start of the period, as an ISO 8601 date and time. |
 | `end_date` | string | The end of the period, as an ISO 8601 date and time. |
-| `group_by` | `function` | How to group. Only function is available. |
+| `group_by` | `function` | How to group. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_usage_events`
 
-List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Hosted MCP calls that carried a stated reason or trace also include mcp_reason and mcp_trace_id. Pass buyer_agent verified for only the calls whose buying agent proved who it was with an AgentID token. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's priced calls, newest first: each one's id (what report_outcome takes to report it), function, cost, the price given and the inputs it was given for, and who sent it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_usage_events", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
@@ -61,14 +290,18 @@ List your workspace's priced calls, newest first: each one's id (what report_out
 | `function_id` | string | Only calls priced by this function. |
 | `start_date` | string | Only calls from this time on, ISO 8601. |
 | `end_date` | string | Only calls up to this time, ISO 8601. |
-| `limit` | integer | Page size. Defaults to 50. |
-| `offset` | integer | Calls to skip. Defaults to 0, at most 1000000. |
-| `buyer_agent` | `all` / `verified` | verified: only calls whose buying agent proved who it was with an AgentID token. Defaults to all. |
+| `limit` | integer | Page size. |
+| `offset` | integer | Calls to skip. |
+| `buyer_agent` | `all` / `verified` | verified: only calls whose buying agent proved who it was with an AgentID token. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_llm_usage`
 
-See what model calls cost your workspace over a period (this month so far by default): totals, how much ran on your own provider key and how much on the platform's, and a daily series. Pass start_date and end_date to choose the period. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+See what model calls cost your workspace over a period (this month so far by default): totals, how much ran on your own provider key and how much on the platform's, and a daily series. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_llm_usage", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
@@ -77,10 +310,14 @@ See what model calls cost your workspace over a period (this month so far by def
 | `start_date` | string | The start of the period, as an ISO 8601 date and time. |
 | `end_date` | string | The end of the period, as an ISO 8601 date and time. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_llm_usage_events`
 
-List the individual model calls behind get_llm_usage, newest first: what each was for, its provider and model, tokens and cost. Filter by operation and by start_date and end_date, and page with limit and offset. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the individual model calls behind get_llm_usage, newest first: what each was for, its provider and model, tokens and cost. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_llm_usage_events", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
@@ -89,42 +326,38 @@ List the individual model calls behind get_llm_usage, newest first: what each wa
 | `operation` | string | Only calls made for this operation. |
 | `start_date` | string | The start of the period, as an ISO 8601 date and time. |
 | `end_date` | string | The end of the period, as an ISO 8601 date and time. |
-| `limit` | integer | How many to return. Defaults to 50. |
+| `limit` | integer | How many to return. |
 | `offset` | integer | How many to skip, for the next page. |
 
-## `get_receipt`
-
-Get the receipt for one of your workspace's priced calls, by its usage event id (the id list_usage_events returns and report_outcome takes): what was priced, by which function and agent, when, the amount, how it was paid, and the outcome if one was reported. Receipts are made only when you ask, never sent for every call. For CSV or a printable page, call GET /api/receipts/{id} with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
-
-- **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
-- **Behaviour:** read-only
-- **REST:** `/api/receipts/{id}`
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `usage_event_id` **(required)** | string | The priced call's usage event id, as list_usage_events returns it. |
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_receipts`
 
-Get receipts for many of your workspace's priced calls at once, as one statement with totals: name up to 50 usage event ids, or a period (this calendar month by default, at most 366 days), optionally for one function or agent. A period statement also counts, for each agent, the value signals set up in Settings, Value receipts. Receipts are made only when you ask. For CSV or a printable page, call GET /api/receipts with format=csv or format=html. Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Get receipts for many of your workspace's priced calls at once, as one statement with totals: name up to 50 usage event ids, or a period (this calendar month by default, at most 366 days), optionally… Needs a Last Price credential with price compute or billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_receipts", "arguments": {...}}`
 - **Access:** key, price compute or billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `ids` | string | Up to 50 usage event ids, comma separated. Send ids or a period, not both. |
-| `start_date` | string | Start of the period, ISO 8601. Defaults to the first of this month (UTC). |
-| `end_date` | string | End of the period, ISO 8601. Defaults to now. |
+| `ids` | string | Up to 50 usage event ids, comma separated. |
+| `start_date` | string | Start of the period, ISO 8601. |
+| `end_date` | string | End of the period, ISO 8601. |
 | `function_id` | string | Only calls priced by this function. |
-| `agent_id` | string | Only calls made by this agent. A key bound to an agent always gets only its own calls. |
-| `limit` | integer | Receipts per page for a period. Defaults to 100. |
-| `offset` | integer | Receipts to skip for a period. Defaults to 0, at most 1000000. |
+| `agent_id` | string | Only calls made by this agent. |
+| `limit` | integer | Receipts per page for a period. |
+| `offset` | integer | Receipts to skip for a period. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `browse_catalog`
 
 Browse the public marketplace catalog of pricing functions.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "browse_catalog", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
 - **REST:** `/api/functions/catalog`
@@ -133,26 +366,33 @@ Browse the public marketplace catalog of pricing functions.
 | :-- | :-- | :-- |
 | `execution_type` | `rule_based` / `ml_model` / `llm_prompt` / `external_api` / `composite` | Only functions of this execution type. |
 | `tags` | array | Only functions carrying these tags. |
-| `limit` | integer | Page size. Defaults to 50; the API caps it at 100. |
-| `offset` | integer | Rows to skip. Defaults to 0. |
+| `limit` | integer | Page size. |
+| `offset` | integer | Rows to skip. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_marketplace_listings`
 
-Browse the public marketplace: the pricing functions their owners listed for anyone to use, each cut to its public fields, with usage and rating. Page with limit and offset. Public: needs no credential, limited per address.
+Browse the public marketplace: the pricing functions their owners listed for anyone to use, each cut to its public fields, with usage and rating.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_marketplace_listings", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
-- **Errors and cautions:** Public: needs no credential, limited per address.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `limit` | integer | How many to return. |
 | `offset` | integer | How many to skip, for the next page. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_my_marketplace_listings`
 
 List your own marketplace listings, public or not. Page with limit and offset. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_my_marketplace_listings", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
@@ -161,31 +401,39 @@ List your own marketplace listings, public or not. Page with limit and offset. N
 | `limit` | integer | How many to return. |
 | `offset` | integer | How many to skip, for the next page. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `create_marketplace_listing`
 
-List one of your functions on the marketplace: pass function_id, and optionally is_public (default false), commission_rate (default 0.30), min_payout_threshold (default 50) and payout_currency (default USD). A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Where payouts go is set by a person, not by this tool. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List one of your functions on the marketplace: pass function_id, and optionally is_public (default false), commission_rate (default 0.30), min_payout_threshold (default 50) and payout_currency… Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "create_marketplace_listing", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/marketplace/listings`
-- **Errors and cautions:** A listing made public is reviewed first; a function that fails the review is saved private and the refusal carries the report. Needs a claimed Last Price credential.
+- **Errors and cautions:** List one of your functions on the marketplace: pass function_id, and optionally is_public (default false), commission_rate (default 0.30), min_payout_threshold (default 50) and payout_currency… Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
-| `is_public` | boolean | List it publicly. Defaults to false. |
-| `commission_rate` | number | The share of each sale the marketplace keeps. Defaults to 0.30. |
-| `min_payout_threshold` | number | The least balance that is paid out. Defaults to 50. |
-| `payout_currency` | string | The currency payouts are made in. Defaults to USD. |
+| `is_public` | boolean | List it publicly. |
+| `commission_rate` | number | The share of each sale the marketplace keeps. |
+| `min_payout_threshold` | number | The least balance that is paid out. |
+| `payout_currency` | string | The currency payouts are made in. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `update_marketplace_listing`
 
-Change one of your marketplace listings: pass listing_id and at least one of is_public, commission_rate and min_payout_threshold. Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Change one of your marketplace listings: pass listing_id and at least one of is_public, commission_rate and min_payout_threshold. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "update_marketplace_listing", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/marketplace/listings/{listingId}`
-- **Errors and cautions:** Making a private listing public runs the marketplace review first; a function that fails it stays as it was and the refusal carries the report. Needs a claimed Last Price credential.
+- **Errors and cautions:** Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -194,10 +442,14 @@ Change one of your marketplace listings: pass listing_id and at least one of is_
 | `commission_rate` | number | The share of each sale the marketplace keeps. |
 | `min_payout_threshold` | number | The least balance that is paid out. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `delete_marketplace_listing`
 
-Remove one of your marketplace listings: pass listing_id. The function stays; it is no longer listed. Only the owner can remove a listing. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Remove one of your marketplace listings: pass listing_id. The function stays; it is no longer listed. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "delete_marketplace_listing", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **Errors and cautions:** Needs a claimed Last Price credential.
@@ -206,97 +458,127 @@ Remove one of your marketplace listings: pass listing_id. The function stays; it
 | :-- | :-- | :-- |
 | `listing_id` **(required)** | string | The marketplace listing: its id, as list_my_marketplace_listings shows it. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_function_review`
 
-Read the latest marketplace review of one of your functions, from its listing: the report, whether the listing is public and the listing id. The review is null when the function has no listing or was never reviewed. Pass function_id. Only the owner can read it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read the latest marketplace review of one of your functions, from its listing: the report, whether the listing is public and the listing id. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_function_review", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `run_function_review`
 
-Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the listing is public. Pass function_id. The sample call spends your endpoint or provider key. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the… Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "run_function_review", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
-- **Errors and cautions:** Needs a claimed Last Price credential.
+- **Errors and cautions:** Run the marketplace review of one of your functions now, as a dry run: it makes one sample call to the function, stores the report on the listing when there is one and never changes whether the… Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `function_id` **(required)** | string | The pricing function UUID: id on a list_functions result. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_public_leaderboard`
 
-Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating. Pass window as 7d, 30d, 90d or all (default all). Public: needs no credential, limited per address.
+Read the public pricing-function leaderboard: the functions the community uses most, ranked by distinct outside consumers, with their rating.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_public_leaderboard", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
-- **Errors and cautions:** Public: needs no credential, limited per address.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `window` | `7d` / `30d` / `90d` / `all` | How far back to rank. Defaults to all. |
+| `window` | `7d` / `30d` / `90d` / `all` | How far back to rank. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_marketplace_earnings`
 
-Read the payout ledger for the functions you own on the marketplace: what each call earned, its commission and its payout status. Filter by payout_status and page with limit and offset. Read-only. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read the payout ledger for the functions you own on the marketplace: what each call earned, its commission and its payout status. Needs a Last Price credential with billing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_marketplace_earnings", "arguments": {...}}`
 - **Access:** key, billing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `payout_status` | string | Only entries with this payout status. |
-| `limit` | integer | How many to return. Defaults to 50. |
+| `limit` | integer | How many to return. |
 | `offset` | integer | How many to skip, for the next page. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_webhooks`
 
-List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret, masked to whsec_ and its last four characters; the full secret comes once from create_webhook, or from rotate_webhook_secret, which makes a new one. Needs a Last Price credential with the webhooks:read scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's outbound webhook endpoints: each one's id, url, events, status and signing secret, masked to whsec_ and its last four characters; the full secret comes once from create_webhook,… Needs a Last Price credential with the webhooks:read scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_webhooks", "arguments": {...}}`
 - **Access:** key, webhooks:read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/webhooks`
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `create_webhook`
 
-Add an outbound webhook endpoint: Last Price sends a signed POST to the https url for each event you list. The answer carries the signing secret (whsec_...); keep it to verify deliveries. Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused. Send ping_webhook afterwards to check the endpoint answers. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Add an outbound webhook endpoint: Last Price sends a signed POST to the https url for each event you list. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "create_webhook", "arguments": {...}}`
 - **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/webhooks`
-- **Errors and cautions:** Events cover held agent calls awaiting approval, disputes, proposed price changes, a low balance, outcomes and changelog entries; the documentation lists their names, and an unknown name is refused.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `url` **(required)** | string | Where to send events. Must start with https://. |
-| `events` **(required)** | array | The events to send, at least one, e.g. ["approval.requested","dispute.opened"]. |
-| `secret` | string | Your own signing secret. Omit it and one is made for you. |
+| `url` **(required)** | string | Where to send events. |
+| `events` **(required)** | array | The events to send, at least one, e.g. |
+| `secret` | string | Your own signing secret. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `update_webhook`
 
-Change a webhook endpoint: its url, the events it gets, or switch it off and on with status. Only the fields you send change; events replaces the whole list. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Change a webhook endpoint: its url, the events it gets, or switch it off and on with status. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "update_webhook", "arguments": {...}}`
 - **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
-| `url` | string | Where to send events. Must start with https://. |
+| `url` | string | Where to send events. |
 | `events` | array | Replaces the whole list of events, at least one. |
 | `status` | `active` / `inactive` | inactive stops deliveries; active resumes them. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `delete_webhook`
 
 Delete a webhook endpoint and its delivery history. This cannot be undone: update_webhook with status inactive pauses it instead. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "delete_webhook", "arguments": {...}}`
 - **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **Errors and cautions:** This cannot be undone: update_webhook with status inactive pauses it instead.
@@ -305,10 +587,14 @@ Delete a webhook endpoint and its delivery history. This cannot be undone: updat
 | :-- | :-- | :-- |
 | `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `ping_webhook`
 
-Send one signed webhook.test event to an active endpoint now and record the result as a delivery, so you can check it receives and verifies events. Read the outcome with list_webhook_deliveries. Needs a Last Price credential with the webhooks:write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Send one signed webhook.test event to an active endpoint now and record the result as a delivery, so you can check it receives and verifies events. Needs a Last Price credential with the webhooks:write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "ping_webhook", "arguments": {...}}`
 - **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 
@@ -316,38 +602,49 @@ Send one signed webhook.test event to an active endpoint now and record the resu
 | :-- | :-- | :-- |
 | `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_webhook_deliveries`
 
-List recent delivery attempts across your workspace's webhook endpoints, newest first: the event, the status your endpoint answered with and when. Use it to find an endpoint that is failing. Needs a Last Price credential with the webhooks:read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List recent delivery attempts across your workspace's webhook endpoints, newest first: the event, the status your endpoint answered with and when. Needs a Last Price credential with the webhooks:read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_webhook_deliveries", "arguments": {...}}`
 - **Access:** key, webhooks:read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `limit` | integer | Most deliveries to return. Defaults to 50. |
+| `limit` | integer | Most deliveries to return. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `verify_webhook_signature`
 
-Check a webhook signature the way Last Price signs them: pass payload (the raw body, up to 8 KB), signature and secret, and optionally encoding (hex or base64) and prefix. Answers whether it is valid. Public and limited per address; use a test secret rather than a live one when you can, because the secret travels in the request. Needs no credential.
+Check a webhook signature the way Last Price signs them: pass payload (the raw body, up to 8 KB), signature and secret, and optionally encoding (hex or base64) and prefix. Needs no credential.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "verify_webhook_signature", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
 - **REST:** `/api/public/webhook-verify`
-- **Errors and cautions:** Public and limited per address; use a test secret rather than a live one when you can, because the secret travels in the request.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `payload` **(required)** | string | The raw body the signature covers. |
 | `signature` **(required)** | string | The signature to check. |
-| `secret` **(required)** | string | The signing secret. Use a test secret where you can. |
-| `encoding` | `hex` / `base64` | How the signature is encoded. Defaults to hex. |
+| `secret` **(required)** | string | The signing secret. |
+| `encoding` | `hex` / `base64` | How the signature is encoded. |
 | `prefix` | string | A prefix the signature carries, for example sha256=. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `rotate_webhook_secret`
 
-Replace a webhook endpoint's signing secret and return the new one (whsec_...), once: list_webhooks shows it masked from then on. Every delivery after this is signed with the new secret and the old one stops verifying, so update your receiver straight away. Use it when the secret leaked, or when you no longer have it. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Replace a webhook endpoint's signing secret and return the new one (whsec_...), once: list_webhooks shows it masked from then on. Needs a Last Price credential with the webhooks:write scope; a person also needs the owner or admin role. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "rotate_webhook_secret", "arguments": {...}}`
 - **Access:** key, webhooks:write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/webhooks/{webhookId}/rotate-secret`
@@ -356,22 +653,30 @@ Replace a webhook endpoint's signing secret and return the new one (whsec_...), 
 | :-- | :-- | :-- |
 | `webhook_id` **(required)** | string | The webhook endpoint UUID: id on a list_webhooks result. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_approvals`
 
-List the actions held for approval in your workspace, newest first: what was asked, who asked (agent or key), its status (pending, approved, rejected or expired) and when it expires. status pending lists what waits for a decision; pass its id to decide_approval. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the actions held for approval in your workspace, newest first: what was asked, who asked (agent or key), its status (pending, approved, rejected or expired) and when it expires. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_approvals", "arguments": {...}}`
 - **Access:** key, audit read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `status` | `pending` / `approved` / `rejected` / `expired` | Only approvals with this status, e.g. pending. |
-| `limit` | integer | Most approvals to return. Defaults to 50. |
+| `status` | `pending` / `approved` / `rejected` / `expired` | Only approvals with this status, e.g. |
+| `limit` | integer | Most approvals to return. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_approval`
 
-Read one approval: the held action, who asked, its status, the reason given and when it was decided. approval_id is the id from list_approvals or the notification that announced it. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read one approval: the held action, who asked, its status, the reason given and when it was decided. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_approval", "arguments": {...}}`
 - **Access:** key, audit read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/approvals/{id}`
@@ -380,10 +685,14 @@ Read one approval: the held action, who asked, its status, the reason given and 
 | :-- | :-- | :-- |
 | `approval_id` **(required)** | string | The approval id, as list_approvals gives it. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `decide_approval`
 
-Approve or reject an action held for approval. Approving lets whoever asked repeat the same request once; rejecting keeps it held back for good. Deciding is for the workspace owner: a person, or the owner's own key (made without scope limits and not bound to an agent). An agent never decides its own request, and an agent-bound key or token cannot decide at all. The audit log records who decided. Needs a Last Price credential with the commerce proposal approve scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Approve or reject an action held for approval. Approving lets whoever asked repeat the same request once; rejecting keeps it held back for good. Needs a Last Price credential with the commerce proposal approve scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "decide_approval", "arguments": {...}}`
 - **Access:** key, commerce proposal approve scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 
@@ -391,53 +700,68 @@ Approve or reject an action held for approval. Approving lets whoever asked repe
 | :-- | :-- | :-- |
 | `approval_id` **(required)** | string | The approval id, as list_approvals gives it. |
 | `decision` **(required)** | `approve` / `reject` | approve or reject. |
-| `reason` | string | Why, kept with the decision. Optional. |
+| `reason` | string | Why, kept with the decision. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_audit_events`
 
-Read the workspace audit log, newest first: who did what and when, including who decided each approval. Filter by action, subject_kind and subject_id, agent_id or since; pass the returned cursor to page on. The team's own rows are for owners and admins. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read the workspace audit log, newest first: who did what and when, including who decided each approval. Needs a Last Price credential with audit read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_audit_events", "arguments": {...}}`
 - **Access:** key, audit read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `since` | string | Only events at or after this time. |
-| `action` | string | Only events with this action, e.g. approval.approve. |
+| `action` | string | Only events with this action, e.g. |
 | `subject_kind` | string | Only events about this kind of subject. |
 | `subject_id` | string | Only events about this subject id. |
 | `agent_id` | string | Only events caused by this agent. |
 | `cursor` | string | The cursor a previous page returned. |
-| `limit` | integer | Most events to return. Defaults to 50. |
+| `limit` | integer | Most events to return. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_connected_apps`
 
-List the apps you connected to Last Price by signing in (Claude, ChatGPT and other MCP clients), newest first: each one's id, name, the host it returns to, the workspace, whether it has full access or which scopes, and when it was connected and last used. this_app marks the connection making this call. Read-only. Needs a credential that names a person: signing in to Last Price from this MCP client, or a person token. An API key names a workspace, not a person, and gets 403. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the apps you connected to Last Price by signing in (Claude, ChatGPT and other MCP clients), newest first: each one's id, name, the host it returns to, the workspace, whether it has full access… Needs a credential that names a person: signing in to Last Price from this MCP client, or a person token. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_connected_apps", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/user/connected-apps`
-- **Errors and cautions:** An API key names a workspace, not a person, and gets 403.
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `disconnect_connected_app`
 
-Disconnect an app you connected by signing in: its sign-in stops working at once, and it must ask you to sign in again to come back. Pass an id from list_connected_apps. A connection with less than full access can disconnect only itself; the dashboard can disconnect any, under Profile, Sessions, Connected apps. Cannot be undone. Needs a credential that names a person: signing in to Last Price from this MCP client, or a person token. An API key names a workspace, not a person, and gets 403. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Disconnect an app you connected by signing in: its sign-in stops working at once, and it must ask you to sign in again to come back. Cannot be undone. Needs a credential that names a person: signing in to Last Price from this MCP client, or a person token. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "disconnect_connected_app", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/user/connected-apps/{grantId}`
-- **Errors and cautions:** Cannot be undone. An API key names a workspace, not a person, and gets 403.
+- **Errors and cautions:** Cannot be undone.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `connected_app_id` **(required)** | string | The connected app's id: id on a list_connected_apps result. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `mint_child_key`
 
-Create a short-lived child key for a sub-agent or job, returned only once. Ask for 1 to 20 concrete scopes within your current grants; no wildcards or administration scopes. The default lifetime is five minutes; request 60 to 86400 seconds, capped by your key, token and ancestors. The child stays in this workspace with the same agent binding and quotas. Revoking or rotating an ancestor stops its descendants. Needs an API key or a current token exchanged from one; no human step. Keep the returned key secret.
+Create a short-lived child key for a sub-agent or job, returned only once. Ask for 1 to 20 concrete scopes within your current grants; no wildcards or administration scopes. Needs an API key or a current token exchanged from one; no human step.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "mint_child_key", "arguments": {...}}`
 - **Access:** key
 - **Behaviour:** changes data
 - **REST:** `/api/api-keys/children`
@@ -448,10 +772,14 @@ Create a short-lived child key for a sub-agent or job, returned only once. Ask f
 | `scopes` **(required)** | array |  |
 | `expires_in_seconds` | integer |  |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `revoke_child_key`
 
-Revoke a direct child of the key this connection uses, by its key id. The child and its descendants stop working. You cannot revoke another parent's child or an unrelated workspace key. Needs an API key or a current token exchanged from one.
+Revoke a direct child of the key this connection uses, by its key id. The child and its descendants stop working. Needs an API key or a current token exchanged from one.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "revoke_child_key", "arguments": {...}}`
 - **Access:** key
 - **Behaviour:** **destructive**
 - **REST:** `/api/api-keys/children/{keyId}`
@@ -460,61 +788,78 @@ Revoke a direct child of the key this connection uses, by its key id. The child 
 | :-- | :-- | :-- |
 | `key_id` **(required)** | string |  |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_partner_allowance`
 
-Read your workspace's partner allowance: whether it is a partner (one allowed to open managed workspaces for other people's businesses), its daily allowance, how many workspaces it opened in the last 24 hours and how many remain today, how many it opened in all and how many their owners claimed. A workspace that is not a partner gets partner null and how_to_join. Only where partner workspaces are switched on (else an error with code not_released). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read your workspace's partner allowance: whether it is a partner (one allowed to open managed workspaces for other people's businesses), its daily allowance, how many workspaces it opened in the last… Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_partner_allowance", "arguments": {...}}`
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/partner`
-- **Errors and cautions:** Only where partner workspaces are switched on (else an error with code not_released).
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_partner_workspaces`
 
-List the workspaces your partner workspace opened for other people's businesses, newest first: each one's name, when it was opened, and whether its owner has claimed it, whether you still manage it, or whether you were let go. status narrows the list (waiting, claimed, managing, released), q searches the names, and before (the oldest opened_at you already have) pages back. Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the workspaces your partner workspace opened for other people's businesses, newest first: each one's name, when it was opened, and whether its owner has claimed it, whether you still manage it,… Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_partner_workspaces", "arguments": {...}}`
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/partner/workspaces`
-- **Errors and cautions:** Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `status` | `all` / `waiting` / `claimed` / `managing` / `released` | Which workspaces: all (the default), waiting for their owner, claimed, still managed by you, or released. |
+| `status` | `all` / `waiting` / `claimed` / `managing` / `released` | Which workspaces: all (the default), waiting for their owner, claimed, still managed by you, or… |
 | `q` | string | Search the workspace names. |
 | `limit` | integer | How many to return, 1 to 200 (default 50). |
 | `before` | string | Only workspaces opened before this time: the oldest opened_at of the page you have. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `create_partner_workspace`
 
-Open a managed workspace for someone's business from your partner workspace: an ordinary production workspace that can take offers, orders and customers at once, owned by an agent until the business owner claims it. The answer carries, once each and never again, your management key in the new workspace (api_key.key: full access, no expiry) and the claim link for the owner (claim.claim_url: works once, for 90 days). Keep the key and send the claim link only to the owner. Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner). Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Open a managed workspace for someone's business from your partner workspace: an ordinary production workspace that can take offers, orders and customers at once, owned by an agent until the business… Needs a Last Price credential with partner workspaces scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "create_partner_workspace", "arguments": {...}}`
 - **Access:** key, partner workspaces scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/partner/workspaces`
-- **Errors and cautions:** Each one spends one of your daily allowance (else an error with code partner_allowance_spent). Only in a workspace Last Price staff made a partner, where partner workspaces are switched on (else an error with code not_released or not_a_partner).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `name` **(required)** | string | The business's name. |
-| `contact_email` | string | The owner's email, if they gave one. Never used to send anything. |
+| `contact_email` | string | The owner's email, if they gave one. |
 | `intended_use` | string | What the business does. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_aitune_backends`
 
-List the inference backends the AITune sidecar offers your workspace and the state of each one: which are available, which are loaded and why one is not. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the inference backends the AITune sidecar offers your workspace and the state of each one: which are available, which are loaded and why one is not. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_aitune_backends", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `start_aitune_profiling`
 
-Start a profiling run for a model on the AITune sidecar: pass model, and optionally batch_sizes, measurement_steps, saturation_cutoff and include_warmup to override the defaults. It uses GPU time on the sidecar; read the finished report with get_aitune_profiling. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Start a profiling run for a model on the AITune sidecar: pass model, and optionally batch_sizes, measurement_steps, saturation_cutoff and include_warmup to override the defaults. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "start_aitune_profiling", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **Errors and cautions:** Needs a claimed Last Price credential.
@@ -527,10 +872,14 @@ Start a profiling run for a model on the AITune sidecar: pass model, and optiona
 | `saturation_cutoff` | number | Stop growing the batch once throughput gains fall below this. |
 | `include_warmup` | boolean | Include the warm-up run in the report. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_aitune_profiling`
 
-Read the latest profiling report for a model on the AITune sidecar: measured latency, throughput and memory per backend, so you can choose how to serve it. Pass the model name as model. Read-only; it does not start a run. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read the latest profiling report for a model on the AITune sidecar: measured latency, throughput and memory per backend, so you can choose how to serve it. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_aitune_profiling", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
@@ -538,164 +887,205 @@ Read the latest profiling report for a model on the AITune sidecar: measured lat
 | :-- | :-- | :-- |
 | `model` **(required)** | string | The model to read the profiling report for. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_aitune_system_stats`
 
-Read the AITune sidecar's current GPU and CPU load: utilisation, memory and temperature. Pass history true to get the readings over the last duration_minutes (1 to 1440, default 60) instead. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read the AITune sidecar's current GPU and CPU load: utilisation, memory and temperature. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_aitune_system_stats", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `history` | boolean | Return the readings over time instead of the current ones. |
-| `duration_minutes` | integer | How far back the history goes, in minutes. Defaults to 60. |
+| `duration_minutes` | integer | How far back the history goes, in minutes. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_agent_capabilities`
 
-Read what one agent may do: its effective scopes with a description of each, how many approvals are pending for it, its rate limit and how idempotency keys work. Pass agent_id. Call it before a planned action to learn whether it will succeed instead of meeting a 403. An agent's own credential reads only its own agent; a workspace credential reads any agent in the workspace. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read what one agent may do: its effective scopes with a description of each, how many approvals are pending for it, its rate limit and how idempotency keys work. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_agent_capabilities", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/capabilities`
-- **Errors and cautions:** Call it before a planned action to learn whether it will succeed instead of meeting a 403.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `agent_id` **(required)** | string | The agent: its id, as it shows in your workspace. An agent's own credential can name only its own agent. |
+| `agent_id` **(required)** | string | The agent: its id, as it shows in your workspace. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_agent_value_receipt`
 
-Read one agent's Value Receipt, measured: its signals over the period with the human value the workspace set for each, what it cost (Last Price compute plus costs recorded in the workspace) and the return when both are known. A figure that cannot be measured is null, with the reason under missing. Pass agent_id, and start_date and end_date to choose the period (default the last 30 days, at most 366). An agent's own credential reads only its own receipt. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read one agent's Value Receipt, measured: its signals over the period with the human value the workspace set for each, what it cost (Last Price compute plus costs recorded in the workspace) and the… Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_agent_value_receipt", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/value-receipt`
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `agent_id` **(required)** | string | The agent: its id, as it shows in your workspace. An agent's own credential can name only its own agent. |
+| `agent_id` **(required)** | string | The agent: its id, as it shows in your workspace. |
 | `start_date` | string | The start of the period, as an ISO 8601 date and time. |
 | `end_date` | string | The end of the period, as an ISO 8601 date and time. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `estimate_task_cost`
 
-Estimate what a task would cost to do by people across countries: pass task_description and countries (names or ISO codes), and optionally currency (default EUR), complexity (low, medium or high) and estimated_time_minutes. It makes a model call, billed to your provider key when you set one and to the platform's otherwise. Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Estimate what a task would cost to do by people across countries: pass task_description and countries (names or ISO codes), and optionally currency (default EUR), complexity (low, medium or high) and… Needs a claimed Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "estimate_task_cost", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/agents/{id}`
-- **Errors and cautions:** Needs a claimed Last Price credential.
+- **Errors and cautions:** Estimate what a task would cost to do by people across countries: pass task_description and countries (names or ISO codes), and optionally currency (default EUR), complexity (low, medium or high) and… Needs a claimed Last Price credential.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `task_description` **(required)** | string | The task to estimate. |
 | `countries` **(required)** | array | The countries to estimate for, as names or ISO codes. |
-| `currency` | string | The currency to show costs in. Defaults to EUR. |
+| `currency` | string | The currency to show costs in. |
 | `complexity` | `low` / `medium` / `high` | How hard the task is. |
 | `estimated_time_minutes` | number | How long the task takes one person, in minutes. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_agent_behaviour_tests`
 
-Read what the behaviour tests offer for one of your agents: whether they are released for your workspace, the scenario pack for the agent's kind, whether your workspace's own Anthropic key is connected, the limits and the recent runs. In early access: it answers released false or not_released until it is switched on for your workspace. Runs never send real mail. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read what the behaviour tests offer for one of your agents: whether they are released for your workspace, the scenario pack for the agent's kind, whether your workspace's own Anthropic key is… Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_agent_behaviour_tests", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/behaviour-tests`
-- **Errors and cautions:** In early access: it answers released false or not_released until it is switched on for your workspace.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `agent_id` **(required)** | string | The agent to test: its id, as an agent shows in your workspace. An agent's own credential can name only its own agent. |
+| `agent_id` **(required)** | string | The agent to test: its id, as an agent shows in your workspace. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `run_agent_behaviour_tests`
 
-Run the behaviour test scenarios against one of your agents and answer the stored run with every scenario's result. It uses your workspace's own Anthropic key, so the model calls are billed to that key, and it is limited to 20 runs a day. Pass scenario_ids to run only some scenarios, or system_prompt_override to test a draft prompt. In early access: it answers released false or not_released until it is switched on for your workspace. Runs never send real mail. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Run the behaviour test scenarios against one of your agents and answer the stored run with every scenario's result. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "run_agent_behaviour_tests", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/agents/{id}/behaviour-tests`
-- **Errors and cautions:** In early access: it answers released false or not_released until it is switched on for your workspace.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `agent_id` **(required)** | string | The agent to test: its id, as an agent shows in your workspace. An agent's own credential can name only its own agent. |
-| `scenario_ids` | array | Run only these scenarios: ids from get_agent_behaviour_tests. Omit to run the whole pack. |
+| `agent_id` **(required)** | string | The agent to test: its id, as an agent shows in your workspace. |
+| `scenario_ids` | array | Run only these scenarios: ids from get_agent_behaviour_tests. |
 | `system_prompt_override` | string | Test this draft system prompt instead of the agent's saved one. |
 | `private_terms` | array | Words or phrases the agent must never repeat in its replies, such as a floor price or a cost. |
 | `approved_recipients` | array | Email addresses the agent is allowed to write to during the run. |
-| `scenario_timeout_seconds` | integer | Seconds each scenario may take before it counts as an error. Defaults to 22 here, so a run answers inside this tool's 30 second limit. |
+| `scenario_timeout_seconds` | integer | Seconds each scenario may take before it counts as an error. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_agent_behaviour_test_run`
 
-Read one behaviour test run for one of your agents, with every scenario's result. In early access: it answers released false or not_released until it is switched on for your workspace. Runs never send real mail. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read one behaviour test run for one of your agents, with every scenario's result. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_agent_behaviour_test_run", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/agents/{id}/behaviour-tests/{runId}`
-- **Errors and cautions:** In early access: it answers released false or not_released until it is switched on for your workspace.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `agent_id` **(required)** | string | The agent to test: its id, as an agent shows in your workspace. An agent's own credential can name only its own agent. |
+| `agent_id` **(required)** | string | The agent to test: its id, as an agent shows in your workspace. |
 | `run_id` **(required)** | string | The run: its id, as run_agent_behaviour_tests or get_agent_behaviour_tests returned it. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_agent_protocol`
 
-Read your Personal Agent Protocol file: the organization name and domain saved for it, whether the domain is verified, the file to publish (the poppy.json a personal agent reads to learn what you let it do) and the address to publish it at. Answers released false until agent protocol files are switched on for your workspace. Read-only. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read your Personal Agent Protocol file: the organization name and domain saved for it, whether the domain is verified, the file to publish (the poppy.json a personal agent reads to learn what you let… Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_agent_protocol", "arguments": {...}}`
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/agent-protocol`
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `set_agent_protocol`
 
-Save the organization name and domain your Personal Agent Protocol file carries: pass organization_name and domain (a host name such as acme-outdoor.com). A new domain gets a new verification value and has to be checked again. Returns the file to publish at https://<domain>/.well-known/poppy.json; publish it exactly as given, then call verify_agent_protocol. Answers 404 until agent protocol files are switched on for your workspace. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Save the organization name and domain your Personal Agent Protocol file carries: pass organization_name and domain (a host name such as acme-outdoor.com). Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "set_agent_protocol", "arguments": {...}}`
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/agent-protocol`
-- **Errors and cautions:** Answers 404 until agent protocol files are switched on for your workspace.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `organization_name` **(required)** | string | The name personal agents show for you. |
 | `domain` **(required)** | string | The host that will serve the file, such as acme-outdoor.com. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `verify_agent_protocol`
 
-Check the Personal Agent Protocol file you published: Last Price fetches https://<domain>/.well-known/poppy.json and compares it with the one get_agent_protocol gives. A match verifies the domain for your workspace; a failure returns reason and message saying what to fix, and a domain another workspace verified answers 409. Answers 404 until agent protocol files are switched on for your workspace. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Check the Personal Agent Protocol file you published: Last Price fetches https://<domain>/.well-known/poppy.json and compares it with the one get_agent_protocol gives. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "verify_agent_protocol", "arguments": {...}}`
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/agent-protocol/verify`
-- **Errors and cautions:** A match verifies the domain for your workspace; a failure returns reason and message saying what to fix, and a domain another workspace verified answers 409. Answers 404 until agent protocol files are switched on for your workspace.
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_offer_settings`
 
-Read how your workspace takes offers and counter-offers from buyers: whether offers are on, your public handle, the rounds, concession and expiry limits, the products open to offers with their list and floor prices, the last 30 days' negotiations, and the public URLs a buyer's agent uses. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read how your workspace takes offers and counter-offers from buyers: whether offers are on, your public handle, the rounds, concession and expiry limits, the products open to offers with their list… Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_offer_settings", "arguments": {...}}`
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/negotiation/settings`
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `set_offer_settings`
 
-Turn offers and counter-offers on or off for your workspace and set the schedule every negotiation runs on. Omitted fields keep their saved value, or the default. A handle another workspace holds is refused. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Turn offers and counter-offers on or off for your workspace and set the schedule every negotiation runs on. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "set_offer_settings", "arguments": {...}}`
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/negotiation/settings`
-- **Errors and cautions:** A handle another workspace holds is refused.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `enabled` **(required)** | boolean | Whether buyers can make offers to your workspace at all. Off by default. |
+| `enabled` **(required)** | boolean | Whether buyers can make offers to your workspace at all. |
 | `handle` | string | Your public handle: 3 to 40 lowercase letters, digits or hyphens. |
 | `max_rounds` | integer | Most offers a buyer may make in one negotiation. |
 | `concession_rate` | number | How far each counter moves toward the buyer, between 0 and 1. |
@@ -703,10 +1093,14 @@ Turn offers and counter-offers on or off for your workspace and set the schedule
 | `offer_ttl_minutes` | integer | How long a counter stands before it expires, in minutes. |
 | `daily_negotiation_cap` | integer | Most new negotiations a day. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `set_offer_product`
 
-Open one product to offers, or change it: this saves the product whole (create or replace). Buyers see the list price and never the floor price, which is never breached; the floor cannot exceed the list price. Each product has its own switch, off unless you set enabled. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Open one product to offers, or change it: this saves the product whole (create or replace). Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "set_offer_product", "arguments": {...}}`
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/negotiation/products`
@@ -717,15 +1111,19 @@ Open one product to offers, or change it: this saves the product whole (create o
 | `title` | string / null | A name for your own reference. |
 | `enabled` **(required)** | boolean | Whether buyers can make offers on this product. |
 | `list_price` **(required)** | number | The asking price buyers see. |
-| `floor_price` **(required)** | number | The lowest price you will accept. Never shown to buyers. |
+| `floor_price` **(required)** | number | The lowest price you will accept. |
 | `unit_cost` | number / null | Your cost per unit, read by the margin and cost guardrails. |
-| `currency` | string | A three letter ISO 4217 code. Defaults to USD. |
+| `currency` | string | A three letter ISO 4217 code. |
 | `max_rounds` | integer / null | Rounds for this product, instead of the workspace setting. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `remove_offer_product`
 
 Take a product off offers. Negotiations already open on it stop, because a product that is not listed answers buyers with not found. Needs a Last Price credential with routing write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "remove_offer_product", "arguments": {...}}`
 - **Access:** key, routing write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 
@@ -733,10 +1131,14 @@ Take a product off offers. Negotiations already open on it stop, because a produ
 | :-- | :-- | :-- |
 | `product_id` **(required)** | string | Your own id for the product, as buyers name it in an offer. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `preview_offer`
 
-Try an offer against one of your own products and see the answer a buyer would get (accept, counter or reject), with the limits behind it. Nothing is recorded and nobody is bound, and it works while offers are off, so you can check your terms first. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Try an offer against one of your own products and see the answer a buyer would get (accept, counter or reject), with the limits behind it. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "preview_offer", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/negotiation/preview`
@@ -745,28 +1147,36 @@ Try an offer against one of your own products and see the answer a buyer would g
 | :-- | :-- | :-- |
 | `product_id` **(required)** | string | Your own id for the product, as buyers name it in an offer. |
 | `offered_price` **(required)** | number | The price the pretend buyer offers. |
-| `round` | integer | Which round of the negotiation this is. Defaults to 1. |
+| `round` | integer | Which round of the negotiation this is. |
 | `previous_counter` | number | The counter you made in the round before, if any. |
 | `quantity` | integer | How many the pretend buyer would buy, for your sales playbook's volume terms. |
 | `annual_commitment` | boolean | True when the pretend buyer commits for a year or more, for your annual commitment terms. |
 | `term_months` | integer | How many months the pretend buyer commits to. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_negotiations`
 
-Your workspace's negotiations, newest first: what a buyer sees plus the floor and asking price each one opened with. Use it to honour an accepted price at checkout: find the negotiation and charge its agreed price. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Your workspace's negotiations, newest first: what a buyer sees plus the floor and asking price each one opened with. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_negotiations", "arguments": {...}}`
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `status` | `open` / `accepted` / `rejected` / `expired` | Only negotiations in this state. |
-| `limit` | integer | How many to return. Defaults to 50. |
+| `limit` | integer | How many to return. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_offer_terms`
 
-Read a seller's negotiable terms by their public handle: which products are open to offers, at what list price and currency, how many offers a negotiation allows and how long a counter stands. Never the floor price. Pass product_id to narrow it to one product. Public: needs no credential. An unknown handle, a seller with offers off and a product that is off all answer not found.
+Read a seller's negotiable terms by their public handle: which products are open to offers, at what list price and currency, how many offers a negotiation allows and how long a counter stands.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_offer_terms", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
 
@@ -775,13 +1185,16 @@ Read a seller's negotiable terms by their public handle: which products are open
 | `handle` **(required)** | string | The seller's public handle, from the terms they publish. |
 | `product_id` | string | The seller's id for the product. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `make_offer`
 
-Name a price for a seller's product and get the answer: accept, counter or reject, with the price and the reason. The first offer opens a negotiation and returns a buyer token, once: keep it. To make the next offer in the same negotiation, pass negotiation_id and buyer_token too. buyer_ref is an optional opaque reference for the seller and never a name or email. quantity, annual_commitment and term_months describe the deal for the seller's volume and commitment terms; the answer may carry the seller's terms and a message. The seller's floor is never breached or shown. Public: needs no credential, and it is limited per address and by the rounds the seller allows.
+Name a price for a seller's product and get the answer: accept, counter or reject, with the price and the reason.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "make_offer", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** changes data
-- **Errors and cautions:** Public: needs no credential, and it is limited per address and by the rounds the seller allows.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -789,16 +1202,21 @@ Name a price for a seller's product and get the answer: accept, counter or rejec
 | `product_id` **(required)** | string | The seller's id for the product. |
 | `offered_price` **(required)** | number | The price you offer, in the seller's currency. |
 | `negotiation_id` | string | The negotiation id from the first answer. |
-| `buyer_token` | string | The buyer token the first answer gave you, once. Keep it: it is the only way back into the negotiation. |
-| `buyer_ref` | string | An opaque reference for the seller's bookkeeping. Never a name or email. |
-| `quantity` | integer | How many you would buy, for the seller's volume terms. Read when the negotiation opens. |
-| `annual_commitment` | boolean | True to commit for a year or more, for the seller's annual commitment terms. Read when the negotiation opens. |
-| `term_months` | integer | How many months you commit to, for the seller's commitment terms. Read when the negotiation opens. |
+| `buyer_token` | string | The buyer token the first answer gave you, once. |
+| `buyer_ref` | string | An opaque reference for the seller's bookkeeping. |
+| `quantity` | integer | How many you would buy, for the seller's volume terms. |
+| `annual_commitment` | boolean | True to commit for a year or more, for the seller's annual commitment terms. |
+| `term_months` | integer | How many months you commit to, for the seller's commitment terms. |
+| `last_offer` | boolean | True when this is your last offer and you will walk away if it is not taken. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_negotiation`
 
-Read your own negotiation with a seller: its status, the rounds used and left, the standing counter, the agreed price and the history. Needs the negotiation id and the buyer token the negotiation opened with, not an account. A wrong token and a missing negotiation answer the same not found. Public: needs no credential.
+Read your own negotiation with a seller: its status, the rounds used and left, the standing counter, the agreed price and the history. Needs the negotiation id and the buyer token the negotiation opened with, not an account.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_negotiation", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
 
@@ -806,12 +1224,16 @@ Read your own negotiation with a seller: its status, the rounds used and left, t
 | :-- | :-- | :-- |
 | `handle` **(required)** | string | The seller's public handle, from the terms they publish. |
 | `negotiation_id` **(required)** | string | The negotiation id from the first answer. |
-| `buyer_token` **(required)** | string | The buyer token the first answer gave you, once. Keep it: it is the only way back into the negotiation. |
+| `buyer_token` **(required)** | string | The buyer token the first answer gave you, once. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `accept_counter`
 
-Take the seller's standing counter: the negotiation closes as accepted at that price. This commits the buyer to the price, so call it only when you mean to buy at it. A counter past its time, a closed negotiation, or a counter the seller can no longer allow answers with a conflict and binds nothing. Needs the negotiation id and the buyer token. Public: needs no credential.
+Take the seller's standing counter: the negotiation closes as accepted at that price. Needs the negotiation id and the buyer token.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "accept_counter", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** **destructive**
 
@@ -819,44 +1241,53 @@ Take the seller's standing counter: the negotiation closes as accepted at that p
 | :-- | :-- | :-- |
 | `handle` **(required)** | string | The seller's public handle, from the terms they publish. |
 | `negotiation_id` **(required)** | string | The negotiation id from the first answer. |
-| `buyer_token` **(required)** | string | The buyer token the first answer gave you, once. Keep it: it is the only way back into the negotiation. |
+| `buyer_token` **(required)** | string | The buyer token the first answer gave you, once. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `fill_handover_sheet`
 
-Handover, step 1: while you talk with someone about the business they would like to own (a driver, a stall, a barber), send the conversation so far as transcript and the sheet as it stands, and get the sheet back filled from what they said (their name, WhatsApp, what they sell, prices, country, currency), with the fields still missing. A language model fills it where the deployment has one, plain rules otherwise (filled_by). Nothing is saved. Record a conversation only after the person said yes to it. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Handover, step 1: while you talk with someone about the business they would like to own (a driver, a stall, a barber), send the conversation so far as transcript and the sheet as it stands, and get… Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "fill_handover_sheet", "arguments": {...}}`
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/handover/sheet`
-- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `transcript` **(required)** | string | The conversation so far, as text. |
 | `sheet` | object | The sheet as it stands, as the last call returned it; leave out on the first call. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `create_handover_business`
 
-Handover, step 2: start a business from a brief (the sheet fill_handover_sheet returned, completed) and the person's consent (when you asked and the words they said yes with). Answers with a draft page proposed from the brief: a look for the trade, items with prices, a floor at 85% on items they will haggle on, and the licence notes for their trade and country. Check every line with the owner, then update_handover_business and publish_handover_business. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Handover, step 2: start a business from a brief (the sheet fill_handover_sheet returned, completed) and the person's consent (when you asked and the words they said yes with). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "create_handover_business", "arguments": {...}}`
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/handover/businesses`
-- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `brief` **(required)** | object | What the owner told you, checked with them. |
 | `consent` **(required)** | object | The person's yes to being recorded and to the business: when you asked and their words. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `update_handover_business`
 
-Change a Handover business's page with its owner: name, tagline, about, look, items (the whole list, replaced), and licences_confirmed once the owner holds the licences the notes name or will before selling. Only the fields you send change. monthly_fee changes the fee after the free months on a live business only (a draft answers not_live). Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Change a Handover business's page with its owner: name, tagline, about, look, items (the whole list, replaced), and licences_confirmed once the owner holds the licences the notes name or will before… Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "update_handover_business", "arguments": {...}}`
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/handover/businesses/{id}`
-- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -867,62 +1298,78 @@ Change a Handover business's page with its owner: name, tagline, about, look, it
 | `look` | `market` / `night` / `sun` | The page's look. |
 | `items` | array | Every item on the page, replacing the list. |
 | `licences_confirmed` | boolean | true once the owner holds the licences the notes name, or will before selling. |
-| `monthly_fee` | number | The monthly fee after the 90 free days, in the business's currency. Live businesses only. |
+| `monthly_fee` | number | The monthly fee after the 90 free days, in the business's currency. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `publish_handover_business`
 
-Handover, step 3: put a draft business live and hand it over. It opens the business its own Last Price workspace (one of the deployment partner's daily allowance), records the plan (90 days free, then the monthly fee for its market, priced through Last Price), lists its items and opens the haggle items to offers under the business's own handle. A trade that needs a licence is refused (licences_unconfirmed) until you confirm its licences with update_handover_business; a business already live answers not_draft. Then get_handover_pack. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Handover, step 3: put a draft business live and hand it over. Needs a Last Price credential with commerce configure scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "publish_handover_business", "arguments": {...}}`
 - **Access:** key, commerce configure scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/handover/businesses/{id}/publish`
-- **Errors and cautions:** A trade that needs a licence is refused (licences_unconfirmed) until you confirm its licences with update_handover_business; a business already live answers not_draft. Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_handover_pack`
 
-Handover, step 4: what you leave the owner with: the page address and its QR code (SVG, to print), the claim link while it can still be used (it makes them the owner: send it only to them), the handover message with the free months and the monthly fee, and a WhatsApp link that sends it. Live businesses only. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Handover, step 4: what you leave the owner with: the page address and its QR code (SVG, to print), the claim link while it can still be used (it makes them the owner: send it only to them), the… Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_handover_pack", "arguments": {...}}`
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/handover/businesses/{id}/pack`
-- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_handover_businesses`
 
-List the businesses your workspace built with Handover, newest first: each one's name, owner, page address, whether it is a draft or live, and its plan (90 days free, then the monthly fee). Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the businesses your workspace built with Handover, newest first: each one's name, owner, page address, whether it is a draft or live, and its plan (90 days free, then the monthly fee). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_handover_businesses", "arguments": {...}}`
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/handover/businesses`
-- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_handover_business`
 
-Read one Handover business: the brief, the page (name, words, look, items and prices, floors on items open to offers), the licence check, the consent that was recorded, and its plan once live. The management key and claim link are never returned here: use get_handover_pack. Only where Handover is switched on for the workspace (else an error with code not_released). Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read one Handover business: the brief, the page (name, words, look, items and prices, floors on items open to offers), the licence check, the consent that was recorded, and its plan once live. Needs a Last Price credential with commerce catalog read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_handover_business", "arguments": {...}}`
 - **Access:** key, commerce catalog read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/handover/businesses/{id}`
-- **Errors and cautions:** Only where Handover is switched on for the workspace (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `business_id` **(required)** | string | The business id, from list_handover_businesses or create_handover_business. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_handover_page`
 
-Read a live Handover business by the address of its page (/b/{slug}), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to make them on with make_offer, and where to order. Never a floor or a key. A draft or an unknown address answers not_found.
+Read a live Handover business by the address of its page (/b/{slug}), with no credential: its name and words, items and prices, licence notes and WhatsApp, which items take offers and the handle to…
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_handover_page", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
 - **REST:** `/api/handover/public/{slug}`
@@ -931,10 +1378,14 @@ Read a live Handover business by the address of its page (/b/{slug}), with no cr
 | :-- | :-- | :-- |
 | `slug` **(required)** | string | The page address, the slug in /b/{slug}: 3 to 40 lowercase letters, digits or hyphens. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `order_from_handover_business`
 
-Order from a live Handover business with no credential: a name, the items by id from get_handover_page with quantities, and optionally when and a note. Prices are the page's. For an item you agreed a price on with make_offer, add it to agreed with its negotiation_id and buyer_token: the agreed price is used only when that negotiation says it was accepted (else offer_not_agreed). The order is recorded on the business's own workspace; the answer carries its reference, the total and a WhatsApp link that sends it to the owner. 10 orders a minute per address.
+Order from a live Handover business with no credential: a name, the items by id from get_handover_page with quantities, and optionally when and a note.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "order_from_handover_business", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** changes data
 - **REST:** `/api/handover/public/{slug}/orders`
@@ -948,20 +1399,28 @@ Order from a live Handover business with no credential: a name, the items by id 
 | `note` | string | Anything the owner should know. |
 | `agreed` | array | Items you agreed a price on with make_offer. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_ucp_profile`
 
-Read Last Price's Universal Commerce Protocol business profile: the services, capabilities and payment handlers a UCP agent discovers before it shops here. Public: needs no credential.
+Read Last Price's Universal Commerce Protocol business profile: the services, capabilities and payment handlers a UCP agent discovers before it shops here.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_ucp_profile", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only
 - **REST:** `/api/ucp/discovery`
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `get_ucp_quote`
 
-Price a cart the UCP way: pass cart with line_items, and optionally request_id, function_id, routing_preference, currency, stage (quote, cart, checkout or order), checkout, order, payment, context and agentid_token. It routes the cart through the pricing network and answers a UCP quote. Pass agentid_token (an AgentID ID token issued for Last Price) to be recorded as a verified buying agent; the answer then names you, marked verified. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Price a cart the UCP way: pass cart with line_items, and optionally request_id, function_id, routing_preference, currency, stage (quote, cart, checkout or order), checkout, order, payment, context… Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_ucp_quote", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/ucp/quote`
@@ -973,16 +1432,20 @@ Price a cart the UCP way: pass cart with line_items, and optionally request_id, 
 | `function_id` | string | The pricing function to use. |
 | `routing_preference` | `cheapest` / `fastest` / `explicit` / `round_robin` / `weighted` / `policy` / `default` | How to pick a function when none is named. |
 | `currency` | string | The currency to price in. |
-| `stage` | `quote` / `cart` / `checkout` / `order` | Where in the funnel the quote is for. Defaults to quote. |
+| `stage` | `quote` / `cart` / `checkout` / `order` | Where in the funnel the quote is for. |
 | `checkout` | object | Checkout details. |
 | `order` | object | Order details. |
 | `context` | object | Anything that shapes the price: product type, country, channel. |
-| `agentid_token` | string | Optional: your AgentID ID token (from auth.agentid.com, issued for Last Price), sent as the AgentID-Token header so the quote records you as a verified buying agent. Leave it out to buy unverified. |
+| `agentid_token` | string | Optional: your AgentID ID token (from auth.agentid.com, issued for Last Price), sent as the… |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `create_ucp_checkout`
 
-Open a UCP checkout session: pass line_items, and optionally buyer, context, payment, signals, cart_id, fulfillment, discounts, currency, idempotency_key and agentid_token. Pass the same idempotency_key with the same body to retry safely: you get the first session back instead of a second one. Pass agentid_token to have the session record you as a verified buying agent. It answers the session with its id and status. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Open a UCP checkout session: pass line_items, and optionally buyer, context, payment, signals, cart_id, fulfillment, discounts, currency, idempotency_key and agentid_token. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "create_ucp_checkout", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/ucp/checkout-sessions`
@@ -996,14 +1459,18 @@ Open a UCP checkout session: pass line_items, and optionally buyer, context, pay
 | `fulfillment` | object | How the order is fulfilled: its methods. |
 | `discounts` | object | Discount codes to apply. |
 | `cart_id` | string | The cart this checkout comes from. |
-| `currency` | string | The currency. Defaults to the first line item's, or USD. |
-| `idempotency_key` | string | Your key for this checkout. Retrying with the same key and body returns the first session; the same key with a different body is refused. |
-| `agentid_token` | string | Optional: your AgentID ID token (from auth.agentid.com, issued for Last Price), sent as the AgentID-Token header so the quote records you as a verified buying agent. Leave it out to buy unverified. |
+| `currency` | string | The currency. |
+| `idempotency_key` | string | Your key for this checkout. |
+| `agentid_token` | string | Optional: your AgentID ID token (from auth.agentid.com, issued for Last Price), sent as the… |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_ucp_checkout`
 
 Read one UCP checkout session: pass checkout_id. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_ucp_checkout", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
@@ -1011,24 +1478,31 @@ Read one UCP checkout session: pass checkout_id. Needs a Last Price credential w
 | :-- | :-- | :-- |
 | `checkout_id` **(required)** | string | The checkout session: its id, as create_ucp_checkout and list_ucp_checkouts show it. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_ucp_checkouts`
 
-List your workspace's UCP checkout sessions, with each one's id, status and totals. Read-only. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's UCP checkout sessions, with each one's id, status and totals. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_ucp_checkouts", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/ucp/checkout-sessions`
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `update_ucp_checkout`
 
-Change a UCP checkout session that is still open: pass checkout_id and at least one of line_items, buyer, context, payment, signals, fulfillment and discounts. A completed or canceled session answers 422. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Change a UCP checkout session that is still open: pass checkout_id and at least one of line_items, buyer, context, payment, signals, fulfillment and discounts. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "update_ucp_checkout", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/ucp/checkout-sessions/{id}`
-- **Errors and cautions:** A completed or canceled session answers 422.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -1040,10 +1514,14 @@ Change a UCP checkout session that is still open: pass checkout_id and at least 
 | `fulfillment` | object | How the order is fulfilled: its methods. |
 | `discounts` | object | Discount codes to apply. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `complete_ucp_checkout`
 
 Complete a UCP checkout session: pass checkout_id. Payment processing is not configured yet, so an open session answers 501 until a payment provider is set up; a session that is already completed is returned as it is. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "complete_ucp_checkout", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **Errors and cautions:** Payment processing is not configured yet, so an open session answers 501 until a payment provider is set up; a session that is already completed is returned as it is.
@@ -1052,10 +1530,14 @@ Complete a UCP checkout session: pass checkout_id. Payment processing is not con
 | :-- | :-- | :-- |
 | `checkout_id` **(required)** | string | The checkout session: its id, as create_ucp_checkout and list_ucp_checkouts show it. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `cancel_ucp_checkout`
 
 Cancel a UCP checkout session: pass checkout_id. A completed session cannot be canceled, and canceling one that is already canceled changes nothing. Needs a Last Price credential with price compute scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "cancel_ucp_checkout", "arguments": {...}}`
 - **Access:** key, price compute scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 
@@ -1063,29 +1545,35 @@ Cancel a UCP checkout session: pass checkout_id. A completed session cannot be c
 | :-- | :-- | :-- |
 | `checkout_id` **(required)** | string | The checkout session: its id, as create_ucp_checkout and list_ucp_checkouts show it. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_storefronts`
 
-List your workspace's storefronts: each one's subdomain, name, whether it is published, what it lists (functions, products open to offers, tag and product filters), its own domains with their DNS records and status, and the addresses agents use (page, agent card, llms.txt, MCP). Also the limits and a suggested subdomain. A storefront is your own front door for agents at <subdomain>.store.last-price.ai or a domain you own. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List your workspace's storefronts: each one's subdomain, name, whether it is published, what it lists (functions, products open to offers, tag and product filters), its own domains with their DNS… Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_storefronts", "arguments": {...}}`
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/storefronts`
-- **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `create_storefront`
 
-Create a storefront: an agent card, llms.txt and MCP endpoint listing a selection of your public offers at <subdomain>.store.last-price.ai (and /s/<subdomain> on last-price.ai). display_name is required; the subdomain defaults to one made from it. It stays unpublished unless published is true. A workspace may run several, one per product line or audience, but each must list a different selection (offer_tags, product_ids or the kinds shown): the same offers twice is refused. Every storefront says it is powered by Last Price. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Create a storefront: an agent card, llms.txt and MCP endpoint listing a selection of your public offers at <subdomain>.store.last-price.ai (and /s/<subdomain> on last-price.ai). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "create_storefront", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/storefronts`
-- **Errors and cautions:** A workspace may run several, one per product line or audience, but each must list a different selection (offer_tags, product_ids or the kinds shown): the same offers twice is refused. Only where the workspace has storefronts switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
-| `subdomain` | string | The <subdomain> in <subdomain>.store.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. Some names are reserved. |
+| `subdomain` | string | The <subdomain> in <subdomain>.store.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. |
 | `published` | boolean | true puts it live; false takes it down. |
 | `display_name` **(required)** | string | The name agents see. |
 | `tagline` | string / null | One line on what it sells. |
@@ -1095,35 +1583,41 @@ Create a storefront: an agent card, llms.txt and MCP endpoint listing a selectio
 | `brand_color` | string / null | A hex colour such as #0f766e. |
 | `show_functions` | boolean | List your public marketplace pricing functions. |
 | `show_negotiation` | boolean | List your products open to offers. |
-| `offer_tags` | array | Only functions with one of these tags. Empty lists every public function. |
-| `product_ids` | array | Only these products open to offers. Empty lists every one. |
+| `offer_tags` | array | Only functions with one of these tags. |
+| `product_ids` | array | Only these products open to offers. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_storefront`
 
-Read one storefront with its domains, addresses and the offers it lists right now. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read one storefront with its domains, addresses and the offers it lists right now. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_storefront", "arguments": {...}}`
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/storefronts/{storefrontId}`
-- **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `update_storefront`
 
-Change a storefront. Only the fields you send change; an empty string clears optional text. Set published to put it live or take it down. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Change a storefront. Only the fields you send change; an empty string clears optional text. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "update_storefront", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**
 - **REST:** `/api/storefronts/{storefrontId}`
-- **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
-| `subdomain` | string | The <subdomain> in <subdomain>.store.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. Some names are reserved. |
+| `subdomain` | string | The <subdomain> in <subdomain>.store.last-price.ai: 3 to 40 lowercase letters, digits or hyphens. |
 | `published` | boolean | true puts it live; false takes it down. |
 | `display_name` | string | The name agents see. |
 | `tagline` | string / null | One line on what it sells. |
@@ -1133,55 +1627,68 @@ Change a storefront. Only the fields you send change; an empty string clears opt
 | `brand_color` | string / null | A hex colour such as #0f766e. |
 | `show_functions` | boolean | List your public marketplace pricing functions. |
 | `show_negotiation` | boolean | List your products open to offers. |
-| `offer_tags` | array | Only functions with one of these tags. Empty lists every public function. |
-| `product_ids` | array | Only these products open to offers. Empty lists every one. |
+| `offer_tags` | array | Only functions with one of these tags. |
+| `product_ids` | array | Only these products open to offers. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `delete_storefront`
 
-Delete a storefront and its domains. Its addresses stop answering at once. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Delete a storefront and its domains. Its addresses stop answering at once. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "delete_storefront", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}`
-- **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `search_storefront_domains`
 
-Find a domain for a storefront: send query (a name, tried with .com, .ai, .io, .co, .app, .dev, .shop and .store) or domains (up to 50 exact ones) and get whether each is available and its first-year price in USD. Read-only: nothing is registered or paid. Only where the workspace has storefronts and domain search switched on (else an error with code not_released). Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Find a domain for a storefront: send query (a name, tried with .com, .ai, .io, .co, .app, .dev, .shop and .store) or domains (up to 50 exact ones) and get whether each is available and its first-year… Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "search_storefront_domains", "arguments": {...}}`
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}`
-- **Errors and cautions:** Only where the workspace has storefronts and domain search switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `query` | string | A name to try with common endings, such as acme pricing. |
 | `domains` | array | Exact domains to ask about instead of query. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `quote_storefront_domain`
 
-Get a price for registering a domain for a storefront, held for 15 minutes. A quote costs nothing and registers nothing: only the workspace owner can buy it, in the dashboard. Only where domain search is switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Get a price for registering a domain for a storefront, held for 15 minutes. A quote costs nothing and registers nothing: only the workspace owner can buy it, in the dashboard. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "quote_storefront_domain", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domain-quotes`
-- **Errors and cautions:** Only where domain search is switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
 | `domain` **(required)** | string | The domain to price, such as acme.ai. |
-| `years` | integer | Years to register. Defaults to 1. |
+| `years` | integer | Years to register. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_storefront_domain_quotes`
 
 List a storefront's domain quotes and registrations: domain, years, price, and quoted, ordered, failed or expired. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_storefront_domain_quotes", "arguments": {...}}`
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/storefronts/{storefrontId}/domain-quotes`
@@ -1190,38 +1697,48 @@ List a storefront's domain quotes and registrations: domain, years, price, and q
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `add_storefront_domain`
 
-Serve a storefront on a domain your company owns (white label), such as agents.yourcompany.com. Answers with two DNS records to add at your DNS provider: a TXT record proving you own the domain and the record that routes it. Then call verify_storefront_domain. Last Price domains and hosting domains are refused. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Serve a storefront on a domain your company owns (white label), such as agents.yourcompany.com. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "add_storefront_domain", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** changes data
 - **REST:** `/api/storefronts/{storefrontId}/domains`
-- **Errors and cautions:** Last Price domains and hosting domains are refused. Only where the workspace has storefronts switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
 | `domain` **(required)** | string | A domain your company owns, such as agents.yourcompany.com. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `verify_storefront_domain`
 
-Check a storefront domain's TXT record now. verified true means the domain is proven yours and the storefront answers there once routing is in place; otherwise reason and detail say what is missing. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Check a storefront domain's TXT record now. verified true means the domain is proven yours and the storefront answers there once routing is in place; otherwise reason and detail say what is missing. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "verify_storefront_domain", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/verify`
-- **Errors and cautions:** Only where the workspace has storefronts switched on (else an error with code not_released).
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
 | `domain_id` **(required)** | string | The domain id, from list_storefronts or add_storefront_domain. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `remove_storefront_domain`
 
 Stop serving a storefront on one of your domains. Only where the workspace has storefronts switched on (else an error with code not_released). Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "remove_storefront_domain", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}`
@@ -1232,24 +1749,31 @@ Stop serving a storefront on one of your domains. Only where the workspace has s
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
 | `domain_id` **(required)** | string | The domain id, from list_storefronts or add_storefront_domain. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `list_storefront_dns_records`
 
-List the DNS records of a domain your workspace registered through Last Price. locked marks the records the storefront needs. A domain bought elsewhere is refused: manage its DNS where it was bought. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the DNS records of a domain your workspace registered through Last Price. locked marks the records the storefront needs. Needs a Last Price credential with workspace settings read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_storefront_dns_records", "arguments": {...}}`
 - **Access:** key, workspace settings read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/dns-records`
-- **Errors and cautions:** A domain bought elsewhere is refused: manage its DNS where it was bought.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `storefront_id` **(required)** | string | The storefront id, from list_storefronts. |
 | `domain_id` **(required)** | string | The domain id, from list_storefronts or add_storefront_domain. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `add_storefront_dns_record`
 
-Add a DNS record to a domain your workspace registered through Last Price, to use it for more than the storefront: MX for email, TXT for SPF, DKIM, DMARC or site verification, CNAME or A for a subdomain. name is relative (blog for blog.<domain>, empty for the domain itself). Records the storefront needs cannot be replaced. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Add a DNS record to a domain your workspace registered through Last Price, to use it for more than the storefront: MX for email, TXT for SPF, DKIM, DMARC or site verification, CNAME or A for a… Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "add_storefront_dns_record", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/dns-records`
@@ -1262,12 +1786,16 @@ Add a DNS record to a domain your workspace registered through Last Price, to us
 | `type` **(required)** | `A` / `AAAA` / `CNAME` / `MX` / `TXT` / `CAA` / `SRV` | The record type. |
 | `value` **(required)** | string | The record value, such as a mail server or a target host. |
 | `ttl` | integer | Seconds to cache it. |
-| `mx_priority` | integer | MX only. Defaults to 10. |
+| `mx_priority` | integer | MX only. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `remove_storefront_dns_record`
 
 Remove a DNS record from a domain your workspace registered through Last Price. Records the storefront needs cannot be removed. Needs a Last Price credential with workspace settings write scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "remove_storefront_dns_record", "arguments": {...}}`
 - **Access:** key, workspace settings write scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** **destructive**, reaches outside Last Price
 - **REST:** `/api/storefronts/{storefrontId}/domains/{domainId}/dns-records/{recordId}`
@@ -1278,50 +1806,46 @@ Remove a DNS record from a domain your workspace registered through Last Price. 
 | `domain_id` **(required)** | string | The domain id, from list_storefronts or add_storefront_domain. |
 | `record_id` **(required)** | string | The record id, from list_storefront_dns_records. |
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `check_agent_readiness`
 
-Run the free agent-ready check on a store: pass url, the store address. It reports whether shopping agents can check out, whether bot blocking is in the way and whether margin survives an agent's cut. It fetches the store, so it is limited per address and answers 404 while the check is not released. Public: needs no credential.
+Run the free agent-ready check on a store: pass url, the store address. It reports whether shopping agents can check out, whether bot blocking is in the way and whether margin survives an agent's cut.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "check_agent_readiness", "arguments": {...}}`
 - **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
 - **Behaviour:** read-only, reaches outside Last Price
 - **REST:** `/api/public/agent-ready-check`
-- **Errors and cautions:** It fetches the store, so it is limited per address and answers 404 while the check is not released.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
 | `url` **(required)** | string | The store address to check. |
 
-## `get_changelog`
-
-What changed in Last Price: the newest release notes, optionally for one feature, written for agents as well as people. Pass feature (a tag such as billing, webhooks, mcp, agent-payments, approvals) to follow one part of the product, and since (YYYY-MM-DD, for example the date you last checked) to see only newer notes. Each note has its date, title, summary, category, feature tags, a link to the full note and, when there is one, the docs section and app screen it is about. Public: needs no credential. Check it at the start of a session and before changing integration code.
-
-- **Access:** no key needed (answers from a public demo without one; a key gives your own workspace)
-- **Behaviour:** read-only
-
-| Argument | Type | Meaning |
-| :-- | :-- | :-- |
-| `feature` | string | A feature tag slug, for example billing. Omit for every feature. |
-| `since` | string | Only notes dated after this day (YYYY-MM-DD). |
-| `audience` | `agents` / `users` | Only notes written for this audience. Omit for both. |
-| `limit` | integer | How many notes at most, newest first. |
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `list_demo_apps`
 
-List the demo apps Last Price ships, each with its name, description, the experiment it runs and, once the demo workspace is seeded, that experiment's status, views and conversions. Read-only. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+List the demo apps Last Price ships, each with its name, description, the experiment it runs and, once the demo workspace is seeded, that experiment's status, views and conversions. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "list_demo_apps", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 
 _No arguments._
 
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
 ## `simulate_agent_cut`
 
-Simulate how much of a sale to offer an agent platform (a shopping agent or agent marketplace that charges sellers a cut) if it ranks sellers partly by the cut they pay. No platform publishes such a ranking, so this is a simulation under your assumption (visibility_per_point_pct: percent more channel sales per extra point of cut), also run at half, double and zero of it. Returns the profit at each cut, the recommended cut, the cut with the smallest worst case, the break-even, and a channel rate ready for PUT /api/channel-rates. Changes nothing. Answers 404 until the cut advisor is switched on for your workspace. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Simulate how much of a sale to offer an agent platform (a shopping agent or agent marketplace that charges sellers a cut) if it ranks sellers partly by the cut they pay. Needs a Last Price credential with routing read scope. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "simulate_agent_cut", "arguments": {...}}`
 - **Access:** key, routing read scope (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/cut-advisor`
-- **Errors and cautions:** Answers 404 until the cut advisor is switched on for your workspace.
 
 | Argument | Type | Meaning |
 | :-- | :-- | :-- |
@@ -1329,22 +1853,43 @@ Simulate how much of a sale to offer an agent platform (a shopping agent or agen
 | `unit_cost` **(required)** | number | What one unit costs you, same currency. |
 | `current_cut_pct` **(required)** | number | The cut the channel takes today, in percent. |
 | `base_units` **(required)** | number | Units sold through the channel per period at the current cut. |
-| `visibility_per_point_pct` | number | Your assumption: percent more channel sales per extra point of cut. Defaults to 2. |
-| `passed_on_pct` | number | How much of the cut is added to the price, in percent. Defaults to 100. |
-| `price_elasticity` | number | How channel buyers respond to price. Defaults to -1.5. |
-| `max_visibility_change_pct` | number | Most ranking can move channel sales, in percent either way. Defaults to 100. |
-| `min_cut_pct` | number | Lowest cut to try. Defaults to 2.5 (or the current cut, if lower). |
-| `max_cut_pct` | number | Highest cut to try. Defaults to 30 (or the current cut, if higher). |
-| `step_pct` | number | Gap between the cuts tried. Defaults to 0.5. |
-| `channel` | string | The channel name, as you save it in channel rates (e.g. instinct). |
+| `visibility_per_point_pct` | number | Your assumption: percent more channel sales per extra point of cut. |
+| `passed_on_pct` | number | How much of the cut is added to the price, in percent. |
+| `price_elasticity` | number | How channel buyers respond to price. |
+| `max_visibility_change_pct` | number | Most ranking can move channel sales, in percent either way. |
+| `min_cut_pct` | number | Lowest cut to try. |
+| `max_cut_pct` | number | Highest cut to try. |
+| `step_pct` | number | Gap between the cuts tried. |
+| `channel` | string | The channel name, as you save it in channel rates (e.g. |
 | `currency` | string | ISO 4217 code of price and unit_cost, echoed back. |
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
 
 ## `get_cut_advisor_settings`
 
-Read the settings behind simulate_agent_cut: whether the cut advisor is released for your workspace, the defaults it applies and the limits on each input. Free to call; read it before simulate_agent_cut to see what it will accept. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
+Read the settings behind simulate_agent_cut: whether the cut advisor is released for your workspace, the defaults it applies and the limits on each input. Needs a Last Price credential. Needs a claimed workspace: a sandbox key from self-registration is refused (403) until a person claims the workspace.
 
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "get_cut_advisor_settings", "arguments": {...}}`
 - **Access:** key (claimed workspace only: a self-registered sandbox key gets 403)
 - **Behaviour:** read-only
 - **REST:** `/api/cut-advisor`
 
 _No arguments._
+
+then run it with `call_tool`: `{"name": "<tool>", "arguments": {...}}`. Most clients also accept a direct call by name.
+A tool `search_tools` cannot find is not switched on for your connection yet.
+
+## `estimate_plan_cost`
+
+Price a whole plan of catalog steps before you dispatch any of it: pass plan (units of work, and optionally replicates, answers_expected and compare_units) and steps, each with name and unit_price…
+
+- **How to call:** not in `tools/list`: `call_tool` with `{"name": "estimate_plan_cost", "arguments": {...}}`
+- **Access:** key
+- **Behaviour:** read-only
+
+| Argument | Type | Meaning |
+| :-- | :-- | :-- |
+| `plan` **(required)** | object |  |
+| `steps` **(required)** | array | The catalog steps the plan uses, in the order they run. |
+| `currency` | string | The currency the prices are in. |
