@@ -51,6 +51,8 @@ async function rpc(method, params, sessionId) {
       'content-type': 'application/json',
       accept: 'application/json, text/event-stream',
       ...(sessionId ? { 'mcp-session-id': sessionId } : {}),
+      // Keyless calls are limited per address (120 tool calls an hour); a key is not counted there.
+      ...(process.env.LASTPRICE_API_KEY ? { 'x-api-key': process.env.LASTPRICE_API_KEY } : {}),
     },
     body: JSON.stringify({ jsonrpc: '2.0', id: method, method, params }),
   });
@@ -77,20 +79,23 @@ async function codeModeCatalog(listed, sessionId) {
   const names = (await searchTools({}, sessionId)).tools ?? [];
   const have = new Set(listed.map((t) => t.name));
   const todo = names.filter((n) => !have.has(n));
-  const found = [];
-  const unresolved = [];
-  let next = 0;
-  await Promise.all(Array.from({ length: 6 }, async () => {
-    while (next < todo.length) {
-      const name = todo[next++];
-      const answer = await searchTools({ query: name, limit: 10 }, sessionId);
-      const tool = (answer.tools ?? []).find((t) => t.name === name);
-      if (tool) found.push({ ...tool, listed: false });
-      else unresolved.push(name);
+  // Keep every definition an answer carries, not only the one asked for: one
+  // search usually returns several still-missing tools, which keeps a run well
+  // under the keyless limit. Searches run one at a time for the same reason.
+  const found = new Map();
+  const searched = new Set();
+  for (const name of todo) {
+    if (found.has(name)) continue;
+    const answer = await searchTools({ query: name, limit: 10 }, sessionId);
+    searched.add(name);
+    for (const tool of answer.tools ?? []) {
+      if (todo.includes(tool.name) && !found.has(tool.name)) found.set(tool.name, { ...tool, listed: false });
     }
-  }));
-  found.sort((a, b) => names.indexOf(a.name) - names.indexOf(b.name));
-  return { tools: [...listed.map((t) => ({ ...t, listed: true })), ...found], unresolved: unresolved.sort() };
+  }
+  const unresolved = todo.filter((n) => !found.has(n));
+  const tools = todo.filter((n) => found.has(n)).map((n) => found.get(n));
+  console.error(`code mode: ${searched.size + 1} search_tools calls for ${todo.length} unlisted tools`);
+  return { tools: [...listed.map((t) => ({ ...t, listed: true })), ...tools], unresolved };
 }
 
 async function liveTools() {
